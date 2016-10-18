@@ -22,7 +22,7 @@ class Document:
         # Generate sentences
         f_handle = open(text_file, 'r')
         for line in f_handle:
-            pass
+            print(line)
 
     def process_annotations(self, annotation_file):
         # Generate events and timex
@@ -34,11 +34,12 @@ class Document:
             id = entity.find("id").text
             id = id[:id.find('@')]
 
+            span = [int(x) for x in entity.find('span').text.split(',')]
             if entity.find('type').text.lower() == "event":
-                obj = Event(entity.find('properties'))
+                obj = Event(entity.find('properties'), span)
                 self.entities[id] = obj
             elif entity.find('type').text.lower().startswith("time"):
-                obj = Timex(entity.find('properties'))
+                obj = Timex(entity.find('properties'), span)
                 self.entities[id] = obj
 
     def __init__(self, id):
@@ -46,7 +47,7 @@ class Document:
 
 
 class Event:
-    scope = []
+    span = []
     doc_time_rel = ""
     type = ""
     degree = ""
@@ -55,7 +56,8 @@ class Event:
     contextual_aspect = ""
     permanence = ""
 
-    def __init__(self, xml_dict):
+    def __init__(self, xml_dict, span):
+        self.span = span
         self.doc_time_rel = xml_dict.find('DocTimeRel').text
         self.type = xml_dict.find('Type').text
         self.degree = xml_dict.find('Degree').text
@@ -66,10 +68,12 @@ class Event:
 
 
 class Timex:
+    span = []
     type_class = ""
 
-    def __init__(self, XML_dict):
-        self.type_class = XML_dict.find('Class').text
+    def __init__(self, xml_dict, span):
+        self.span = span
+        self.type_class = xml_dict.find('Class').text
 
 
 class Relation:
