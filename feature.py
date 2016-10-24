@@ -1,3 +1,3 @@
 class FeatureVector:
-    def generate_vector(self):
+    def generate_vector(self, entity):
         pass
