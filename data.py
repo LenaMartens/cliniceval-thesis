@@ -29,6 +29,7 @@ def load_dictionary():
 
 
 def save_dictionary():
+    print(len(dictionary))
     dict_file = open(dictionary_path, 'wb')
     pickle.dump(dictionary, dict_file)
 
@@ -36,7 +37,6 @@ def save_dictionary():
 def add_word_to_dictionary(word):
     global dictionary, dict_id
 
-    print(word)
     if word not in dictionary:
         dictionary[word] = dict_id
         dict_id += 1
@@ -60,9 +60,7 @@ class Document:
         # Generate sentences
         f_handle = open(text_file, 'r')
 
-        for line in f_handle:
-            if line[0] != '[' and line[0] != '\n':
-                self.sentences += line
+        self.sentences = f_handle.read()
 
     def process_annotations(self, annotation_file):
         # Generate events and timex
@@ -105,11 +103,7 @@ class Document:
             source = self.entities[source_id[:source_id.find('@')]]
 
         target_id = relation.find('properties').find('Target').text
-        if target_id.find('e') == -1:
-            print(target_id)
-            target = None
-        else:
-            target = self.entities[target_id[:target_id.find('@')]]
+        target = self.entities[target_id[:target_id.find('@')]]
 
         obj = Relation(source, relation.find('properties').find('Type').text, target)
         self.relations[id] = obj
@@ -118,7 +112,7 @@ class Document:
 class Event:
     span = []
     doc_time_rel = ""
-    type = ""
+    type_class = ""
     degree = ""
     polarity = ""
     contextual_modality = ""
@@ -129,7 +123,7 @@ class Event:
     def __init__(self, xml_dict, span, word):
         self.span = span
         self.doc_time_rel = xml_dict.find('DocTimeRel').text
-        self.type = xml_dict.find('Type').text
+        self.type_class = xml_dict.find('Type').text
         self.degree = xml_dict.find('Degree').text
         self.polarity = xml_dict.find('Polarity').text
         self.contextual_modality = xml_dict.find('ContextualModality').text
@@ -176,7 +170,7 @@ if __name__ == '__main__':
             elif file.find(".") == -1:
                 doc.process_file(file_path)
         for k, entity in doc.entities.items():
-            add_word_to_dictionary(doc.get_word(entity.span))
+            add_word_to_dictionary(entity.word)
 
         # Persist document in object structure
         write_file = open(os.path.join(store_path, "doc_" + id), 'wb')
