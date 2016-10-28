@@ -1,57 +1,13 @@
 import os
-import pickle
 import xml.etree.ElementTree as ET
-import configparser
-
+import utils
 import re
 
-config = configparser.ConfigParser()
-config.read('configuration.INI')
-dev = config['DataLocation']['dev_corpus']
-store_path = config['DataLocation']['doc_store']
 
-dictionary_path = config['DataLocation']['dictionary']
-dictionary = {}
+class Document(object):
 
-dict_id = 0
-
-
-def load_dictionary():
-    global dictionary, dict_id
-
-    try:
-        dict_file = open(dictionary_path, 'rb')
-        dictionary = pickle.load(dict_file)
-    except:
-        dictionary = {}
-    print(len(dictionary))
-    dict_id = len(dictionary)
-
-
-def save_dictionary():
-    print(len(dictionary))
-    dict_file = open(dictionary_path, 'wb')
-    pickle.dump(dictionary, dict_file)
-
-
-def add_word_to_dictionary(word):
-    global dictionary, dict_id
-
-    if word not in dictionary:
-        dictionary[word] = dict_id
-        dict_id += 1
-
-
-class Document:
-    # doc ID
-    id = 0
-
-    # array of strings
-    sentences = ""
-
-    # id to objects dictionary
-    entities = {}
-    relations = {}
+    def get_entities(self):
+        return self.entities.values()
 
     def get_word(self, span):
         return self.sentences[span[0]:span[1]]
@@ -76,6 +32,15 @@ class Document:
             self.process_relation(relation)
 
     def __init__(self, id):
+        # doc ID
+        self.id = 0
+
+        # array of strings
+        self.sentences = ""
+
+        # id to objects dictionary
+        self.entities = {}
+        self.relations = {}
         self.id = id
 
     def process_event(self, entity):
@@ -87,7 +52,7 @@ class Document:
         if entity.find('type').text.lower() == "event":
             obj = Event(entity.find('properties'), span, word)
             self.entities[id] = obj
-        elif entity.find('type').text.lower().startswith("time"):
+        elif entity.find('type').text.lower().find("time") > -1:
             obj = Timex(entity.find('properties'), span, word)
             self.entities[id] = obj
 
@@ -97,7 +62,6 @@ class Document:
 
         source_id = relation.find('properties').find('Source').text
         if source_id.find('e') == -1:
-            print(source_id)
             source = None
         else:
             source = self.entities[source_id[:source_id.find('@')]]
@@ -109,16 +73,10 @@ class Document:
         self.relations[id] = obj
 
 
-class Event:
-    span = []
-    doc_time_rel = ""
-    type_class = ""
-    degree = ""
-    polarity = ""
-    contextual_modality = ""
-    contextual_aspect = ""
-    permanence = ""
-    word = ""
+class Event(object):
+    @staticmethod
+    def get_class():
+        return "Event"
 
     def __init__(self, xml_dict, span, word):
         self.span = span
@@ -132,22 +90,21 @@ class Event:
         self.word = word
 
 
-class Timex:
-    span = []
-    type_class = ""
-    word = ""
+class Timex(object):
+    @staticmethod
+    def get_class():
+        return "TimeX"
 
     def __init__(self, xml_dict, span, word):
         self.span = span
-        self.type_class = xml_dict.find('Class').text
+        try:
+            self.type_class = xml_dict.find('Class').text
+        except AttributeError:
+            self.type_class = "SECTIONTIME"
         self.word = word
 
 
-class Relation:
-    source = None
-    class_type = ""
-    target = None
-
+class Relation(object):
     def __init__(self, source=None,
                  class_type="",
                  target=None):
@@ -156,23 +113,28 @@ class Relation:
         self.target = target
 
 
-if __name__ == '__main__':
-    load_dictionary()
-    for dir in os.listdir(dev):
+def read_all_dev():
+    utils.load_dictionary()
+    for dir in os.listdir(utils.dev):
         index = dir.rfind("_")
         id = dir[index + 1:index + 4]
         # Give doc the correct ID
         doc = Document(id)
-        for file in os.listdir(os.path.join(dev, dir)):
-            file_path = os.path.join(dev, dir, file)
+        for file in os.listdir(os.path.join(utils.dev, dir)):
+            file_path = os.path.join(utils.dev, dir, file)
             if file.find("Temporal-Relation") > -1:
                 doc.process_annotations(file_path)
             elif file.find(".") == -1:
                 doc.process_file(file_path)
         for k, entity in doc.entities.items():
-            add_word_to_dictionary(entity.word)
+            utils.add_word_to_dictionary(entity.word)
 
         # Persist document in object structure
-        write_file = open(os.path.join(store_path, "doc_" + id), 'wb')
-        pickle.dump(doc, write_file)
-    save_dictionary()
+
+        utils.save_document(doc, id)
+    utils.save_dictionary()
+
+
+if __name__ == '__main__':
+    from data import Document
+    read_all_dev()

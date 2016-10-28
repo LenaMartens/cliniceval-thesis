@@ -1,23 +1,26 @@
 import numpy as np
+import utils
 
-from data import load_dictionary
-
-dictionary = {}
-load_dictionary()
+dictionary = utils.get_dictionary()
 
 
 class FeatureVector:
     entity = None
     vector = None
 
-    def generate_vector(self, entity):
+    def generate_vector(self):
         pass
+
+    def __init__(self, entity):
+        self.entity = entity
+        self.generate_vector()
 
 
 class WordFeatureVector(FeatureVector):
-
-    def __init__(self, entity):
-        word = entity.word
+    def generate_vector(self):
+        word = self.entity.word
         self.vector = np.zeros(len(dictionary))
         self.vector[dictionary[word]] = 1
-        self.entity = entity
+
+# if __name__ == "__main__":
+#     f = WordFeatureVector(None)
