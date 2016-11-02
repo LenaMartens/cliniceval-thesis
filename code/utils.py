@@ -20,19 +20,17 @@ def load_dictionary():
         dict_file = open(dictionary_path, 'rb')
         dictionary = pickle.load(dict_file)
         dict_file.close()
-    except:
+    except Exception as e:
+	print(e)
         dictionary = {}
     dict_id = len(dictionary)
-
 
 load_dictionary()
 
 
 def save_dictionary():
-    print(len(dictionary))
-    dict_file = open(dictionary_path, 'wb')
-    pickle.dump(dictionary, dict_file)
-    dict_file.close()
+    with  open(dictionary_path, 'wb') as dict_file:
+    	pickle.dump(dictionary, dict_file, protocol=2)
 
 
 def get_dictionary():
@@ -43,7 +41,6 @@ def add_word_to_dictionary(word):
     global dictionary, dict_id
 
     if word not in dictionary:
-        print(word)
         dictionary[word] = dict_id
         dict_id += 1
 
