@@ -49,9 +49,8 @@ def add_word_to_dictionary(word):
 
 
 def save_document(doc, id):
-    write_file = open(os.path.join(store_path, "doc_" + id), 'wb')
-    pickle.dump(doc, write_file)
-    write_file.close()
+    with open(os.path.join(store_path, "doc_" + id), 'wb') as write_file:
+        pickle.dump(doc, write_file, protocol=2)
 
 
 def get_documents_from_file(filepath):
@@ -68,4 +67,4 @@ def get_documents_from_file(filepath):
 
 def save_model(sv):
     with open(model_path, 'wb') as file:
-        pickle.dump(sv, file)
+        pickle.dump(sv, file, protocol=2)
