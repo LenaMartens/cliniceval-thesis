@@ -20,7 +20,7 @@ class WordFeatureVector(FeatureVector):
     def generate_vector(self):
         word = self.entity.word
         self.vector = np.zeros(len(dictionary))
-	print(len(dictionary))
+        print(len(dictionary))
         self.vector[dictionary[word]] = 1
 
 # if __name__ == "__main__":

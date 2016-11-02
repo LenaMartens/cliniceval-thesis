@@ -21,16 +21,17 @@ def load_dictionary():
         dictionary = pickle.load(dict_file)
         dict_file.close()
     except Exception as e:
-	print(e)
+        print(e)
         dictionary = {}
     dict_id = len(dictionary)
+
 
 load_dictionary()
 
 
 def save_dictionary():
-    with  open(dictionary_path, 'wb') as dict_file:
-    	pickle.dump(dictionary, dict_file, protocol=2)
+    with open(dictionary_path, 'wb') as dict_file:
+        pickle.dump(dictionary, dict_file, protocol=2)
 
 
 def get_dictionary():
