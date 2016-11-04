@@ -27,7 +27,8 @@ class SupportVectorMachine(Classifier):
         self.machine = svm.SVC()
         print('started training')
         self.machine.fit(input, output)
-
+	self.trainingdata = []
+	
     def predict(self, sample):
         # sample = FeatureVector
         return self.machine.predict(sample.vector)
@@ -38,16 +39,19 @@ class SupportVectorMachine(Classifier):
 def generate_training_data(documents):
     feature_vectors = []
     for document in documents:
-        for entity in document.get_entities():
+        print(document)
+	for entity in document.get_entities():
             if entity.get_class() == "Event":
                 feature_vectors.append(WordFeatureVector(entity))
     return feature_vectors
 
 if __name__ == '__main__':
     from classification import SupportVectorMachine
+    print("hello")
     docs = utils.get_documents_from_file(utils.store_path)
     features = generate_training_data(docs)
     sv = SupportVectorMachine(features, "doc_time_rel")
-    utils.save_model(sv)
+    sv.train()
+    utils.save_model(sv, name="SuportVectorMachine_dev")
     for i in range(10):
         print("predicted: "+sv.predict(features[i])+" actual: "+features[i].entity.doc_time_rel)
