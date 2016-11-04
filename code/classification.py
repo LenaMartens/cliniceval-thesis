@@ -15,6 +15,11 @@ class Classifier:
         pass
 
 
+    def __init__(self, trainingdata, class_to_fy):
+        # List of FeatureVectors
+        self.trainingdata = trainingdata
+        self.class_to_fy = class_to_fy
+
 class SupportVectorMachine(Classifier):
     def train(self):
         input = [x.vector for x in self.trainingdata]
@@ -27,10 +32,7 @@ class SupportVectorMachine(Classifier):
         # sample = FeatureVector
         return self.machine.predict(sample.vector)
 
-    def __init__(self, trainingdata, class_to_fy):
-        # List of FeatureVectors
-        self.trainingdata = trainingdata
-        self.class_to_fy = class_to_fy
+
 
 
 def generate_training_data(documents):
