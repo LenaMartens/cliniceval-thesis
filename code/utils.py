@@ -65,5 +65,11 @@ def get_documents_from_file(filepath):
 
 def save_model(sv, name="anonymous"):
     print("Saving model")
-    with open(os.path.join(model_path, name+".pickle"), 'wb') as file:
+    with open(os.path.join(model_path, name + ".pickle"), 'wb') as file:
         pickle.dump(sv, file, protocol=2)
+
+
+def load_mode(name):
+    with open(os.path.join(model_path, name + ".pickle"), 'rb') as file:
+        model = pickle.load(file)
+    return model
