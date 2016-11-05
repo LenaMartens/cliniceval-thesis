@@ -4,11 +4,7 @@ from feature import WordFeatureVector
 
 
 class Classifier:
-    trainingdata = []
-    class_to_fy = ""
-    machine = None
-
-    def train(self):
+    def train(self, trainingdata):
         pass
 
     def predict(self, sample):
@@ -16,8 +12,8 @@ class Classifier:
 
     def __init__(self, trainingdata, class_to_fy):
         # List of FeatureVectors
-        self.train(trainingdata)
         self.class_to_fy = class_to_fy
+        self.train(trainingdata)
 
 
 class SupportVectorMachine(Classifier):

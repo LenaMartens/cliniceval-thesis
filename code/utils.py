@@ -1,6 +1,7 @@
 import configparser
 import os
 import pickle
+from sklearn.externals import joblib
 
 config = configparser.ConfigParser()
 config.read('configuration.INI')
@@ -65,11 +66,11 @@ def get_documents_from_file(filepath):
 
 def save_model(sv, name="anonymous"):
     print("Saving model")
-    with open(os.path.join(model_path, name + ".pickle"), 'wb') as file:
-        pickle.dump(sv, file, protocol=2)
+    with open(os.path.join(model_path, name), 'wb') as file:
+        joblib.dump(sv, file)
 
 
-def load_mode(name):
-    with open(os.path.join(model_path, name + ".pickle"), 'rb') as file:
-        model = pickle.load(file)
+def load_model(name):
+    with open(os.path.join(model_path, name), 'rb') as file:
+        model = joblib.load(file)
     return model
