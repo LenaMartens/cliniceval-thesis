@@ -26,7 +26,9 @@ class SupportVectorMachine(Classifier):
 
     def predict(self, sample):
         # sample = FeatureVector
-        return self.machine.predict(sample.vector)
+	sample = sample.vector.reshape(1, -1)
+        print(sample)
+	return self.machine.predict(sample)
 
 
 def generate_training_data(documents):
@@ -43,7 +45,10 @@ if __name__ == '__main__':
     from classification import SupportVectorMachine
     docs = utils.get_documents_from_file(utils.store_path)
     features = generate_training_data(docs)
+    '''
     sv = SupportVectorMachine(features, "doc_time_rel")
     utils.save_model(sv, name="SupportVectorMachine_dev")
+    '''
+    sv = utils.load_model("SupportVectorMachine_dev")
     for i in range(10):
-        print("predicted: " + sv.predict(features[i]) + " actual: " + features[i].entity.doc_time_rel)
+        print("predicted: " + str(sv.predict(features[i])) + " actual: " + str(features[i].entity.doc_time_rel))
