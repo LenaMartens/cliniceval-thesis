@@ -5,6 +5,11 @@ import re
 
 
 class Document(object):
+    def relation_exists(self, source, target):
+        return source.id in self.relation_mapping and self.relation_mapping[source.id] == target.id
+
+    def get_relations(self):
+        return self.relations.values()
 
     def get_entities(self):
         return self.entities.values()
@@ -32,15 +37,13 @@ class Document(object):
             self.process_relation(relation)
 
     def __init__(self, id):
-        # doc ID
-        self.id = 0
-
         # array of strings
         self.sentences = ""
 
         # id to objects dictionary
         self.entities = {}
         self.relations = {}
+        self.relation_mapping = {}
         self.id = id
 
     def process_event(self, entity):
@@ -50,10 +53,10 @@ class Document(object):
         span = [int(x) for x in re.split('[, ;]+', entity.find('span').text)]
         word = self.get_word(span)
         if entity.find('type').text.lower() == "event":
-            obj = Event(entity.find('properties'), span, word)
+            obj = Event(entity.find('properties'), span, word, id)
             self.entities[id] = obj
         elif entity.find('type').text.lower().find("time") > -1:
-            obj = Timex(entity.find('properties'), span, word)
+            obj = Timex(entity.find('properties'), span, word, id)
             self.entities[id] = obj
 
     def process_relation(self, relation):
@@ -61,16 +64,14 @@ class Document(object):
         id = id[:id.find('@')]
 
         source_id = relation.find('properties').find('Source').text
-        if source_id.find('e') == -1:
-            source = None
-        else:
-            source = self.entities[source_id[:source_id.find('@')]]
+        source = self.entities[source_id[:source_id.find('@')]]
 
         target_id = relation.find('properties').find('Target').text
         target = self.entities[target_id[:target_id.find('@')]]
 
         obj = Relation(source, relation.find('properties').find('Type').text, target)
         self.relations[id] = obj
+        self.relation_mapping[source_id] = target_id
 
 
 class Event(object):
@@ -78,7 +79,8 @@ class Event(object):
     def get_class():
         return "Event"
 
-    def __init__(self, xml_dict, span, word):
+    def __init__(self, xml_dict, span, word, id):
+        self.id = id
         self.span = span
         self.doc_time_rel = xml_dict.find('DocTimeRel').text
         self.type_class = xml_dict.find('Type').text
@@ -95,7 +97,8 @@ class Timex(object):
     def get_class():
         return "TimeX"
 
-    def __init__(self, xml_dict, span, word):
+    def __init__(self, xml_dict, span, word, id):
+        self.id = id
         self.span = span
         try:
             self.type_class = xml_dict.find('Class').text
@@ -107,10 +110,12 @@ class Timex(object):
 class Relation(object):
     def __init__(self, source=None,
                  class_type="",
-                 target=None):
+                 target=None,
+                 positive=True):
         self.source = source
         self.class_type = class_type
         self.target = target
+        self.positive = positive
 
 
 def read_all_dev():
@@ -137,4 +142,5 @@ def read_all_dev():
 
 if __name__ == '__main__':
     from data import Document
+
     read_all_dev()

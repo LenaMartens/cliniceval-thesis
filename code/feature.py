@@ -5,9 +5,6 @@ dictionary = utils.get_dictionary()
 
 
 class FeatureVector:
-    entity = None
-    vector = None
-
     def generate_vector(self):
         pass
 
@@ -22,5 +19,11 @@ class WordFeatureVector(FeatureVector):
         self.vector = np.zeros(len(dictionary))
         self.vector[dictionary[word]] = 1
 
-# if __name__ == "__main__":
-#     f = WordFeatureVector(None)
+
+class RelationFeatureVector(FeatureVector):
+    def generate_vector(self):
+        word1 = self.entity.source.word
+        word2 = self.entity.target.word
+        self.vector = np.zeros(len(dictionary) * 2)
+        self.vector[dictionary[word1]] = 1
+        self.vector[len(dictionary) + dictionary[word2] - 1] = 1

@@ -67,10 +67,10 @@ def get_documents_from_file(filepath):
 def save_model(sv, name="anonymous"):
     print("Saving model")
     with open(os.path.join(model_path, name), 'wb') as file:
-        joblib.dump(sv, file)
+        joblib.dump(sv, os.path.join(model_path, name))
 
 
 def load_model(name):
     with open(os.path.join(model_path, name), 'rb') as file:
-        model = joblib.load(file)
+        model = joblib.load(os.path.join(model_path, name))
     return model

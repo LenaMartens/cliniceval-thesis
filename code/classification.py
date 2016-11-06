@@ -1,6 +1,9 @@
-from sklearn import svm
+import random
+
+from sklearn import svm, linear_model
 import utils
-from feature import WordFeatureVector
+from data import Relation
+from feature import WordFeatureVector, RelationFeatureVector
 
 
 class Classifier:
@@ -16,39 +19,76 @@ class Classifier:
         self.train(trainingdata)
 
 
+class LogisticRegression(Classifier):
+    def train(self, trainingdata):
+        input = [x.vector for x in trainingdata]
+        output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
+        self.machine = linear_model.LogisticRegression()
+        self.machine.fit(input, output)
+
+    def predict(self, sample):
+        # returns a log probability distribution
+        return self.machine.predict_proba(sample)
+
+    def __init__(self, trainingdata):
+        # List of FeatureVectors
+        Classifier.__init__(self, trainingdata, "positive")
+
+
 class SupportVectorMachine(Classifier):
     def train(self, trainingdata):
         input = [x.vector for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
         self.machine = svm.SVC()
-        print('started training')
         self.machine.fit(input, output)
 
     def predict(self, sample):
         # sample = FeatureVector
-	sample = sample.vector.reshape(1, -1)
+        sample = sample.vector.reshape(1, -1)
         print(sample)
-	return self.machine.predict(sample)
+        return self.machine.predict(sample)
 
 
 def generate_training_data(documents):
     feature_vectors = []
     for document in documents:
-        print(document)
         for entity in document.get_entities():
             if entity.get_class() == "Event":
                 feature_vectors.append(WordFeatureVector(entity))
     return feature_vectors
 
 
+def generate_training_candidates(documents):
+    feature_vectors = []
+    for document in documents:
+        # Get positive candidates
+        entities = list(document.get_entities())
+        relations = document.get_relations()
+        for relation in relations:
+            feature_vectors.append(RelationFeatureVector(relation))
+        # Generate negative candidates (as many as there are positive)
+        added = 0
+        maxr = len(entities)
+        relation_len = len(relations)
+        added_dict = {}
+        while added < relation_len:
+            [source_id, target_id] = random.sample(range(0, maxr), 2)
+            if (source_id, target_id) not in added_dict:
+                source = entities[source_id]
+                target = entities[target_id]
+                if not document.relation_exists(source, target):
+                    relation = Relation(source=source, target=target, positive=False)
+                    feature_vectors.append(RelationFeatureVector(relation))
+                    added += 1
+                    added_dict[(source_id, target_id)] = True
+    return feature_vectors
+
 if __name__ == '__main__':
     from classification import SupportVectorMachine
+
     docs = utils.get_documents_from_file(utils.store_path)
-    features = generate_training_data(docs)
-    '''
-    sv = SupportVectorMachine(features, "doc_time_rel")
-    utils.save_model(sv, name="SupportVectorMachine_dev")
-    '''
-    sv = utils.load_model("SupportVectorMachine_dev")
+    features = generate_training_candidates(docs)
+    lr = LogisticRegression(features)
+    utils.save_model(lr, name="LogisticRegression_randomcandidate")
     for i in range(10):
-        print("predicted: " + str(sv.predict(features[i])) + " actual: " + str(features[i].entity.doc_time_rel))
+        print("predicted: " + str(lr.predict(features[i].vector)) + " actual: " + str(features[i].entity.positive))
