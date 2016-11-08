@@ -118,19 +118,24 @@ class Relation(object):
         self.positive = positive
 
 
+def read_document(dir):
+    index = dir.rfind("_")
+    id = dir[index + 1:index + 4]
+    # Give doc the correct ID
+    doc = Document(id)
+    for file in os.listdir(os.path.join(utils.dev, dir)):
+        file_path = os.path.join(utils.dev, dir, file)
+        if file.find("Temporal-Relation") > -1:
+            doc.process_annotations(file_path)
+        elif file.find(".") == -1:
+            doc.process_file(file_path)
+    return doc
+
+
 def read_all_dev():
     utils.load_dictionary()
     for dir in os.listdir(utils.dev):
-        index = dir.rfind("_")
-        id = dir[index + 1:index + 4]
-        # Give doc the correct ID
-        doc = Document(id)
-        for file in os.listdir(os.path.join(utils.dev, dir)):
-            file_path = os.path.join(utils.dev, dir, file)
-            if file.find("Temporal-Relation") > -1:
-                doc.process_annotations(file_path)
-            elif file.find(".") == -1:
-                doc.process_file(file_path)
+        doc = read_document(dir)
         for k, entity in doc.entities.items():
             utils.add_word_to_dictionary(entity.word)
 

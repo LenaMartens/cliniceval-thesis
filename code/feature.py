@@ -14,16 +14,23 @@ class FeatureVector:
 
 
 class WordFeatureVector(FeatureVector):
+    def get_vector(self):
+        return self.vector
+
     def generate_vector(self):
         word = self.entity.word
-        self.vector = np.zeros(len(dictionary))
-        self.vector[dictionary[word]] = 1
+        self.vector = np.zeros(len(dictionary) + 1)
+        try:
+            self.vector[dictionary[word]] = 1
+        except KeyError:
+            self.vector[len(dictionary)] = 1
 
 
 class RelationFeatureVector(FeatureVector):
+    def get_vector(self):
+        return np.concatenate([x.get_vector() for x in self.features])
+
     def generate_vector(self):
-        word1 = self.entity.source.word
-        word2 = self.entity.target.word
-        self.vector = np.zeros(len(dictionary) * 2)
-        self.vector[dictionary[word1]] = 1
-        self.vector[len(dictionary) + dictionary[word2] - 1] = 1
+        self.features = list()
+        self.features.append(WordFeatureVector(self.entity.source))
+        self.features.append(WordFeatureVector(self.entity.target))

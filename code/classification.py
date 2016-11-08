@@ -21,14 +21,15 @@ class Classifier:
 
 class LogisticRegression(Classifier):
     def train(self, trainingdata):
-        input = [x.vector for x in trainingdata]
+        input = [x.get_vector() for x in trainingdata]
+        print(input)
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
         self.machine = linear_model.LogisticRegression()
         self.machine.fit(input, output)
 
     def predict(self, sample):
         # returns a log probability distribution
-        return self.machine.predict_proba(sample)
+        return self.machine.predict_proba(sample.get_vector())
 
     def __init__(self, trainingdata):
         # List of FeatureVectors
@@ -44,7 +45,7 @@ class SupportVectorMachine(Classifier):
 
     def predict(self, sample):
         # sample = FeatureVector
-        sample = sample.vector.reshape(1, -1)
+        sample = sample.get_vector().reshape(1, -1)
         print(sample)
         return self.machine.predict(sample)
 
@@ -83,12 +84,13 @@ def generate_training_candidates(documents):
                     added_dict[(source_id, target_id)] = True
     return feature_vectors
 
+
 if __name__ == '__main__':
-    from classification import SupportVectorMachine
+    from classification import SupportVectorMachine, LogisticRegression
 
     docs = utils.get_documents_from_file(utils.store_path)
     features = generate_training_candidates(docs)
     lr = LogisticRegression(features)
     utils.save_model(lr, name="LogisticRegression_randomcandidate")
     for i in range(10):
-        print("predicted: " + str(lr.predict(features[i].vector)) + " actual: " + str(features[i].entity.positive))
+        print("predicted: " + str(lr.predict(features[i])) + " actual: " + str(features[i].entity.positive))
