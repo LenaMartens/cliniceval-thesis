@@ -29,7 +29,8 @@ class LogisticRegression(Classifier):
 
     def predict(self, sample):
         # returns a log probability distribution
-        return self.machine.predict_proba(sample.get_vector())
+        sample = sample.get_vector().reshape(1, -1)
+        return self.machine.predict_proba(sample)
 
     def __init__(self, trainingdata):
         # List of FeatureVectors
@@ -46,7 +47,6 @@ class SupportVectorMachine(Classifier):
     def predict(self, sample):
         # sample = FeatureVector
         sample = sample.get_vector().reshape(1, -1)
-        print(sample)
         return self.machine.predict(sample)
 
 

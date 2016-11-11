@@ -136,6 +136,7 @@ def read_all_dev():
     utils.load_dictionary()
     for dir in os.listdir(utils.dev):
         doc = read_document(dir)
+        len_doc = len(doc.entities)
         for k, entity in doc.entities.items():
             utils.add_word_to_dictionary(entity.word)
 
