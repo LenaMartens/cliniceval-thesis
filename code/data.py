@@ -73,6 +73,13 @@ class Document(object):
         self.relations[id] = obj
         self.relation_mapping[source_id] = target_id
 
+    def add_relation(self, source_id, sink_id):
+        source = self.entities[source_id]
+        sink = self.entities[sink_id]
+        rel = Relation(source, "CONTAINS", sink)
+        self.relations[id] = rel
+
+
 
 class Event(object):
     @staticmethod
@@ -119,10 +126,10 @@ class Relation(object):
 
 
 def read_document(dir):
-    index = dir.rfind("_")
-    id = dir[index + 1:index + 4]
+    #index = dir.rfind("_")
+    #id = dir[index + 1:index + 4]
     # Give doc the correct ID
-    doc = Document(id)
+    doc = Document(dir)
     for file in os.listdir(os.path.join(utils.dev, dir)):
         file_path = os.path.join(utils.dev, dir, file)
         if file.find("Temporal-Relation") > -1:
@@ -142,7 +149,7 @@ def read_all_dev():
 
         # Persist document in object structure
 
-        utils.save_document(doc, id)
+        utils.save_document(doc, dir)
     utils.save_dictionary()
 
 

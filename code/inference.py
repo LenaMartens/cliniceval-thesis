@@ -79,6 +79,14 @@ try:
     model.optimize()
 
     print(model.getObjective())
+    for var in model.getVars():
+        if var.X == 1:
+            str = var.VarName
+            if str.starts_with('true'):
+                m = re.search("true: (.+?), (.+?) ", str)
+                if m:
+                    print(m.group(1), m.group(2))
+                document.add_relation(m.group(1), m.group(2))
     print('Obj: %g' % model.objVal)
 
 except GurobiError as e:
