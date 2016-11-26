@@ -1,0 +1,73 @@
+import os
+from xml.dom import minidom
+
+import utils
+import xml.etree.ElementTree as etree
+
+
+def save_as_xml(document, filename):
+    doc_id = document.id
+    root = etree.Element("annotations")
+    for entity in document.get_entities():
+        ent = etree.SubElement(root, "entity")
+
+        id = etree.SubElement(ent, "id")
+        id.text = "{}@{}@{}".format(str(entity.id), 'e', doc_id)
+
+        span = etree.SubElement(ent, "span")
+        span.text = "{},{}".format(entity.span[0], entity.span[1])
+
+        type = etree.SubElement(ent, "type")
+        type.text = entity.get_class().upper()
+
+        # parentstype = etree.SubElement(ent, "parentstype")
+        # parentstype.text =
+
+        properties = etree.SubElement(ent, "properties")
+
+        if entity.get_class().startswith("E"):
+            dct = etree.SubElement(properties, "DocTimeRel")
+            dct.text = entity.doc_time_rel
+
+            # maybe more...
+
+    for relation in document.get_relations():
+        ent = etree.SubElement(root, "entity")
+
+        id = etree.SubElement(ent, "id")
+        id.text = "{}@{}@{}".format(str(relation.id), 'r', doc_id)
+
+        type = etree.SubElement(ent, "type")
+        type.text = "TLINK"
+
+        properties = etree.SubElement(ent, "properties")
+
+        source = etree.SubElement(properties, "Source")
+        source.text = "{}@{}@{}".format(str(relation.source.id), 'e', doc_id)
+
+        type = etree.SubElement(properties, "Source")
+        type.text = relation.class_type
+
+        target = etree.SubElement(properties, "Target")
+        target.text = "{}@{}@{}".format(str(relation.target.id), 'e', doc_id)
+
+    with open(filename, 'w') as f:
+        f.write(prettify(root))
+
+
+def prettify(elem):
+    """Return a pretty-printed XML string for the Element.
+    """
+    rough_string = etree.tostring(elem, 'utf-8')
+    reparsed = minidom.parseString(rough_string)
+    return reparsed.toprettyxml(indent="  ")
+
+
+if __name__ == "__main__":
+    docs = utils.get_documents_from_file(utils.store_path)
+    for document in docs:
+        newpath = os.path.join()
+        if not os.path.exists(newpath):
+            os.makedirs(newpath)
+        xml_path = os.path.join(newpath, document.id + ".xml")
+        save_as_xml(document, xml_path)

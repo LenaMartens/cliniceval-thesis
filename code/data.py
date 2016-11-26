@@ -69,15 +69,20 @@ class Document(object):
         target_id = relation.find('properties').find('Target').text
         target = self.entities[target_id[:target_id.find('@')]]
 
-        obj = Relation(source, relation.find('properties').find('Type').text, target)
+        obj = Relation(source, relation.find('properties').find('Type').text, target, id=id)
         self.relations[id] = obj
         self.relation_mapping[source_id] = target_id
+
+    def clear_relations(self):
+        self.relations.clear()
+        self.rel_id = 0
 
     def add_relation(self, source_id, sink_id):
         source = self.entities[source_id]
         sink = self.entities[sink_id]
-        rel = Relation(source, "CONTAINS", sink)
-        self.relations[id] = rel
+        rel = Relation(source, "CONTAINS", sink, id=self.rel_id)
+        self.relations[self.rel_id] = rel
+        self.rel_id+=1
 
 
 
@@ -102,7 +107,7 @@ class Event(object):
 class Timex(object):
     @staticmethod
     def get_class():
-        return "TimeX"
+        return "TimeX3"
 
     def __init__(self, xml_dict, span, word, id):
         self.id = id
@@ -118,7 +123,9 @@ class Relation(object):
     def __init__(self, source=None,
                  class_type="",
                  target=None,
-                 positive=True):
+                 positive=True,
+                 id=0):
+        self.id = id
         self.source = source
         self.class_type = class_type
         self.target = target

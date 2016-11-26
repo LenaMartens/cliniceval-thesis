@@ -41,22 +41,23 @@ def generate_all_candidates(document):
     return feature_vectors
 
 
-try:
+def inference(document, logistic_model):
+    document = read_document(example_document)
+    candidates = generate_all_candidates(document)
+
     model = Model('Relations in document')
     model.Params.UpdateMode = 1
 
-    document = read_document(example_document)
-    candidates = generate_all_candidates(document)
-    logistic_model = utils.load_model("LogisticRegression_randomcandidate")
     for candidate in candidates:
         probs = logistic_model.predict(candidate)
         # positive variable
         positive_var = model.addVar(vtype=GRB.BINARY, obj=probs[0][0],
-                     name="true: {}, {}".format(candidate.entity.source.id, candidate.entity.target.id))
+                                    name="true: {}, {}".format(candidate.entity.source.id, candidate.entity.target.id))
         # negative variable
         negative_var = model.addVar(vtype=GRB.BINARY, obj=probs[0][1],
-                     name="false: {}, {}".format(candidate.entity.source.id, candidate.entity.target.id))
-        model.addConstr(negative_var + positive_var == 1, 'only one label for {}, {}'.format(candidate.entity.source.id, candidate.entity.target.id))
+                                    name="false: {}, {}".format(candidate.entity.source.id, candidate.entity.target.id))
+        model.addConstr(negative_var + positive_var == 1,
+                        'only one label for {}, {}'.format(candidate.entity.source.id, candidate.entity.target.id))
     model.update()
     '''
     twee variablen per relatie -> niet-label en wel-label (makkelijker voor objectief) V
@@ -78,16 +79,17 @@ try:
 
     model.optimize()
 
-    print(model.getObjective())
+    document.clear_relations()
     for var in model.getVars():
         if var.X == 1:
             str = var.VarName
-            if str.starts_with('true'):
-                m = re.search("true: (.+?), (.+?) ", str)
+            if str.startswith('true'):
+                m = re.search(r'true: (.+?), (.+?)', str)
                 if m:
-                    print(m.group(1), m.group(2))
-                document.add_relation(m.group(1), m.group(2))
-    print('Obj: %g' % model.objVal)
+                    document.add_relation(m.group(1), m.group(2))
 
-except GurobiError as e:
-    print('Error code ' + str(e.errno) + ": " + str(e))
+if __name__=="__main__":
+    logistic_model = utils.load_model("LogisticRegression_randomcandidate")
+    for document in utils.get_documents_from_file():
+        inference(document)
+        utils.save_document(document, document.id)

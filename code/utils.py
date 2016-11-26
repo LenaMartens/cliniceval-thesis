@@ -12,6 +12,8 @@ model_path = config['ModelLocation']['models']
 dictionary_path = config['DataLocation']['dictionary']
 dictionary = {}
 
+outputpath = config['OutputLocation']['documents']
+
 dict_id = 0
 
 
@@ -52,7 +54,7 @@ def save_document(doc, id):
         pickle.dump(doc, write_file, protocol=2)
 
 
-def get_documents_from_file(filepath):
+def get_documents_from_file(filepath=store_path):
     documents = []
     for file in os.listdir(filepath):
         if file.find('doc') == -1:
