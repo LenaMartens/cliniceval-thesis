@@ -42,7 +42,6 @@ def generate_all_candidates(document):
 
 
 def inference(document, logistic_model):
-    document = read_document(example_document)
     candidates = generate_all_candidates(document)
 
     model = Model('Relations in document')
@@ -88,7 +87,13 @@ def inference(document, logistic_model):
                 if m:
                     document.add_relation(m.group(1), m.group(2))
 
-if __name__=="__main__":
+
+def infer_relations_on_documents(documents, model=utils.load_model("LogisticRegression_randomcandidate")):
+    for document in documents:
+        inference(document, model)
+
+
+if __name__ == "__main__":
     logistic_model = utils.load_model("LogisticRegression_randomcandidate")
     for document in utils.get_documents_from_file():
         inference(document)

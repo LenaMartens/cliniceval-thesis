@@ -133,8 +133,6 @@ class Relation(object):
 
 
 def read_document(dir):
-    #index = dir.rfind("_")
-    #id = dir[index + 1:index + 4]
     # Give doc the correct ID
     doc = Document(dir)
     for file in os.listdir(os.path.join(utils.dev, dir)):
@@ -146,21 +144,20 @@ def read_document(dir):
     return doc
 
 
-def read_all_dev():
+def read_all(directory):
     utils.load_dictionary()
-    for dir in os.listdir(utils.dev):
+    docs = []
+    for dir in os.listdir(directory):
         doc = read_document(dir)
-        len_doc = len(doc.entities)
+        docs.append(doc)
         for k, entity in doc.entities.items():
             utils.add_word_to_dictionary(entity.word)
-
-        # Persist document in object structure
-
         utils.save_document(doc, dir)
     utils.save_dictionary()
+    return docs
 
 
 if __name__ == '__main__':
     from data import Document
 
-    read_all_dev()
+    read_all(utils.dev)

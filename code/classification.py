@@ -22,7 +22,6 @@ class Classifier:
 class LogisticRegression(Classifier):
     def train(self, trainingdata):
         input = [x.get_vector() for x in trainingdata]
-        print(input)
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
         self.machine = linear_model.LogisticRegression()
         self.machine.fit(input, output)
@@ -83,6 +82,18 @@ def generate_training_candidates(documents):
                     added += 1
                     added_dict[(source_id, target_id)] = True
     return feature_vectors
+
+
+def train_doctime_classifier(docs=utils.get_documents_from_file(utils.store_path)):
+    features = generate_training_data(docs)
+    svm = SupportVectorMachine(features)
+    return svm
+
+
+def train_relation_classifier(docs=utils.get_documents_from_file(utils.store_path)):
+    features = generate_training_candidates(docs)
+    lr = LogisticRegression(features)
+    return lr
 
 
 if __name__ == '__main__':

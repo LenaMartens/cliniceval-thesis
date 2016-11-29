@@ -63,10 +63,19 @@ def prettify(elem):
     return reparsed.toprettyxml(indent="  ")
 
 
+def output_docs_as_xml(documents):
+    for document in documents:
+        newpath = os.path.join(utils.outputpath, document.id)
+        if not os.path.exists(newpath):
+            os.makedirs(newpath)
+        xml_path = os.path.join(newpath, document.id + ".xml")
+        save_as_xml(document, xml_path)
+
+
 if __name__ == "__main__":
     docs = utils.get_documents_from_file(utils.store_path)
     for document in docs:
-        newpath = os.path.join()
+        newpath = os.path.join(utils.outputpath, document.id)
         if not os.path.exists(newpath):
             os.makedirs(newpath)
         xml_path = os.path.join(newpath, document.id + ".xml")

@@ -6,6 +6,7 @@ from sklearn.externals import joblib
 config = configparser.ConfigParser()
 config.read('configuration.INI')
 dev = config['DataLocation']['dev_corpus']
+train = config['DataLocation']['train_corpus']
 store_path = config['DataLocation']['doc_store']
 model_path = config['ModelLocation']['models']
 
