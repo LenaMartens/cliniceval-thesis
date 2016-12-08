@@ -78,11 +78,15 @@ class Document(object):
         self.rel_id = 0
 
     def add_relation(self, source_id, sink_id):
-        source = self.entities[source_id]
-        sink = self.entities[sink_id]
-        rel = Relation(source, "CONTAINS", sink, id=self.rel_id)
-        self.relations[self.rel_id] = rel
-        self.rel_id+=1
+	print(source_id, sink_id)
+	try:
+            source = self.entities[source_id]
+            sink = self.entities[sink_id]
+            rel = Relation(source, "CONTAINS", sink, id=self.rel_id)
+            self.relations[self.rel_id] = rel
+            self.rel_id+=1
+	except KeyError:
+	    pass
 
 
 
