@@ -1,3 +1,5 @@
+import nltk
+from nltk.data import load
 import numpy as np
 import utils
 
@@ -5,8 +7,11 @@ dictionary = utils.get_dictionary()
 
 
 class FeatureVector:
+    def get_vector(self):
+        return self.vector
+
     def generate_vector(self):
-        pass
+        self.vector = []
 
     def __init__(self, entity):
         self.entity = entity
@@ -14,9 +19,6 @@ class FeatureVector:
 
 
 class WordFeatureVector(FeatureVector):
-    def get_vector(self):
-        return self.vector
-
     def generate_vector(self):
         word = self.entity.word
         self.vector = np.zeros(len(dictionary) + 1)
@@ -24,6 +26,18 @@ class WordFeatureVector(FeatureVector):
             self.vector[dictionary[word]] = 1
         except KeyError:
             self.vector[len(dictionary)] = 1
+
+
+tagdict = load('help/tagsets/upenn_tagset.pickle')
+tag_list = tagdict.keys()
+
+
+class POSFeatureVector(FeatureVector):
+    def generate_vector(self):
+        word = self.entity.word
+        (word, tag) = nltk.pos_tag(word)
+        self.vector = np.zeros(len(tag_list))
+        self.vector[tag_list.find(tag)] = 1
 
 
 class RelationFeatureVector(FeatureVector):

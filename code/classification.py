@@ -84,13 +84,13 @@ def generate_training_candidates(documents):
     return feature_vectors
 
 
-def train_doctime_classifier(docs=utils.get_documents_from_file(utils.store_path)):
+def train_doctime_classifier(docs):
     features = generate_training_data(docs)
     svm = SupportVectorMachine(features)
     return svm
 
 
-def train_relation_classifier(docs=utils.get_documents_from_file(utils.store_path)):
+def train_relation_classifier(docs):
     features = generate_training_candidates(docs)
     lr = LogisticRegression(features)
     return lr
