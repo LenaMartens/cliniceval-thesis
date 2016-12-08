@@ -28,6 +28,19 @@ def generate_prediction_candidates(document, amount=20):
     return feature_vectors
 
 
+def generate_all_paragraph_candidates(document):
+    entities = list(document.get_entities())
+    feature_vectors = []
+
+    for entity1 in entities:
+        for entity2 in entities:
+            if entity1 is not entity2 and entity1.paragraph == entity2.paragraph:
+                relation = Relation(source=entity1, target=entity2, positive=False)
+                feature_vectors.append(RelationFeatureVector(relation))
+
+    return feature_vectors
+
+
 def generate_all_candidates(document):
     entities = list(document.get_entities())
     feature_vectors = []
@@ -42,13 +55,15 @@ def generate_all_candidates(document):
 
 
 def inference(document, logistic_model):
-    candidates = generate_all_candidates(document)
+    candidates = generate_all_paragraph_candidates(document)
 
     model = Model('Relations in document')
     model.Params.UpdateMode = 1
     # No output
     model.Params.OutputFlag = 0
-    
+    # Limit number of threads
+    model.Params.Threads = 4
+
     for candidate in candidates:
         probs = logistic_model.predict(candidate)
         # positive variable
@@ -92,7 +107,7 @@ def inference(document, logistic_model):
 
 def infer_relations_on_documents(documents, model=None):
     if model is None:
-	model = utils.load_model("LogisticRegression_randomcandidate") 
+        model = utils.load_model("LogisticRegression_randomcandidate")
 
     for document in documents:
         print("Inference on {}".format(document.id))

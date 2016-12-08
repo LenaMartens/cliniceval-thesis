@@ -31,6 +31,9 @@ class Configuration:
     def remove(self):
         self.stack.pop()
 
+    # expliciete actie?
+    def stop(self):
+        self.buffer = list()
     # Do we need to be able to have multiple arrows pointing to one thing?
 
 

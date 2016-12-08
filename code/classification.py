@@ -86,7 +86,7 @@ def generate_training_candidates(documents):
 
 def train_doctime_classifier(docs):
     features = generate_training_data(docs)
-    svm = SupportVectorMachine(features)
+    svm = SupportVectorMachine(features, "doc_time_rel")
     return svm
 
 
@@ -94,6 +94,16 @@ def train_relation_classifier(docs):
     features = generate_training_candidates(docs)
     lr = LogisticRegression(features)
     return lr
+
+
+def predict_DCT(documents, model=None):
+    for document in documents:
+        for entity in document.get_entities():
+            if entity.get_class() == "Event":
+                feature = WordFeatureVector(entity)
+                dct = model.predict(feature)
+                entity.doc_time_rel = dct
+    return None
 
 
 if __name__ == '__main__':

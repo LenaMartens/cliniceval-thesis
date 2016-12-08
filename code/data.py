@@ -1,3 +1,4 @@
+import bisect
 import os
 import xml.etree.ElementTree as ET
 import utils
@@ -5,37 +6,6 @@ import re
 
 
 class Document(object):
-    def relation_exists(self, source, target):
-        return source.id in self.relation_mapping and self.relation_mapping[source.id] == target.id
-
-    def get_relations(self):
-        return self.relations.values()
-
-    def get_entities(self):
-        return self.entities.values()
-
-    def get_word(self, span):
-        return self.sentences[span[0]:span[1]]
-
-    def process_file(self, text_file):
-        # Generate sentences
-        f_handle = open(text_file, 'r')
-
-        self.sentences = f_handle.read()
-
-    def process_annotations(self, annotation_file):
-        # Generate events and timex
-        tree = ET.parse(annotation_file)
-        root = tree.getroot()
-
-        entities_xml = root.find("annotations").findall("entity")
-        for entity in entities_xml:
-            self.process_event(entity)
-
-        relations_xml = root.find("annotations").findall("relation")
-        for relation in relations_xml:
-            self.process_relation(relation)
-
     def __init__(self, id):
         # array of strings
         self.sentences = ""
@@ -51,12 +21,13 @@ class Document(object):
         id = id[:id.find('@')]
 
         span = [int(x) for x in re.split('[, ;]+', entity.find('span').text)]
+        paragraph = bisect.bisect(self.paragraph_delimiters, span[0])
         word = self.get_word(span)
         if entity.find('type').text.lower() == "event":
-            obj = Event(entity.find('properties'), span, word, id)
+            obj = Event(entity.find('properties'), span, word, id, paragraph)
             self.entities[id] = obj
         elif entity.find('type').text.lower().find("time") > -1:
-            obj = Timex(entity.find('properties'), span, word, id)
+            obj = Timex(entity.find('properties'), span, word, id, paragraph)
             self.entities[id] = obj
 
     def process_relation(self, relation):
@@ -78,16 +49,47 @@ class Document(object):
         self.rel_id = 0
 
     def add_relation(self, source_id, sink_id):
-	print(source_id, sink_id)
-	try:
+        print(source_id, sink_id)
+        try:
             source = self.entities[source_id]
             sink = self.entities[sink_id]
             rel = Relation(source, "CONTAINS", sink, id=self.rel_id)
             self.relations[self.rel_id] = rel
-            self.rel_id+=1
-	except KeyError:
-	    pass
+            self.rel_id += 1
+        except KeyError:
+            pass
 
+    def relation_exists(self, source, target):
+        return source.id in self.relation_mapping and self.relation_mapping[source.id] == target.id
+
+    def get_relations(self):
+        return self.relations.values()
+
+    def get_entities(self):
+        return self.entities.values()
+
+    def get_word(self, span):
+        return self.sentences[span[0]:span[1]]
+
+    def process_file(self, text_file):
+        # Generate sentences
+        f_handle = open(text_file, 'r')
+
+        self.sentences = f_handle.read()
+        self.paragraph_delimiters = [m.start() for m in re.finditer('\\n', self.sentences)]
+
+    def process_annotations(self, annotation_file):
+        # Generate events and timex
+        tree = ET.parse(annotation_file)
+        root = tree.getroot()
+
+        entities_xml = root.find("annotations").findall("entity")
+        for entity in entities_xml:
+            self.process_event(entity)
+
+        relations_xml = root.find("annotations").findall("relation")
+        for relation in relations_xml:
+            self.process_relation(relation)
 
 
 class Event(object):
@@ -95,7 +97,8 @@ class Event(object):
     def get_class():
         return "Event"
 
-    def __init__(self, xml_dict, span, word, id):
+    def __init__(self, xml_dict, span, word, id, paragraph):
+        self.paragraph = paragraph
         self.id = id
         self.span = span
         self.doc_time_rel = xml_dict.find('DocTimeRel').text
@@ -113,7 +116,8 @@ class Timex(object):
     def get_class():
         return "TimeX3"
 
-    def __init__(self, xml_dict, span, word, id):
+    def __init__(self, xml_dict, span, word, id, paragraph):
+        self.paragraph = paragraph
         self.id = id
         self.span = span
         try:
@@ -136,11 +140,11 @@ class Relation(object):
         self.positive = positive
 
 
-def read_document(dir):
+def read_document(parent_directory, dir):
     # Give doc the correct ID
     doc = Document(dir)
-    for file in os.listdir(os.path.join(utils.dev, dir)):
-        file_path = os.path.join(utils.dev, dir, file)
+    for file in os.listdir(os.path.join(parent_directory, dir)):
+        file_path = os.path.join(parent_directory, dir, file)
         if file.find("Temporal-Relation") > -1:
             doc.process_annotations(file_path)
         elif file.find(".") == -1:
@@ -152,7 +156,7 @@ def read_all(directory):
     utils.load_dictionary()
     docs = []
     for dir in os.listdir(directory):
-        doc = read_document(dir)
+        doc = read_document(directory, dir)
         docs.append(doc)
         for k, entity in doc.entities.items():
             utils.add_word_to_dictionary(entity.word)
