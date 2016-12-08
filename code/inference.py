@@ -48,6 +48,7 @@ def inference(document, logistic_model):
     model.Params.UpdateMode = 1
     # No output
     model.Params.OutputFlag = 0
+    
     for candidate in candidates:
         probs = logistic_model.predict(candidate)
         # positive variable
@@ -89,7 +90,10 @@ def inference(document, logistic_model):
                     document.add_relation(m.group(1), m.group(2))
 
 
-def infer_relations_on_documents(documents, model=utils.load_model("LogisticRegression_randomcandidate")):
+def infer_relations_on_documents(documents, model=None):
+    if model is None:
+	model = utils.load_model("LogisticRegression_randomcandidate") 
+
     for document in documents:
         print("Inference on {}".format(document.id))
         inference(document, model)
