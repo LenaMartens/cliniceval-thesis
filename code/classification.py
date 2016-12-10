@@ -103,7 +103,7 @@ def predict_DCT(documents, model=None):
                 feature = WordFeatureVector(entity)
                 dct = model.predict(feature)
                 entity.doc_time_rel = dct
-    return None
+    return documents
 
 
 if __name__ == '__main__':

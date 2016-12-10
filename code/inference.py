@@ -2,12 +2,10 @@ import random
 
 from gurobipy import *
 
+import output
 import utils
 from data import Relation, read_document
 from feature import RelationFeatureVector
-
-example_document = "C:\\Users\\lena\Documents\\THESIS\\THYME\\Test\\ID006_clinic_016"
-
 
 def generate_prediction_candidates(document, amount=20):
     entities = list(document.get_entities())
@@ -89,7 +87,8 @@ def inference(document, logistic_model):
                     cik = model.getVarByName("true: {}, {}".format(i.id, k.id))
                     cjk = model.getVarByName("true: {}, {}".format(j.id, k.id))
                     cij = model.getVarByName("true: {}, {}".format(i.id, j.id))
-                    model.addConstr(cik - cjk - cij >= -1, "transitivity")
+		    if cik is not None and cjk is not None and cij is not None:
+	                model.addConstr(cik - cjk - cij >= -1, "transitivity")
     # maximize
     model.ModelSense = -1
 
@@ -111,7 +110,11 @@ def infer_relations_on_documents(documents, model=None):
 
     for document in documents:
         print("Inference on {}".format(document.id))
-        inference(document, model)
+        try:
+	    inference(document, model)
+	    output.output_doc(document)
+	except GurobiError:
+	    print('oh no')
 
 
 if __name__ == "__main__":

@@ -17,9 +17,6 @@ def complete(trainpath, testpath):
     relation_model = classification.train_relation_classifier(train_documents)
     print("Infering document relations")
     infered_docus = inference.infer_relations_on_documents(predicted_docus, relation_model)
-    print("Outputting results as XMLs")
-    output.output_docs_as_xml(infered_docus)
-
 
 if __name__ == "__main__":
     complete(utils.dev, utils.train)

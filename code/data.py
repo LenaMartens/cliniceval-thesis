@@ -15,7 +15,8 @@ class Document(object):
         self.relations = {}
         self.relation_mapping = {}
         self.id = id
-
+	self.paragraph_delimiters = []
+	
     def process_event(self, entity):
         id = entity.find("id").text
         id = id[:id.find('@')]
@@ -49,7 +50,6 @@ class Document(object):
         self.rel_id = 0
 
     def add_relation(self, source_id, sink_id):
-        print(source_id, sink_id)
         try:
             source = self.entities[source_id]
             sink = self.entities[sink_id]
