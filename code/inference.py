@@ -56,11 +56,10 @@ def inference(document, logistic_model):
     candidates = generate_all_paragraph_candidates(document)
 
     model = Model('Relations in document')
-    model.Params.UpdateMode = 1
     # No output
     model.Params.OutputFlag = 0
     # Limit number of threads
-    model.Params.Threads = 4
+#    model.Params.Threads = 4
 
     for candidate in candidates:
         probs = logistic_model.predict(candidate)
@@ -99,7 +98,7 @@ def inference(document, logistic_model):
         if var.X == 1:
             str = var.VarName
             if str.startswith('true'):
-                m = re.search(r'true: (.+?), (.+?)', str)
+                m = re.search(r'true: (.+?), (.+?)$', str)
                 if m:
                     document.add_relation(m.group(1), m.group(2))
 
@@ -108,13 +107,11 @@ def infer_relations_on_documents(documents, model=None):
     if model is None:
         model = utils.load_model("LogisticRegression_randomcandidate")
 
-    for document in documents:
-        print("Inference on {}".format(document.id))
-        try:
-	    inference(document, model)
-	    output.output_doc(document)
-	except GurobiError:
-	    print('oh no')
+    for i, document in enumerate(documents):
+        print("Inference on {}".format(document.id) +", number "+str(i))
+        inference(document, model)
+        print("Outputting document")
+        output.output_doc(document)
 
 
 if __name__ == "__main__":

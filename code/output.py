@@ -28,7 +28,6 @@ def save_as_xml(document, filename):
         if entity.get_class().startswith("E"):
             dct = etree.SubElement(properties, "DocTimeRel")
             dct.text = entity.doc_time_rel
-
             # maybe more...
 
     for relation in document.get_relations():
@@ -53,7 +52,7 @@ def save_as_xml(document, filename):
 
     with open(filename, 'w') as f:
         f.write(prettify(root))
-
+    print("outputted "+filename+"!")
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
