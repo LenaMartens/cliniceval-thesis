@@ -1,0 +1,86 @@
+Reading the documents
+Training DCT
+Predicting DCT
+298
+------------------------------------------
+Training pre-inference classifier
+Infering document relations
+Inference on ID055_clinic_163, number 0
+Outputting document
+outputted ../Output/ID055_clinic_163/ID055_clinic_163.xml!
+Inference on ID071_path_210, number 1
+Outputting document
+outputted ../Output/ID071_path_210/ID071_path_210.xml!
+Inference on ID189_clinic_550, number 2
+Outputting document
+outputted ../Output/ID189_clinic_550/ID189_clinic_550.xml!
+Inference on ID100_clinic_295, number 3
+Outputting document
+outputted ../Output/ID100_clinic_295/ID100_clinic_295.xml!
+Inference on ID124_clinic_365, number 4
+Outputting document
+outputted ../Output/ID124_clinic_365/ID124_clinic_365.xml!
+Inference on ID036_clinic_108, number 5
+Outputting document
+outputted ../Output/ID036_clinic_108/ID036_clinic_108.xml!
+Inference on ID134_path_394a, number 6
+Outputting document
+outputted ../Output/ID134_path_394a/ID134_path_394a.xml!
+Inference on ID127_clinic_372, number 7
+Outputting document
+outputted ../Output/ID127_clinic_372/ID127_clinic_372.xml!
+Inference on ID086_clinic_254, number 8
+Outputting document
+outputted ../Output/ID086_clinic_254/ID086_clinic_254.xml!
+Inference on ID158_path_466, number 9
+Outputting document
+outputted ../Output/ID158_path_466/ID158_path_466.xml!
+Inference on ID175_clinic_511, number 10
+Outputting document
+outputted ../Output/ID175_clinic_511/ID175_clinic_511.xml!
+Inference on ID188_clinic_549, number 11
+Outputting document
+outputted ../Output/ID188_clinic_549/ID188_clinic_549.xml!
+Inference on ID149_path_439a, number 12
+Outputting document
+outputted ../Output/ID149_path_439a/ID149_path_439a.xml!
+Inference on ID206_path_601a, number 13
+Outputting document
+outputted ../Output/ID206_path_601a/ID206_path_601a.xml!
+Inference on ID196_path_577, number 14
+Outputting document
+outputted ../Output/ID196_path_577/ID196_path_577.xml!
+Inference on ID103_clinic_306, number 15
+Outputting document
+outputted ../Output/ID103_clinic_306/ID103_clinic_306.xml!
+Inference on ID148_clinic_435, number 16
+Outputting document
+outputted ../Output/ID148_clinic_435/ID148_clinic_435.xml!
+Inference on ID077_clinic_227, number 17
+Outputting document
+outputted ../Output/ID077_clinic_227/ID077_clinic_227.xml!
+Inference on ID030_clinic_090, number 18
+Outputting document
+outputted ../Output/ID030_clinic_090/ID030_clinic_090.xml!
+Inference on ID175_path_512, number 19
+Outputting document
+outputted ../Output/ID175_path_512/ID175_path_512.xml!
+Inference on ID150_path_442, number 20
+Outputting document
+outputted ../Output/ID150_path_442/ID150_path_442.xml!
+Inference on ID069_clinic_203, number 21
+Outputting document
+outputted ../Output/ID069_clinic_203/ID069_clinic_203.xml!
+Inference on ID207_path_604a, number 22
+Outputting document
+outputted ../Output/ID207_path_604a/ID207_path_604a.xml!
+Inference on ID125_clinic_366, number 23
+Outputting document
+outputted ../Output/ID125_clinic_366/ID125_clinic_366.xml!
+Inference on ID124_path_364, number 24
+Outputting document
+outputted ../Output/ID124_path_364/ID124_path_364.xml!
+Inference on ID111_clinic_327, number 25
+Outputting document
+outputted ../Output/ID111_clinic_327/ID111_clinic_327.xml!
+Inference on ID109_clinic_319, number 26
