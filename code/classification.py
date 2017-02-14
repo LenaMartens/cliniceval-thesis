@@ -21,6 +21,7 @@ class Classifier:
 
 class LogisticRegression(Classifier):
     def train(self, trainingdata):
+        print(len(trainingdata))
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
         self.machine = linear_model.LogisticRegression()
@@ -76,7 +77,7 @@ def generate_training_candidates(documents):
             if (source_id, target_id) not in added_dict:
                 source = entities[source_id]
                 target = entities[target_id]
-                if not document.relation_exists(source, target):
+                if not document.relation_exists(source, target) and source.paragraph == target.paragraph:
                     relation = Relation(source=source, target=target, positive=False)
                     feature_vectors.append(RelationFeatureVector(relation))
                     added += 1

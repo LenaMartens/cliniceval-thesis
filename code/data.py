@@ -15,8 +15,8 @@ class Document(object):
         self.relations = {}
         self.relation_mapping = {}
         self.id = id
-	self.paragraph_delimiters = []
-	
+        self.paragraph_delimiters = []
+
     def process_event(self, entity):
         id = entity.find("id").text
         id = id[:id.find('@')]

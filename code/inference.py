@@ -2,10 +2,12 @@ import random
 
 from gurobipy import *
 
+import classification
 import output
 import utils
 from data import Relation, read_document
 from feature import RelationFeatureVector
+
 
 def generate_prediction_candidates(document, amount=20):
     entities = list(document.get_entities())
@@ -56,7 +58,6 @@ def inference(document, logistic_model):
     candidates = generate_all_paragraph_candidates(document)
 
     model = Model('Relations in document')
-    model.Params.UpdateMode = 1
     # No output
     model.Params.OutputFlag = 0
     # Limit number of threads
@@ -87,8 +88,8 @@ def inference(document, logistic_model):
                     cik = model.getVarByName("true: {}, {}".format(i.id, k.id))
                     cjk = model.getVarByName("true: {}, {}".format(j.id, k.id))
                     cij = model.getVarByName("true: {}, {}".format(i.id, j.id))
-		    if cik is not None and cjk is not None and cij is not None:
-	                model.addConstr(cik - cjk - cij >= -1, "transitivity")
+                    if cik is not None and cjk is not None and cij is not None:
+                        model.addConstr(cik - cjk - cij >= -1, "transitivity")
     # maximize
     model.ModelSense = -1
 
@@ -111,14 +112,15 @@ def infer_relations_on_documents(documents, model=None):
     for document in documents:
         print("Inference on {}".format(document.id))
         try:
-	    inference(document, model)
-	    output.output_doc(document)
-	except GurobiError:
-	    print('oh no')
+            inference(document, model)
+            output.output_doc(document)
+        except GurobiError:
+            print('oh no')
+        break
 
 
 if __name__ == "__main__":
-    logistic_model = utils.load_model("LogisticRegression_randomcandidate")
+    relation_model = classification.train_relation_classifier(utils.get_documents_from_file())
     for document in utils.get_documents_from_file():
-        inference(document)
+        infer_relations_on_documents(document, relation_model)
         utils.save_document(document, document.id)

@@ -27,6 +27,7 @@ class WordFeatureVector(FeatureVector):
         except KeyError:
             self.vector[len(dictionary)] = 1
 
+
 '''
 tagdict = load('help/tagsets/upenn_tagset.pickle')
 tag_list = tagdict.keys()
@@ -39,6 +40,7 @@ class POSFeatureVector(FeatureVector):
         self.vector = np.zeros(len(tag_list))
         self.vector[tag_list.find(tag)] = 1
 '''
+
 
 class RelationFeatureVector(FeatureVector):
     def get_vector(self):
