@@ -24,13 +24,13 @@ class Document(object):
         span = [int(x) for x in re.split('[, ;]+', entity.find('span').text)]
         paragraph = bisect.bisect(self.paragraph_delimiters, span[0])
         word = self.get_word(span)
-	if entity.find('type').text.lower() == "event":
+        if entity.find('type').text.lower() == "event":
             obj = Event(entity.find('properties'), span, word, id, paragraph)
             self.entities[id] = obj
         elif entity.find('type').text.lower().find("time") > -1:
             obj = Timex(entity.find('properties'), span, word, id, paragraph)
             self.entities[id] = obj
-	
+
     def process_relation(self, relation):
         id = relation.find("id").text
         id = id[:id.find('@')]
@@ -146,8 +146,8 @@ def read_document(parent_directory, dir):
             doc.process_annotations(file_path)
         elif file.find(".") == -1:
             doc.process_file(file_path)
-    if(len(doc.get_entities()) == 0):
-	print(doc.id)
+    if (len(doc.get_entities()) == 0):
+        print(doc.id)
     return doc
 
 

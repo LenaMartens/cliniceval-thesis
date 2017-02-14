@@ -112,8 +112,9 @@ if __name__ == '__main__':
     from classification import SupportVectorMachine, LogisticRegression
 
     docs = utils.get_documents_from_file(utils.store_path)
-    features = generate_training_candidates(docs)
-    lr = LogisticRegression(features)
-    utils.save_model(lr, name="LogisticRegression_randomcandidate")
-    for i in range(10):
-        print("predicted: " + str(lr.predict(features[i])) + " actual: " + str(features[i].entity.positive))
+    train_relation_classifier(docs)
+    # features = generate_training_candidates(docs)
+    # lr = LogisticRegression(features)
+    # utils.save_model(lr, name="LogisticRegression_randomcandidate")
+    # for i in range(10):
+    #     print("predicted: " + str(lr.predict(features[i])) + " actual: " + str(features[i].entity.positive))

@@ -5,6 +5,10 @@ import utils
 
 dictionary = utils.get_dictionary()
 
+'''
+A vector denoting a single feature
+'''
+
 
 class FeatureVector:
     def get_vector(self):
@@ -18,6 +22,29 @@ class FeatureVector:
         self.generate_vector()
 
 
+'''
+A vector consisting of several features. Is implemented as a list of FeatureVectors
+'''
+
+
+class ConcatenatedVector:
+    def get_vector(self):
+        return np.concatenate([x.get_vector() for x in self.features])
+
+    def __init__(self, entity):
+        self.entity = entity
+        self.features = list()
+        self.generate_vector()
+
+    def generate_vector(self):
+        pass
+
+
+'''
+One hot encoding of the word in the dictionary of encountered words.
+'''
+
+
 class WordFeatureVector(FeatureVector):
     def generate_vector(self):
         word = self.entity.word
@@ -28,25 +55,29 @@ class WordFeatureVector(FeatureVector):
             self.vector[len(dictionary)] = 1
 
 
-'''
 tagdict = load('help/tagsets/upenn_tagset.pickle')
-tag_list = tagdict.keys()
+tag_list = list(tagdict.keys())
+
+'''
+One hot encoding of part of speech tag.
+'''
 
 
 class POSFeatureVector(FeatureVector):
     def generate_vector(self):
         word = self.entity.word
-        (word, tag) = nltk.pos_tag(word)
+        [(word, tag)] = nltk.pos_tag([word])
         self.vector = np.zeros(len(tag_list))
-        self.vector[tag_list.find(tag)] = 1
-'''
+        self.vector[tag_list.index(tag)] = 1
 
 
-class RelationFeatureVector(FeatureVector):
-    def get_vector(self):
-        return np.concatenate([x.get_vector() for x in self.features])
-
+class RelationFeatureVector(ConcatenatedVector):
     def generate_vector(self):
-        self.features = list()
         self.features.append(WordFeatureVector(self.entity.source))
+        self.features.append(POSFeatureVector(self.entity.source))
         self.features.append(WordFeatureVector(self.entity.target))
+        self.features.append(POSFeatureVector(self.entity.target))
+
+
+
+

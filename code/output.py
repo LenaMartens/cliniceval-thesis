@@ -45,7 +45,7 @@ def save_as_xml(document, filename):
         source = etree.SubElement(properties, "Source")
         source.text = "{}@{}@{}".format(str(relation.source.id), 'e', doc_id)
 
-        type = etree.SubElement(properties, "Source")
+        type = etree.SubElement(properties, "Type")
         type.text = relation.class_type
 
         target = etree.SubElement(properties, "Target")
