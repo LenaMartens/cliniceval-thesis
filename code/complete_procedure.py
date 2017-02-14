@@ -22,9 +22,9 @@ def complete(trainpath, testpath):
     print("Training pre-inference classifier")
     relation_model = classification.train_relation_classifier(train_documents)
     print("Infering document relations")
-    inference.infer_relations_on_documents(predicted_docus, relation_model)
+    inference.infer_relations_on_documents(predicted_docus[7:], relation_model)
     print("Outputting document")
    # output.output_doc(predicted_docus)
 
 if __name__ == "__main__":
-    complete(utils.dev, utils.test)
+    complete(utils.train, utils.test)
