@@ -1,0 +1,461 @@
+
+Gurobi 7.0.1 (linux64, Python) logging started Wed Dec  7 16:32:44 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Wed Dec  7 16:39:58 2016
+
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Optimize a model with 0 rows, 0 columns and 0 nonzeros
+Coefficient statistics:
+  Matrix range     [0e+00, 0e+00]
+  Objective range  [0e+00, 0e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [0e+00, 0e+00]
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0   -0.0000000e+00   0.000000e+00   0.000000e+00      0s
+
+Solved in 0 iterations and 0.00 seconds
+Optimal objective -0.000000000e+00
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Optimize a model with 410700 rows, 11100 columns and 1226550 nonzeros
+Variable types: 0 continuous, 11100 integer (11100 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [6e-03, 1e+00]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective 1861.21
+Presolve removed 5550 rows and 5550 columns
+Presolve time: 2.61s
+Presolved: 405150 rows, 5550 columns, 1215450 nonzeros
+Variable types: 0 continuous, 5550 integer (5550 binary)
+Presolved: 5550 rows, 410700 columns, 1221000 nonzeros
+
+Presolve removed 5550 rows and 410700 columns
+
+Root relaxation: objective 3.902501e+03, 1414 iterations, 0.55 seconds
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    3902.5007524 3902.50075  0.00%     -    3s
+
+Explored 0 nodes (1414 simplex iterations) in 3.38 seconds
+Thread count was 16 (of 16 available processors)
+
+Solution count 2: 3902.5 1861.21 
+Pool objective bound 3902.5
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 3.902500752440e+03, best bound 3.902500752440e+03, gap 0.0000%
+
+Gurobi 7.0.1 (linux64, Python) logging started Thu Dec  8 13:53:54 2016
+
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+
+Gurobi 7.0.1 (linux64, Python) logging started Thu Dec  8 13:57:30 2016
+
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+
+Gurobi 7.0.1 (linux64, Python) logging started Thu Dec  8 13:58:26 2016
+
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+
+Gurobi 7.0.1 (linux64, Python) logging started Thu Dec  8 14:05:43 2016
+
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec  9 13:33:54 2016
+
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec  9 15:23:23 2016
+
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec  9 21:34:46 2016
+
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+
+Gurobi 7.0.1 (linux64, Python) logging started Tue Dec 13 15:03:28 2016
+
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+
+Gurobi 7.0.1 (linux64, Python) logging started Tue Dec 13 17:19:04 2016
+
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+
+Gurobi 7.0.1 (linux64, Python) logging started Tue Dec 13 18:00:52 2016
+
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+Parameter UpdateMode unchanged
+   Value: 1  Min: 0  Max: 1  Default: 1
+
+Gurobi 7.0.1 (linux64, Python) logging started Wed Dec 14 11:58:07 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Wed Dec 14 15:40:13 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Thu Dec 15 13:38:01 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Thu Dec 15 15:29:41 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec 16 10:40:53 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec 16 10:50:26 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec 16 12:08:48 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec 16 12:24:57 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec 16 12:57:07 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec 16 13:03:41 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec 16 13:10:32 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec 16 13:12:34 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec 16 13:15:31 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec 16 13:23:11 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Dec 16 16:51:34 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Sun Dec 18 15:09:44 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Mon Dec 19 12:34:16 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Mon Dec 19 17:06:10 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Tue Dec 20 09:20:30 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Tue Dec 20 09:36:08 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Tue Dec 20 11:00:39 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Tue Dec 20 11:07:29 2016
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Fri Jan  6 13:38:22 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Sat Jan  7 14:46:14 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Sat Jan  7 18:33:47 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Sun Jan  8 12:09:59 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Sun Jan  8 13:09:14 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Sun Jan  8 13:11:11 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Sun Jan  8 13:19:41 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Sun Jan  8 13:20:32 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Sun Jan  8 14:58:52 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Sun Jan  8 17:10:26 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Sun Jan  8 17:18:40 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Thu Feb  2 16:21:23 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Thu Feb  2 16:50:45 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Thu Feb  2 16:55:18 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Thu Feb  2 21:05:00 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Tue Feb 14 10:48:18 2017
+
+
+Gurobi 7.0.1 (linux64, Python) logging started Tue Feb 14 13:13:43 2017
+

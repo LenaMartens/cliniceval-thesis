@@ -7,7 +7,8 @@ import xml.etree.ElementTree as etree
 
 def save_as_xml(document, filename):
     doc_id = document.id
-    root = etree.Element("annotations")
+    data_root = etree.Element("data")
+    root = etree.SubElement(data_root, "annotations")
     for entity in document.get_entities():
         ent = etree.SubElement(root, "entity")
 
@@ -28,7 +29,6 @@ def save_as_xml(document, filename):
         if entity.get_class().startswith("E"):
             dct = etree.SubElement(properties, "DocTimeRel")
             dct.text = entity.doc_time_rel
-
             # maybe more...
 
     for relation in document.get_relations():
@@ -52,8 +52,8 @@ def save_as_xml(document, filename):
         target.text = "{}@{}@{}".format(str(relation.target.id), 'e', doc_id)
 
     with open(filename, 'w') as f:
-        f.write(prettify(root))
-
+        f.write(prettify(data_root))
+    print("outputted "+filename+"!")
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.

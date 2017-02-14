@@ -7,6 +7,7 @@ config = configparser.ConfigParser()
 config.read('configuration.INI')
 dev = config['DataLocation']['dev_corpus']
 train = config['DataLocation']['train_corpus']
+test = config['DataLocation']['test_corpus']
 store_path = config['DataLocation']['doc_store']
 model_path = config['ModelLocation']['models']
 
