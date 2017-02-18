@@ -6,7 +6,7 @@ import classification
 import output
 import utils
 from data import Relation, read_document
-from feature import RelationFeatureVector
+from feature import TimeRelationVector
 
 
 def generate_prediction_candidates(document, amount=20):
@@ -22,7 +22,7 @@ def generate_prediction_candidates(document, amount=20):
             source = entities[source_id]
             target = entities[target_id]
             relation = Relation(source=source, target=target, positive=False)
-            feature_vectors.append(RelationFeatureVector(relation))
+            feature_vectors.append(TimeRelationVector(relation))
             added += 1
             added_dict[(source_id, target_id)] = True
     return feature_vectors
@@ -36,7 +36,7 @@ def generate_all_paragraph_candidates(document):
         for entity2 in entities:
             if entity1 is not entity2 and entity1.paragraph == entity2.paragraph:
                 relation = Relation(source=entity1, target=entity2, positive=False)
-                feature_vectors.append(RelationFeatureVector(relation))
+                feature_vectors.append(TimeRelationVector(relation))
 
     return feature_vectors
 
@@ -49,7 +49,7 @@ def generate_all_candidates(document):
         for entity2 in entities:
             if entity1 is not entity2:
                 relation = Relation(source=entity1, target=entity2, positive=False)
-                feature_vectors.append(RelationFeatureVector(relation))
+                feature_vectors.append(TimeRelationVector(relation))
 
     return feature_vectors
 

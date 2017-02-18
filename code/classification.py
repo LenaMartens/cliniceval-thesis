@@ -3,7 +3,7 @@ import random
 from sklearn import svm, linear_model
 import utils
 from data import Relation
-from feature import WordFeatureVector, RelationFeatureVector
+from feature import WordFeatureVector, TimeRelationVector
 
 
 class Classifier:
@@ -66,7 +66,7 @@ def generate_training_candidates(documents):
         entities = list(document.get_entities())
         relations = document.get_relations()
         for relation in relations:
-            feature_vectors.append(RelationFeatureVector(relation))
+            feature_vectors.append(TimeRelationVector(relation))
         # Generate negative candidates (as many as there are positive)
         added = 0
         maxr = len(entities)
@@ -79,7 +79,7 @@ def generate_training_candidates(documents):
                 target = entities[target_id]
                 if not document.relation_exists(source, target) and source.paragraph == target.paragraph:
                     relation = Relation(source=source, target=target, positive=False)
-                    feature_vectors.append(RelationFeatureVector(relation))
+                    feature_vectors.append(TimeRelationVector(relation))
                     added += 1
                     added_dict[(source_id, target_id)] = True
     return feature_vectors

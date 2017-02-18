@@ -78,3 +78,7 @@ def load_model(name):
     with open(os.path.join(model_path, name), 'rb') as file:
         model = joblib.load(os.path.join(model_path, name))
     return model
+
+
+def get_doctimes():
+    return {"BEFORE":0, "AFTER":1, "OVERLAP":2}
