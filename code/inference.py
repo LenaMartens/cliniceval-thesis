@@ -6,7 +6,7 @@ import classification
 import output
 import utils
 from data import Relation, read_document
-from feature import RelationFeatureVector
+from feature import TimeRelationVector
 
 
 def generate_prediction_candidates(document, amount=20):
@@ -22,7 +22,7 @@ def generate_prediction_candidates(document, amount=20):
             source = entities[source_id]
             target = entities[target_id]
             relation = Relation(source=source, target=target, positive=False)
-            feature_vectors.append(RelationFeatureVector(relation))
+            feature_vectors.append(TimeRelationVector(relation))
             added += 1
             added_dict[(source_id, target_id)] = True
     return feature_vectors
@@ -36,7 +36,7 @@ def generate_all_paragraph_candidates(document):
         for entity2 in entities:
             if entity1 is not entity2 and entity1.paragraph == entity2.paragraph:
                 relation = Relation(source=entity1, target=entity2, positive=False)
-                feature_vectors.append(RelationFeatureVector(relation))
+                feature_vectors.append(TimeRelationVector(relation))
 
     return feature_vectors
 
@@ -49,12 +49,12 @@ def generate_all_candidates(document):
         for entity2 in entities:
             if entity1 is not entity2:
                 relation = Relation(source=entity1, target=entity2, positive=False)
-                feature_vectors.append(RelationFeatureVector(relation))
+                feature_vectors.append(TimeRelationVector(relation))
 
     return feature_vectors
 
 
-def inference(document, logistic_model):
+def inference(document, logistic_model, doc_time_constraints=0):
     candidates = generate_all_paragraph_candidates(document)
 
     model = Model('Relations in document')
@@ -73,6 +73,9 @@ def inference(document, logistic_model):
                                     name="false: {}, {}".format(candidate.entity.source.id, candidate.entity.target.id))
         model.addConstr(negative_var + positive_var == 1,
                         'only one label for {}, {}'.format(candidate.entity.source.id, candidate.entity.target.id))
+        if doc_time_constraints:
+            if candidate.entity.source.doc_time_rel == candidate.entity.target.doc_time_rel:
+                model.addConstr(negative_var == 1, '{} and {} do not have the same doctimerel'.format(candidate.entity.source.id, candidate.entity.target.id))
     model.update()
     '''
     twee variablen per relatie -> niet-label en wel-label (makkelijker voor objectief) V
@@ -90,6 +93,9 @@ def inference(document, logistic_model):
                     cij = model.getVarByName("true: {}, {}".format(i.id, j.id))
                     if cik is not None and cjk is not None and cij is not None:
                         model.addConstr(cik - cjk - cij >= -1, "transitivity")
+
+
+
     # maximize
     model.ModelSense = -1
 
