@@ -124,6 +124,7 @@ class WordVector(ConcatenatedVector):
         self.features.append(WordFeatureVector(self.entity))
         self.features.append(POSFeatureVector(self.entity))
         self.features.append(CapitalFeatureVector(self.entity))
+        self.features.append(DocTimeVector(self.entity))
 
 
 class TimeRelationVector(ConcatenatedVector):
