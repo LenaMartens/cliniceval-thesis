@@ -1,8 +1,0 @@
-Reading the documents
-Training DCT
-Predicting DCT
-444
-------------------------------------------
-Training pre-inference classifier
-Infering document relations
-Inference on ID090_clinic_265, number 0

@@ -66,9 +66,10 @@ One hot encoding of part of speech tag.
 class POSFeatureVector(FeatureVector):
     def generate_vector(self):
         word = self.entity.word
-        [(word, tag)] = nltk.pos_tag([word])
         self.vector = np.zeros(len(tag_list))
-        self.vector[tag_list.index(tag)] = 1
+        if word:
+	    [(word, tag)] = nltk.pos_tag([word])
+            self.vector[tag_list.index(tag)] = 1
 
 
 class RelationFeatureVector(ConcatenatedVector):
