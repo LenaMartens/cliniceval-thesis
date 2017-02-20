@@ -86,7 +86,7 @@ class DocTimeVector(FeatureVector):
     def generate_vector(self):
         self.vector = np.zeros(len(doctimes)+1)
         try:
-            self.vector[doctimes[self.entity.word.doc_time_rel]] = 1
+            self.vector[doctimes[self.entity.doc_time_rel]] = 1
         except KeyError:
             self.vector[len(dictionary)] = 1
 tagdict = load('help/tagsets/upenn_tagset.pickle')
@@ -100,7 +100,6 @@ One hot encoding of part of speech tag.
 class POSFeatureVector(FeatureVector):
     def generate_vector(self):
         word = self.entity.word
-        [(word, tag)] = nltk.pos_tag([self.entity.word])
         self.vector = np.zeros(len(tag_list))
         if word:
 	    [(word, tag)] = nltk.pos_tag([word])
@@ -127,7 +126,7 @@ class WordVector(ConcatenatedVector):
         self.features.append(WordFeatureVector(self.entity))
         self.features.append(POSFeatureVector(self.entity))
         self.features.append(CapitalFeatureVector(self.entity))
-        self.features.append(DocTimeVector(self.entity))
+        #self.features.append(DocTimeVector(self.entity))
 
 
 class TimeRelationVector(ConcatenatedVector):

@@ -10,7 +10,7 @@ def complete(trainpath, testpath):
     train_documents = data.read_all(trainpath)
     test_documents = data.read_all(testpath)
     print("Training DCT")
-#    DCT_model = classification.train_doctime_classifier(train_documents)
+    DCT_model = classification.train_doctime_classifier(train_documents)
     print("Predicting DCT")
 #    predicted_docus = classification.predict_DCT(test_documents, DCT_model)
     

@@ -3,7 +3,7 @@ import random
 from sklearn import svm, linear_model
 import utils
 from data import Relation
-from feature import WordFeatureVector, TimeRelationVector
+from feature import WordVector, TimeRelationVector
 
 
 class Classifier:
@@ -39,9 +39,11 @@ class LogisticRegression(Classifier):
 
 class SupportVectorMachine(Classifier):
     def train(self, trainingdata):
-        input = [x.vector for x in trainingdata]
+        input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
-        self.machine = svm.SVC()
+	for x in output:
+	    print(x)
+	self.machine = svm.SVC()
         self.machine.fit(input, output)
 
     def predict(self, sample):
@@ -55,7 +57,7 @@ def generate_training_data(documents):
     for document in documents:
         for entity in document.get_entities():
             if entity.get_class() == "Event":
-                feature_vectors.append(WordFeatureVector(entity))
+                feature_vectors.append(WordVector(entity))
     return feature_vectors
 
 
@@ -101,7 +103,7 @@ def predict_DCT(documents, model=None):
     for document in documents:
         for entity in document.get_entities():
             if entity.get_class() == "Event":
-                feature = WordFeatureVector(entity)
+                feature = WordVector(entity)
                 dct = model.predict(feature)
                 entity.doc_time_rel = dct
         print(len(document.get_entities()), len(document.get_relations()))
