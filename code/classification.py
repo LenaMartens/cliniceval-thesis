@@ -41,9 +41,8 @@ class SupportVectorMachine(Classifier):
     def train(self, trainingdata):
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
-	for x in output:
-	    print(x)
-	self.machine = svm.SVC()
+
+        self.machine = svm.SVC()
         self.machine.fit(input, output)
 
     def predict(self, sample):
@@ -114,7 +113,7 @@ if __name__ == '__main__':
     from classification import SupportVectorMachine, LogisticRegression
 
     docs = utils.get_documents_from_file(utils.store_path)
-    train_relation_classifier(docs)
+    train_doctime_classifier(docs)
     # features = generate_training_candidates(docs)
     # lr = LogisticRegression(features)
     # utils.save_model(lr, name="LogisticRegression_randomcandidate")

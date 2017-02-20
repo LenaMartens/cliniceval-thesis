@@ -81,4 +81,4 @@ def load_model(name):
 
 
 def get_doctimes():
-    return {"BEFORE":0, "AFTER":1, "OVERLAP":2}
+    return {"BEFORE":0, "AFTER":1, "OVERLAP":2, "BEFORE/OVERLAP":3}

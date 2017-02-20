@@ -75,7 +75,7 @@ Is the word capitalised?
 
 class CapitalFeatureVector(FeatureVector):
     def generate_vector(self):
-        self.vector = [self.entity.word.title()]
+        self.vector = [self.entity.word.istitle()]
 
 '''
 What DOCTIME has the word been classified as?
@@ -102,7 +102,7 @@ class POSFeatureVector(FeatureVector):
         word = self.entity.word
         self.vector = np.zeros(len(tag_list))
         if word:
-	    [(word, tag)] = nltk.pos_tag([word])
+            [(word, tag)] = nltk.pos_tag([word])
             self.vector[tag_list.index(tag)] = 1
 
 
