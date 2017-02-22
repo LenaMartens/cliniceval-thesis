@@ -77,18 +77,22 @@ class CapitalFeatureVector(FeatureVector):
     def generate_vector(self):
         self.vector = [self.entity.word.istitle()]
 
+
 '''
 What DOCTIME has the word been classified as?
 '''
 doctimes = utils.get_doctimes()
 
+
 class DocTimeVector(FeatureVector):
     def generate_vector(self):
-        self.vector = np.zeros(len(doctimes)+1)
+        self.vector = np.zeros(len(doctimes) + 1)
         try:
             self.vector[doctimes[self.entity.doc_time_rel]] = 1
         except KeyError:
             self.vector[len(dictionary)] = 1
+
+
 tagdict = load('help/tagsets/upenn_tagset.pickle')
 tag_list = list(tagdict.keys())
 
@@ -126,7 +130,7 @@ class WordVector(ConcatenatedVector):
         self.features.append(WordFeatureVector(self.entity))
         self.features.append(POSFeatureVector(self.entity))
         self.features.append(CapitalFeatureVector(self.entity))
-        #self.features.append(DocTimeVector(self.entity))
+        # self.features.append(DocTimeVector(self.entity))
 
 
 class TimeRelationVector(ConcatenatedVector):

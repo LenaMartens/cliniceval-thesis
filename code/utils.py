@@ -81,4 +81,11 @@ def load_model(name):
 
 
 def get_doctimes():
-    return {"BEFORE":0, "AFTER":1, "OVERLAP":2, "BEFORE/OVERLAP":3}
+    return {"BEFORE": 0, "AFTER": 1, "OVERLAP": 2, "BEFORE/OVERLAP": 3}
+
+
+def document_generator(filepath=store_path):
+    for file in os.listdir(filepath):
+        if file.find('doc') != -1:
+            with open(os.path.join(filepath, file), 'rb') as doc_file:
+                yield pickle.load(doc_file)
