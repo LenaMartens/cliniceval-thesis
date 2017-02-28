@@ -131,7 +131,7 @@ class PolarityFeatureVector(FeatureVector):
             except KeyError:
                 print(self.entity.polarity)
                 self.vector[len(polarities)] = 1
-        self.vector = scipy.sparse.csr_matrix(self.vector)
+            self.vector = scipy.sparse.csr_matrix(self.vector)
 
 
 '''
@@ -149,7 +149,7 @@ class ModalityFeatureVector(FeatureVector):
             except KeyError:
                 print(self.entity.modality)
                 self.vector[len(modalities)] = 1
-        self.vector = scipy.sparse.csr_matrix(self.vector)
+            self.vector = scipy.sparse.csr_matrix(self.vector)
 
 
 '''

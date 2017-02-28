@@ -89,7 +89,7 @@ def get_polarities():
 
 
 def get_modalities():
-    return {"ACTUAL": 0, "HEDGED": 1, "HYPOTHETICAL": 2}
+    return {"ACTUAL": 0, "HEDGED": 1, "HYPOTHETICAL": 2, "GENERIC":3}
 
 
 def document_generator(filepath=store_path):
