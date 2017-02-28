@@ -44,6 +44,8 @@ A vector consisting of several features. Is implemented as a list of FeatureVect
 
 class ConcatenatedVector:
     def get_vector(self):
+        for x in self.features:
+            print(x.get_vector().shape)
         return scipy.concatenate([x.get_vector() for x in self.features])
 
     def __init__(self, entity):
