@@ -147,6 +147,8 @@ class ModalityFeatureVector(FeatureVector):
             except KeyError:
                 print(self.entity.modality)
                 self.vector[len(modalities)] = 1
+        else:
+            self.vector[len(modalities)] = 1
 
 
 '''
