@@ -40,4 +40,4 @@ def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_
 
 
 if __name__ == "__main__":
-    complete(utils.train, utils.dev, repredict_dct=False)
+    complete(utils.train, utils.dev, repredict_dct=True, retrain_rc=True)

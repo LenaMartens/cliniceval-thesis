@@ -1,20 +1,16 @@
 Reading the documents
 Training DCT
 Traceback (most recent call last):
-  File "complete_procedure.py", line 30, in <module>
-    complete(utils.train, utils.test)
-  File "complete_procedure.py", line 13, in complete
+  File "complete_procedure.py", line 43, in <module>
+    complete(utils.train, utils.dev, repredict_dct=True, retrain_rc=True)
+  File "complete_procedure.py", line 21, in complete
     DCT_model = classification.train_doctime_classifier(train_documents)
-  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/classification.py", line 90, in train_doctime_classifier
+  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/classification.py", line 91, in train_doctime_classifier
     svm = SupportVectorMachine(features, "doc_time_rel")
   File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/classification.py", line 19, in __init__
     self.train(trainingdata)
-  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/classification.py", line 45, in train
-    self.machine.fit(input, output)
-  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/venv/local/lib/python2.7/site-packages/sklearn/svm/base.py", line 151, in fit
-    X, y = check_X_y(X, y, dtype=np.float64, order='C', accept_sparse='csr')
-  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/venv/local/lib/python2.7/site-packages/sklearn/utils/validation.py", line 521, in check_X_y
-    ensure_min_features, warn_on_dtype, estimator)
-  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/venv/local/lib/python2.7/site-packages/sklearn/utils/validation.py", line 382, in check_array
-    array = np.array(array, dtype=dtype, order=order, copy=copy)
-ValueError: could not convert string to float: Tumor
+  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/classification.py", line 42, in train
+    input = [x.get_vector() for x in trainingdata]
+  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/feature.py", line 47, in get_vector
+    return scipy.concatenate([x.get_vector() for x in self.features])
+ValueError: zero-dimensional arrays cannot be concatenated
