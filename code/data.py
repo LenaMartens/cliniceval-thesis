@@ -16,6 +16,7 @@ class Document(object):
         self.relation_mapping = {}
         self.id = id
         self.paragraph_delimiters = []
+        self.sentence_delimiters = []
 
     def process_event(self, entity):
         id = entity.find("id").text
@@ -23,12 +24,14 @@ class Document(object):
 
         span = [int(x) for x in re.split('[, ;]+', entity.find('span').text)]
         paragraph = bisect.bisect(self.paragraph_delimiters, span[0])
+        sentence = bisect.bisect(self.sentence_delimiters, span[0])
+
         word = self.get_word(span)
         if entity.find('type').text.lower() == "event":
-            obj = Event(entity.find('properties'), span, word, id, paragraph)
+            obj = Event(entity.find('properties'), span, word, id, paragraph, sentence)
             self.entities[id] = obj
         elif entity.find('type').text.lower().find("time") > -1:
-            obj = Timex(entity.find('properties'), span, word, id, paragraph)
+            obj = Timex(entity.find('properties'), span, word, id, paragraph, sentence)
             self.entities[id] = obj
 
     def process_relation(self, relation):
@@ -36,10 +39,12 @@ class Document(object):
         id = id[:id.find('@')]
 
         source_id = relation.find('properties').find('Source').text
-        source = self.entities[source_id[:source_id.find('@')]]
+        source_id = source_id[:source_id.find('@')]
+        source = self.entities[source_id]
 
         target_id = relation.find('properties').find('Target').text
-        target = self.entities[target_id[:target_id.find('@')]]
+        target_id = target_id[:target_id.find('@')]
+        target = self.entities[target_id]
 
         obj = Relation(source, relation.find('properties').find('Type').text, target, id=id)
         self.relations[id] = obj
@@ -74,6 +79,7 @@ class Document(object):
 
         self.sentences = f_handle.read()
         self.paragraph_delimiters = [m.start() for m in re.finditer('\\n', self.sentences)]
+        self.sentence_delimiters = [m.start() for m in re.finditer('\. ', self.sentences)]
 
     def process_annotations(self, annotation_file):
         # Generate events and timex
@@ -94,15 +100,16 @@ class Event(object):
     def get_class():
         return "Event"
 
-    def __init__(self, xml_dict, span, word, id, paragraph):
+    def __init__(self, xml_dict, span, word, id, paragraph, sentence):
         self.paragraph = paragraph
+        self.sentence = sentence
         self.id = id
         self.span = span
         self.doc_time_rel = xml_dict.find('DocTimeRel').text
         self.type_class = xml_dict.find('Type').text
         self.degree = xml_dict.find('Degree').text
         self.polarity = xml_dict.find('Polarity').text
-        self.contextual_modality = xml_dict.find('ContextualModality').text
+        self.modality = xml_dict.find('ContextualModality').text
         self.contextual_aspect = xml_dict.find('ContextualAspect').text
         self.permanence = xml_dict.find('Permanence').text
         self.word = word
@@ -113,8 +120,9 @@ class Timex(object):
     def get_class():
         return "TimeX3"
 
-    def __init__(self, xml_dict, span, word, id, paragraph):
+    def __init__(self, xml_dict, span, word, id, paragraph, sentence):
         self.paragraph = paragraph
+        self.sentence = sentence
         self.id = id
         self.span = span
         try:
@@ -167,4 +175,5 @@ def read_all(directory):
 if __name__ == '__main__':
     from data import Document
 
+    read_all(utils.train)
     read_all(utils.dev)

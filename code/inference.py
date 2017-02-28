@@ -61,7 +61,7 @@ def inference(document, logistic_model, doc_time_constraints=0):
     # No output
     model.Params.OutputFlag = 0
     # Limit number of threads
-#    model.Params.Threads = 4
+    #    model.Params.Threads = 4
 
     for candidate in candidates:
         probs = logistic_model.predict(candidate)
@@ -74,8 +74,10 @@ def inference(document, logistic_model, doc_time_constraints=0):
         model.addConstr(negative_var + positive_var == 1,
                         'only one label for {}, {}'.format(candidate.entity.source.id, candidate.entity.target.id))
         if doc_time_constraints:
-            if candidate.entity.source.doc_time_rel == candidate.entity.target.doc_time_rel:
-                model.addConstr(negative_var == 1, '{} and {} do not have the same doctimerel'.format(candidate.entity.source.id, candidate.entity.target.id))
+            if candidate.entity.source.doc_time_rel != candidate.entity.target.doc_time_rel:
+                model.addConstr(negative_var == 1,
+                                '{} and {} do not have the same doctimerel'.format(candidate.entity.source.id,
+                                                                                   candidate.entity.target.id))
     model.update()
     '''
     twee variablen per relatie -> niet-label en wel-label (makkelijker voor objectief) V
@@ -94,8 +96,6 @@ def inference(document, logistic_model, doc_time_constraints=0):
                     if cik is not None and cjk is not None and cij is not None:
                         model.addConstr(cik - cjk - cij >= -1, "transitivity")
 
-
-
     # maximize
     model.ModelSense = -1
 
@@ -111,15 +111,40 @@ def inference(document, logistic_model, doc_time_constraints=0):
                     document.add_relation(m.group(1), m.group(2))
 
 
+def greedy_decision(document, model, all=False):
+    if all:
+        candidates = generate_all_candidates(document)
+    else:
+        candidates = generate_all_paragraph_candidates(document)
+
+    for candidate in candidates:
+        probs = model.predict(candidate)
+        positive = probs[0][0]
+        if positive > 0.5:
+            document.add_relation(candidate.entity.source.id, candidate.entity.target.id)
+
+
 def infer_relations_on_documents(documents, model=None):
     if model is None:
         model = utils.load_model("LogisticRegression_randomcandidate")
 
     for i, document in enumerate(documents):
-        print("Inference on {}".format(document.id) +", number "+str(i))
+        print("Inference on {}".format(document.id) + ", number " + str(i))
         inference(document, model)
         print("Outputting document")
         output.output_doc(document)
+
+
+def greedily_decide_relations_on_documents(documents, model=None):
+    if model is None:
+        model = utils.load_model("LogisticRegression_randomcandidate")
+
+    for i, document in enumerate(documents):
+        print("Inference on {}".format(document.id) + ", number " + str(i))
+        greedy_decision(document, model)
+        print("Outputting document")
+        output.output_doc(document)
+
 
 if __name__ == "__main__":
     relation_model = classification.train_relation_classifier(utils.get_documents_from_file())

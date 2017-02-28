@@ -2,6 +2,8 @@ import nltk
 from nltk.data import load
 import numpy as np
 import utils
+import scipy
+import scipy.sparse
 
 dictionary = utils.get_dictionary()
 '''
@@ -42,7 +44,7 @@ A vector consisting of several features. Is implemented as a list of FeatureVect
 
 class ConcatenatedVector:
     def get_vector(self):
-        return np.concatenate([x.get_vector() for x in self.features])
+        return scipy.concatenate([x.get_vector() for x in self.features])
 
     def __init__(self, entity):
         self.entity = entity
@@ -66,6 +68,7 @@ class WordFeatureVector(FeatureVector):
             self.vector[dictionary[word]] = 1
         except KeyError:
             self.vector[len(dictionary)] = 1
+        self.vector = scipy.sparse.csr_matrix(self.vector)
 
 
 '''
@@ -81,16 +84,18 @@ class CapitalFeatureVector(FeatureVector):
 '''
 What DOCTIME has the word been classified as?
 '''
-doctimes = utils.get_doctimes()
 
 
 class DocTimeVector(FeatureVector):
     def generate_vector(self):
+        doctimes = utils.get_doctimes()
         self.vector = np.zeros(len(doctimes) + 1)
         try:
             self.vector[doctimes[self.entity.doc_time_rel]] = 1
         except KeyError:
-            self.vector[len(dictionary)] = 1
+            print(self.entity.doc_time_rel)
+            self.vector[len(doctimes)] = 1
+        self.vector = scipy.sparse.csr_matrix(self.vector)
 
 
 tagdict = load('help/tagsets/upenn_tagset.pickle')
@@ -108,6 +113,43 @@ class POSFeatureVector(FeatureVector):
         if word:
             [(word, tag)] = nltk.pos_tag([word])
             self.vector[tag_list.index(tag)] = 1
+        self.vector = scipy.sparse.csr_matrix(self.vector)
+
+
+'''
+One hot encoding of polarity of the word (from input file)
+'''
+
+
+class PolarityFeatureVector(FeatureVector):
+    def generate_vector(self):
+        polarities = utils.get_polarities()
+        self.vector = np.zeros(len(polarities) + 1)
+        if self.entity.get_class() == "Event":
+            try:
+                self.vector[polarities[self.entity.polarity]] = 1
+            except KeyError:
+                print(self.entity.polarity)
+                self.vector[len(polarities)] = 1
+        self.vector = scipy.sparse.csr_matrix(self.vector)
+
+
+'''
+One hot encoding of modality of the word (from input file)
+'''
+
+
+class ModalityFeatureVector(FeatureVector):
+    def generate_vector(self):
+        modalities = utils.get_modalities()
+        self.vector = np.zeros(len(modalities) + 1)
+        if self.entity.get_class() == "Event":
+            try:
+                self.vector[modalities[self.entity.modality]] = 1
+            except KeyError:
+                print(self.entity.modality)
+                self.vector[len(modalities)] = 1
+        self.vector = scipy.sparse.csr_matrix(self.vector)
 
 
 '''
@@ -121,6 +163,16 @@ class SameParVector(RelationFeatureVector):
 
 
 '''
+Do the two entities appear in the same sentence?
+'''
+
+
+class SameSentenceVector(RelationFeatureVector):
+    def generate_vector(self):
+        self.vector = [self.source.sentence == self.target.sentence]
+
+
+'''
 Specific feature vectors used in training and prediction
 '''
 
@@ -130,7 +182,9 @@ class WordVector(ConcatenatedVector):
         self.features.append(WordFeatureVector(self.entity))
         self.features.append(POSFeatureVector(self.entity))
         self.features.append(CapitalFeatureVector(self.entity))
-        # self.features.append(DocTimeVector(self.entity))
+        self.features.append(DocTimeVector(self.entity))
+        self.features.append(ModalityFeatureVector(self.entity))
+        self.features.append(PolarityFeatureVector(self.entity))
 
 
 class TimeRelationVector(ConcatenatedVector):
@@ -138,3 +192,4 @@ class TimeRelationVector(ConcatenatedVector):
         self.features.append(WordVector(self.entity.source))
         self.features.append(WordVector(self.entity.target))
         self.features.append(SameParVector(self.entity.source, self.entity.target))
+        self.features.append(SameSentenceVector(self.entity.source, self.entity.target))

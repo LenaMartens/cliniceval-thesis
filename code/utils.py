@@ -84,6 +84,14 @@ def get_doctimes():
     return {"BEFORE": 0, "AFTER": 1, "OVERLAP": 2, "BEFORE/OVERLAP": 3}
 
 
+def get_polarities():
+    return {"NEG": 0, "POS": 1}
+
+
+def get_modalities():
+    return {"ACTUAL": 0, "HEDGED": 1, "HYPOTHETICAL": 2}
+
+
 def document_generator(filepath=store_path):
     for file in os.listdir(filepath):
         if file.find('doc') != -1:
