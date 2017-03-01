@@ -14,7 +14,6 @@ A vector denoting a single feature of a word
 class FeatureVector:
     def get_vector(self):
         self.generate_vector()
-        self.vector = scipy.sparse.csr_matrix(self.vector)
         return self.vector
 
     def generate_vector(self):
@@ -45,7 +44,8 @@ A vector consisting of several features. Is implemented as a list of FeatureVect
 class ConcatenatedVector:
     def get_vector(self):
         self.generate_vector()
-        return scipy.hstack([x.get_vector() for x in self.features])
+        flat = np.concatenate([x.get_vector() for x in self.features])
+        return scipy.sparse.csr_matrix(flat)
 
     def __init__(self, entity):
         self.entity = entity
