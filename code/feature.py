@@ -15,7 +15,7 @@ class FeatureVector:
     def get_vector(self):
         self.generate_vector()
         self.vector = scipy.sparse.csr_matrix(self.vector)
-	return self.vector
+        return self.vector
 
     def generate_vector(self):
         self.vector = []
@@ -44,14 +44,15 @@ A vector consisting of several features. Is implemented as a list of FeatureVect
 
 class ConcatenatedVector:
     def get_vector(self):
-	for x in self.features:
-	    print(x.__class__.__name__ + "   "+ str(x.get_vector()))
-        return scipy.concatenate([x.get_vector() for x in self.features])
+        self.generate_vector()
+        return scipy.hstack([x.get_vector() for x in self.features])
 
     def __init__(self, entity):
         self.entity = entity
         self.features = list()
-        self.generate_vector()
+
+    def generate_vector(self):
+        pass
 
 
 '''
@@ -146,7 +147,6 @@ class ModalityFeatureVector(FeatureVector):
                 self.vector[len(modalities)] = 1
         else:
             self.vector[len(modalities)] = 1
-	print(self.vector)
 
 '''
 Do the two entities appear in the same paragraph?
