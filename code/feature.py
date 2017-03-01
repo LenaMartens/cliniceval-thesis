@@ -13,7 +13,9 @@ A vector denoting a single feature of a word
 
 class FeatureVector:
     def get_vector(self):
-        return self.vector
+        self.generate_vector()
+        self.vector = scipy.sparse.csr_matrix(self.vector)
+	return self.vector
 
     def generate_vector(self):
         self.vector = []
@@ -21,8 +23,6 @@ class FeatureVector:
     def __init__(self, entity):
         self.entity = entity
         self.vector = []
-        self.generate_vector()
-        self.vector = scipy.sparse.csr_matrix(self.vector)
 
 
 '''
@@ -35,8 +35,6 @@ class RelationFeatureVector(FeatureVector):
         self.source = source
         self.vector = []
         self.target = target
-        self.generate_vector()
-        self.vector = scipy.sparse.csr_matrix(self.vector)
 
 
 '''
@@ -47,16 +45,13 @@ A vector consisting of several features. Is implemented as a list of FeatureVect
 class ConcatenatedVector:
     def get_vector(self):
 	for x in self.features:
-	    print(x.get_vector())
+	    print(x.__class__.__name__ + "   "+ str(x.get_vector()))
         return scipy.concatenate([x.get_vector() for x in self.features])
 
     def __init__(self, entity):
         self.entity = entity
         self.features = list()
         self.generate_vector()
-
-    def generate_vector(self):
-        pass
 
 
 '''
@@ -81,7 +76,7 @@ Is the word capitalised?
 
 class CapitalFeatureVector(FeatureVector):
     def generate_vector(self):
-        self.vector = [self.entity.word.istitle()]
+        self.vector = np.asarray([self.entity.word.istitle()])
 
 
 '''
@@ -151,7 +146,7 @@ class ModalityFeatureVector(FeatureVector):
                 self.vector[len(modalities)] = 1
         else:
             self.vector[len(modalities)] = 1
-
+	print(self.vector)
 
 '''
 Do the two entities appear in the same paragraph?
@@ -182,7 +177,6 @@ class WordVector(ConcatenatedVector):
     def generate_vector(self):
         self.features.append(WordFeatureVector(self.entity))
         self.features.append(POSFeatureVector(self.entity))
-        self.features.append(CapitalFeatureVector(self.entity))
         self.features.append(DocTimeVector(self.entity))
         self.features.append(ModalityFeatureVector(self.entity))
         self.features.append(PolarityFeatureVector(self.entity))
