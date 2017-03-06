@@ -6,6 +6,7 @@ import scipy
 import scipy.sparse
 
 dictionary = utils.get_dictionary()
+lemma_dictionary = utils.get_lemma_dictionary()
 '''
 A vector denoting a single feature of a word
 '''
@@ -68,6 +69,21 @@ class WordFeatureVector(FeatureVector):
         except KeyError:
             self.vector[len(dictionary)] = 1
 
+'''
+One hot encoding of the word in the dictionary of the lematized encountered words.
+'''
+
+
+class LemmaFeatureVector(FeatureVector):
+    def generate_vector(self):
+        word = self.entity.word
+        word = utils.lemmatize_word(word)
+        self.vector = np.zeros(len(dictionary) + 1)
+        try:
+            self.vector[dictionary[word]] = 1
+        except KeyError:
+            self.vector[len(dictionary)] = 1
+
 
 '''
 Is the word capitalised?
@@ -88,13 +104,13 @@ class DocTimeVector(FeatureVector):
     def generate_vector(self):
         doctimes = utils.get_doctimes()
         self.vector = np.zeros(len(doctimes) + 1)
- 	if self.entity.get_class() == "Event":
+        if self.entity.get_class() == "Event":
             try:
                 self.vector[doctimes[self.entity.doc_time_rel]] = 1
             except KeyError or AttributeError:
                 self.vector[len(doctimes)] = 1
-	else:
-                self.vector[len(doctimes)] = 1
+        else:
+            self.vector[len(doctimes)] = 1
 
 
 tagdict = load('help/tagsets/upenn_tagset.pickle')
@@ -115,7 +131,7 @@ class POSFeatureVector(FeatureVector):
 
 
 '''
-One hot encoding of polarity of the word (from input file)
+One hot encoding of polarity of the word (from UMLS input file)
 '''
 
 
@@ -131,7 +147,7 @@ class PolarityFeatureVector(FeatureVector):
 
 
 '''
-One hot encoding of modality of the word (from input file)
+One hot encoding of modality of the word (from UMLS input file)
 '''
 
 
@@ -147,6 +163,7 @@ class ModalityFeatureVector(FeatureVector):
                 self.vector[len(modalities)] = 1
         else:
             self.vector[len(modalities)] = 1
+
 
 '''
 Do the two entities appear in the same paragraph?
@@ -176,6 +193,8 @@ Specific feature vectors used in training and prediction
 class WordVector(ConcatenatedVector):
     def generate_vector(self):
         self.features.append(WordFeatureVector(self.entity))
+        self.features.append(LemmaFeatureVector(self.entity))
+        self.features.append(CapitalFeatureVector(self.entity))
         self.features.append(POSFeatureVector(self.entity))
         self.features.append(DocTimeVector(self.entity))
         self.features.append(ModalityFeatureVector(self.entity))

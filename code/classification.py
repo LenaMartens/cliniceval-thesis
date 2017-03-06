@@ -42,7 +42,7 @@ class SupportVectorMachine(Classifier):
     def train(self, trainingdata):
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
-	input = scipy.sparse.csr_matrix(input)
+        input = scipy.sparse.csr_matrix(input)
         self.machine = svm.SVC()
         self.machine.fit(input, output)
 
@@ -114,8 +114,8 @@ if __name__ == '__main__':
 
     docs = utils.get_documents_from_file(utils.store_path)
     train_doctime_classifier(docs)
-    # features = generate_training_candidates(docs)
-    # lr = LogisticRegression(features)
-    # utils.save_model(lr, name="LogisticRegression_randomcandidate")
-    # for i in range(10):
-    #     print("predicted: " + str(lr.predict(features[i])) + " actual: " + str(features[i].entity.positive))
+# features = generate_training_candidates(docs)
+# lr = LogisticRegression(features)
+# utils.save_model(lr, name="LogisticRegression_randomcandidate")
+# for i in range(10):
+#     print("predicted: " + str(lr.predict(features[i])) + " actual: " + str(features[i].entity.positive))

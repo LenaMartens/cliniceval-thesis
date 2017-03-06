@@ -154,13 +154,14 @@ def read_document(parent_directory, dir):
             doc.process_annotations(file_path)
         elif file.find(".") == -1:
             doc.process_file(file_path)
-    if (len(doc.get_entities()) == 0):
+    if len(doc.get_entities()) == 0:
         print(doc.id)
     return doc
 
 
 def read_all(directory):
-    utils.load_dictionary()
+    utils.load_dictionary(utils.lemma_dictionary)
+    utils.load_dictionary(utils.dictionary_path)
     docs = []
     for dir in os.listdir(directory):
         doc = read_document(directory, dir)

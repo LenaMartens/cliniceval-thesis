@@ -2,6 +2,7 @@ import configparser
 import os
 import pickle
 from sklearn.externals import joblib
+from nltk.stem.wordnet import WordNetLemmatizer
 
 config = configparser.ConfigParser()
 config.read('configuration.INI')
@@ -12,43 +13,54 @@ store_path = config['DataLocation']['doc_store']
 model_path = config['ModelLocation']['models']
 
 dictionary_path = config['DataLocation']['dictionary']
-dictionary = {}
+lemma_path = config['DataLocation']['lemma_dictionary']
 
 outputpath = config['OutputLocation']['documents']
 
-dict_id = 0
 
-
-def load_dictionary():
-    global dictionary, dict_id
+def load_dictionary(dict_path):
     try:
-        dict_file = open(dictionary_path, 'rb')
-        dictionary = pickle.load(dict_file)
+        dict_file = open(dict_path, 'rb')
+        dict = pickle.load(dict_file)
         dict_file.close()
     except Exception as e:
         print(e)
-        dictionary = {}
-    dict_id = len(dictionary)
+        dict = {}
+    dictionary_id = len(dict)
+    return dict, dictionary_id
 
 
-load_dictionary()
+(dictionary, dict_id) = load_dictionary(dictionary_path)
+(lemma_dictionary, lemma_id) = load_dictionary(lemma_path)
 
 
 def save_dictionary():
     with open(dictionary_path, 'wb') as dict_file:
         pickle.dump(dictionary, dict_file, protocol=2)
 
+    with open(lemma_path, 'wb') as dict_file:
+        pickle.dump(lemma_dictionary, dict_file, protocol=2)
+
 
 def get_dictionary():
     return dictionary
 
 
+def get_lemma_dictionary():
+    return lemma_dictionary
+
+
 def add_word_to_dictionary(word):
-    global dictionary, dict_id
+    global dictionary, dict_id, lemma_dictionary, lemma_id
 
     if word not in dictionary:
         dictionary[word] = dict_id
         dict_id += 1
+
+    l_word = lemmatize_word(word)
+    if l_word not in lemma_dictionary:
+        lemma_dictionary[l_word] = lemma_id
+        lemma_id += 1
 
 
 def save_document(doc, id):
@@ -89,7 +101,7 @@ def get_polarities():
 
 
 def get_modalities():
-    return {"ACTUAL": 0, "HEDGED": 1, "HYPOTHETICAL": 2, "GENERIC":3}
+    return {"ACTUAL": 0, "HEDGED": 1, "HYPOTHETICAL": 2, "GENERIC": 3}
 
 
 def document_generator(filepath=store_path):
@@ -97,3 +109,8 @@ def document_generator(filepath=store_path):
         if file.find('doc') != -1:
             with open(os.path.join(filepath, file), 'rb') as doc_file:
                 yield pickle.load(doc_file)
+
+
+def lemmatize_word(word):
+    lmtzr = WordNetLemmatizer()
+    return lmtzr.lemmatize(word)

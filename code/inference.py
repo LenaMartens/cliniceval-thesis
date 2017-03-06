@@ -7,7 +7,7 @@ import output
 import utils
 from data import Relation, read_document
 from feature import TimeRelationVector
-from guppy import hpy; h=hpy()
+
 
 def generate_prediction_candidates(document, amount=20):
     entities = list(document.get_entities())
@@ -134,7 +134,7 @@ def infer_relations_on_documents(documents, model=None):
         inference(document, model)
         print("Outputting document")
         output.output_doc(document)
-	print(h.heap())
+
 
 def greedily_decide_relations(documents, model=None):
     if model is None:
