@@ -44,8 +44,7 @@ A vector consisting of several features. Is implemented as a list of FeatureVect
 class ConcatenatedVector:
     def get_vector(self):
         self.generate_vector()
-        flat = np.concatenate([x.get_vector() for x in self.features])
-        return scipy.sparse.csr_matrix(flat)
+        return np.concatenate([x.get_vector() for x in self.features])
 
     def __init__(self, entity):
         self.entity = entity
@@ -89,11 +88,13 @@ class DocTimeVector(FeatureVector):
     def generate_vector(self):
         doctimes = utils.get_doctimes()
         self.vector = np.zeros(len(doctimes) + 1)
-        try:
-            self.vector[doctimes[self.entity.doc_time_rel]] = 1
-        except KeyError:
-            print(self.entity.doc_time_rel)
-            self.vector[len(doctimes)] = 1
+ 	if self.entity.get_class() == "Event":
+            try:
+                self.vector[doctimes[self.entity.doc_time_rel]] = 1
+            except KeyError or AttributeError:
+                self.vector[len(doctimes)] = 1
+	else:
+                self.vector[len(doctimes)] = 1
 
 
 tagdict = load('help/tagsets/upenn_tagset.pickle')
@@ -125,8 +126,7 @@ class PolarityFeatureVector(FeatureVector):
         if self.entity.get_class() == "Event":
             try:
                 self.vector[polarities[self.entity.polarity]] = 1
-            except KeyError:
-                print(self.entity.polarity)
+            except KeyError or AttributeError:
                 self.vector[len(polarities)] = 1
 
 

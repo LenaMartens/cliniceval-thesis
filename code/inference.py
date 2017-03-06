@@ -7,7 +7,7 @@ import output
 import utils
 from data import Relation, read_document
 from feature import TimeRelationVector
-
+from guppy import hpy; h=hpy()
 
 def generate_prediction_candidates(document, amount=20):
     entities = list(document.get_entities())
@@ -61,7 +61,7 @@ def inference(document, logistic_model, doc_time_constraints=0):
     # No output
     model.Params.OutputFlag = 0
     # Limit number of threads
-    #    model.Params.Threads = 4
+    model.Params.Threads = 4
 
     for candidate in candidates:
         probs = logistic_model.predict(candidate)
@@ -117,6 +117,7 @@ def greedy_decision(document, model, all=False):
     else:
         candidates = generate_all_paragraph_candidates(document)
 
+    document.clear_relations()
     for candidate in candidates:
         probs = model.predict(candidate)
         positive = probs[0][0]
@@ -133,9 +134,9 @@ def infer_relations_on_documents(documents, model=None):
         inference(document, model)
         print("Outputting document")
         output.output_doc(document)
+	print(h.heap())
 
-
-def greedily_decide_relations_on_documents(documents, model=None):
+def greedily_decide_relations(documents, model=None):
     if model is None:
         model = utils.load_model("LogisticRegression_randomcandidate")
 

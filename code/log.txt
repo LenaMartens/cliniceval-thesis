@@ -1,16 +1,919 @@
 Reading the documents
-Training DCT
-Traceback (most recent call last):
-  File "complete_procedure.py", line 43, in <module>
-    complete(utils.train, utils.dev, repredict_dct=True, retrain_rc=True)
-  File "complete_procedure.py", line 21, in complete
-    DCT_model = classification.train_doctime_classifier(train_documents)
-  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/classification.py", line 91, in train_doctime_classifier
-    svm = SupportVectorMachine(features, "doc_time_rel")
-  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/classification.py", line 19, in __init__
-    self.train(trainingdata)
-  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/classification.py", line 42, in train
-    input = [x.get_vector() for x in trainingdata]
-  File "/export/home1/NoCsBack/hci/lena/cliniceval-thesis/code/feature.py", line 47, in get_vector
-    return scipy.concatenate([x.get_vector() for x in self.features])
-ValueError: zero-dimensional arrays cannot be concatenated
+Inferring document relations
+Inference on ID081_clinic_239, number 0
+Outputting document
+outputted ../Output/greedy/ID081_clinic_239/ID081_clinic_239Temporal.xml!
+Inference on ID189_clinic_550, number 1
+Outputting document
+outputted ../Output/greedy/ID189_clinic_550/ID189_clinic_550Temporal.xml!
+Inference on ID100_clinic_295, number 2
+Outputting document
+outputted ../Output/greedy/ID100_clinic_295/ID100_clinic_295Temporal.xml!
+Inference on ID171_path_501, number 3
+Outputting document
+outputted ../Output/greedy/ID171_path_501/ID171_path_501Temporal.xml!
+Inference on ID208_clinic_608, number 4
+Outputting document
+outputted ../Output/greedy/ID208_clinic_608/ID208_clinic_608Temporal.xml!
+Inference on ID115_clinic_337, number 5
+Outputting document
+outputted ../Output/greedy/ID115_clinic_337/ID115_clinic_337Temporal.xml!
+Inference on ID124_clinic_365, number 6
+Outputting document
+outputted ../Output/greedy/ID124_clinic_365/ID124_clinic_365Temporal.xml!
+Inference on ID036_clinic_108, number 7
+Outputting document
+outputted ../Output/greedy/ID036_clinic_108/ID036_clinic_108Temporal.xml!
+Inference on ID090_clinic_265, number 8
+Outputting document
+outputted ../Output/greedy/ID090_clinic_265/ID090_clinic_265Temporal.xml!
+Inference on ID178_path_521, number 9
+Outputting document
+outputted ../Output/greedy/ID178_path_521/ID178_path_521Temporal.xml!
+Inference on ID099_clinic_294, number 10
+Outputting document
+outputted ../Output/greedy/ID099_clinic_294/ID099_clinic_294Temporal.xml!
+Inference on ID192_path_560a, number 11
+Outputting document
+outputted ../Output/greedy/ID192_path_560a/ID192_path_560aTemporal.xml!
+Inference on ID082_path_243, number 12
+Outputting document
+outputted ../Output/greedy/ID082_path_243/ID082_path_243Temporal.xml!
+Inference on ID121_path_355a, number 13
+Outputting document
+outputted ../Output/greedy/ID121_path_355a/ID121_path_355aTemporal.xml!
+Inference on ID161_path_475a, number 14
+Outputting document
+outputted ../Output/greedy/ID161_path_475a/ID161_path_475aTemporal.xml!
+Inference on ID131_clinic_386, number 15
+Outputting document
+outputted ../Output/greedy/ID131_clinic_386/ID131_clinic_386Temporal.xml!
+Inference on ID188_clinic_549, number 16
+Outputting document
+outputted ../Output/greedy/ID188_clinic_549/ID188_clinic_549Temporal.xml!
+Inference on ID081_clinic_241, number 17
+Outputting document
+outputted ../Output/greedy/ID081_clinic_241/ID081_clinic_241Temporal.xml!
+Inference on ID149_path_439a, number 18
+Outputting document
+outputted ../Output/greedy/ID149_path_439a/ID149_path_439aTemporal.xml!
+Inference on ID201_path_592, number 19
+Outputting document
+outputted ../Output/greedy/ID201_path_592/ID201_path_592Temporal.xml!
+Inference on ID196_path_577, number 20
+Outputting document
+outputted ../Output/greedy/ID196_path_577/ID196_path_577Temporal.xml!
+Inference on ID113_path_332, number 21
+Outputting document
+outputted ../Output/greedy/ID113_path_332/ID113_path_332Temporal.xml!
+Inference on ID122_clinic_357, number 22
+Outputting document
+outputted ../Output/greedy/ID122_clinic_357/ID122_clinic_357Temporal.xml!
+Inference on ID041_path_119, number 23
+Outputting document
+outputted ../Output/greedy/ID041_path_119/ID041_path_119Temporal.xml!
+Inference on ID148_clinic_435, number 24
+Outputting document
+outputted ../Output/greedy/ID148_clinic_435/ID148_clinic_435Temporal.xml!
+Inference on ID077_clinic_227, number 25
+Outputting document
+outputted ../Output/greedy/ID077_clinic_227/ID077_clinic_227Temporal.xml!
+Inference on ID122_path_358, number 26
+Outputting document
+outputted ../Output/greedy/ID122_path_358/ID122_path_358Temporal.xml!
+Inference on ID043_clinic_124, number 27
+Outputting document
+outputted ../Output/greedy/ID043_clinic_124/ID043_clinic_124Temporal.xml!
+Inference on ID121_clinic_354, number 28
+Outputting document
+outputted ../Output/greedy/ID121_clinic_354/ID121_clinic_354Temporal.xml!
+Inference on ID218_clinic_564, number 29
+Outputting document
+outputted ../Output/greedy/ID218_clinic_564/ID218_clinic_564Temporal.xml!
+Inference on ID139_clinic_408, number 30
+Outputting document
+outputted ../Output/greedy/ID139_clinic_408/ID139_clinic_408Temporal.xml!
+Inference on ID153_clinic_452, number 31
+Outputting document
+outputted ../Output/greedy/ID153_clinic_452/ID153_clinic_452Temporal.xml!
+Inference on ID114_clinic_336, number 32
+Outputting document
+outputted ../Output/greedy/ID114_clinic_336/ID114_clinic_336Temporal.xml!
+Inference on ID081_path_240, number 33
+Outputting document
+outputted ../Output/greedy/ID081_path_240/ID081_path_240Temporal.xml!
+Inference on ID155_clinic_458, number 34
+Outputting document
+outputted ../Output/greedy/ID155_clinic_458/ID155_clinic_458Temporal.xml!
+Inference on ID069_clinic_203, number 35
+Outputting document
+outputted ../Output/greedy/ID069_clinic_203/ID069_clinic_203Temporal.xml!
+Inference on ID139_clinic_410, number 36
+Outputting document
+outputted ../Output/greedy/ID139_clinic_410/ID139_clinic_410Temporal.xml!
+Inference on ID125_clinic_366, number 37
+Outputting document
+outputted ../Output/greedy/ID125_clinic_366/ID125_clinic_366Temporal.xml!
+Inference on ID124_path_364, number 38
+Outputting document
+outputted ../Output/greedy/ID124_path_364/ID124_path_364Temporal.xml!
+Inference on ID109_clinic_319, number 39
+Outputting document
+outputted ../Output/greedy/ID109_clinic_319/ID109_clinic_319Temporal.xml!
+Inference on ID146_clinic_429, number 40
+Outputting document
+outputted ../Output/greedy/ID146_clinic_429/ID146_clinic_429Temporal.xml!
+Inference on ID132_clinic_387, number 41
+Outputting document
+outputted ../Output/greedy/ID132_clinic_387/ID132_clinic_387Temporal.xml!
+Inference on ID091_path_269a, number 42
+Outputting document
+outputted ../Output/greedy/ID091_path_269a/ID091_path_269aTemporal.xml!
+Inference on ID205_path_598, number 43
+Outputting document
+outputted ../Output/greedy/ID205_path_598/ID205_path_598Temporal.xml!
+Inference on ID001_clinic_001, number 44
+Outputting document
+outputted ../Output/greedy/ID001_clinic_001/ID001_clinic_001Temporal.xml!
+Inference on ID144_path_424, number 45
+Outputting document
+outputted ../Output/greedy/ID144_path_424/ID144_path_424Temporal.xml!
+Inference on ID181_path_530, number 46
+Outputting document
+outputted ../Output/greedy/ID181_path_530/ID181_path_530Temporal.xml!
+Inference on ID068_clinic_200, number 47
+Outputting document
+outputted ../Output/greedy/ID068_clinic_200/ID068_clinic_200Temporal.xml!
+Inference on ID011_path_032, number 48
+Outputting document
+outputted ../Output/greedy/ID011_path_032/ID011_path_032Temporal.xml!
+Inference on ID196_clinic_578, number 49
+Outputting document
+outputted ../Output/greedy/ID196_clinic_578/ID196_clinic_578Temporal.xml!
+Inference on ID160_path_472a, number 50
+Outputting document
+outputted ../Output/greedy/ID160_path_472a/ID160_path_472aTemporal.xml!
+Inference on ID072_clinic_214, number 51
+Outputting document
+outputted ../Output/greedy/ID072_clinic_214/ID072_clinic_214Temporal.xml!
+Inference on ID010_clinic_028, number 52
+Outputting document
+outputted ../Output/greedy/ID010_clinic_028/ID010_clinic_028Temporal.xml!
+Inference on ID195_path_574, number 53
+Outputting document
+outputted ../Output/greedy/ID195_path_574/ID195_path_574Temporal.xml!
+Inference on ID004_path_011, number 54
+Outputting document
+outputted ../Output/greedy/ID004_path_011/ID004_path_011Temporal.xml!
+Inference on ID019_path_056, number 55
+Outputting document
+outputted ../Output/greedy/ID019_path_056/ID019_path_056Temporal.xml!
+Inference on ID009_clinic_027, number 56
+Outputting document
+outputted ../Output/greedy/ID009_clinic_027/ID009_clinic_027Temporal.xml!
+Inference on ID090_path_266a, number 57
+Outputting document
+outputted ../Output/greedy/ID090_path_266a/ID090_path_266aTemporal.xml!
+Inference on ID021_clinic_063, number 58
+Outputting document
+outputted ../Output/greedy/ID021_clinic_063/ID021_clinic_063Temporal.xml!
+Inference on ID098_clinic_289, number 59
+Outputting document
+outputted ../Output/greedy/ID098_clinic_289/ID098_clinic_289Temporal.xml!
+Inference on ID180_path_527, number 60
+Outputting document
+outputted ../Output/greedy/ID180_path_527/ID180_path_527Temporal.xml!
+Inference on ID213_clinic_622, number 61
+Outputting document
+outputted ../Output/greedy/ID213_clinic_622/ID213_clinic_622Temporal.xml!
+Inference on ID092_clinic_271, number 62
+Outputting document
+outputted ../Output/greedy/ID092_clinic_271/ID092_clinic_271Temporal.xml!
+Inference on ID001_clinic_003, number 63
+Outputting document
+outputted ../Output/greedy/ID001_clinic_003/ID001_clinic_003Temporal.xml!
+Inference on ID107_clinic_313, number 64
+Outputting document
+outputted ../Output/greedy/ID107_clinic_313/ID107_clinic_313Temporal.xml!
+Inference on ID003_path_008, number 65
+Outputting document
+outputted ../Output/greedy/ID003_path_008/ID003_path_008Temporal.xml!
+Inference on ID013_path_038, number 66
+Outputting document
+outputted ../Output/greedy/ID013_path_038/ID013_path_038Temporal.xml!
+Inference on ID137_clinic_402, number 67
+Outputting document
+outputted ../Output/greedy/ID137_clinic_402/ID137_clinic_402Temporal.xml!
+Inference on ID040_clinic_115, number 68
+Outputting document
+outputted ../Output/greedy/ID040_clinic_115/ID040_clinic_115Temporal.xml!
+Inference on ID152_clinic_447, number 69
+Outputting document
+outputted ../Output/greedy/ID152_clinic_447/ID152_clinic_447Temporal.xml!
+Inference on ID149_clinic_440, number 70
+Outputting document
+outputted ../Output/greedy/ID149_clinic_440/ID149_clinic_440Temporal.xml!
+Inference on ID092_path_272, number 71
+Outputting document
+outputted ../Output/greedy/ID092_path_272/ID092_path_272Temporal.xml!
+Inference on ID194_clinic_568, number 72
+Outputting document
+outputted ../Output/greedy/ID194_clinic_568/ID194_clinic_568Temporal.xml!
+Inference on ID176_clinic_514, number 73
+Outputting document
+outputted ../Output/greedy/ID176_clinic_514/ID176_clinic_514Temporal.xml!
+Inference on ID097_clinic_288, number 74
+Outputting document
+outputted ../Output/greedy/ID097_clinic_288/ID097_clinic_288Temporal.xml!
+Inference on ID012_clinic_034, number 75
+Outputting document
+outputted ../Output/greedy/ID012_clinic_034/ID012_clinic_034Temporal.xml!
+Inference on ID138_clinic_407, number 76
+Outputting document
+outputted ../Output/greedy/ID138_clinic_407/ID138_clinic_407Temporal.xml!
+Inference on ID096_clinic_285, number 77
+Outputting document
+outputted ../Output/greedy/ID096_clinic_285/ID096_clinic_285Temporal.xml!
+Inference on ID217_path_633a, number 78
+Outputting document
+outputted ../Output/greedy/ID217_path_633a/ID217_path_633aTemporal.xml!
+Inference on ID173_clinic_507, number 79
+Outputting document
+outputted ../Output/greedy/ID173_clinic_507/ID173_clinic_507Temporal.xml!
+Inference on ID040_path_116a, number 80
+Outputting document
+outputted ../Output/greedy/ID040_path_116a/ID040_path_116aTemporal.xml!
+Inference on ID050_path_146a, number 81
+Outputting document
+outputted ../Output/greedy/ID050_path_146a/ID050_path_146aTemporal.xml!
+Inference on ID089_clinic_262, number 82
+Outputting document
+outputted ../Output/greedy/ID089_clinic_262/ID089_clinic_262Temporal.xml!
+Inference on ID027_clinic_079, number 83
+Outputting document
+outputted ../Output/greedy/ID027_clinic_079/ID027_clinic_079Temporal.xml!
+Inference on ID053_path_156, number 84
+Outputting document
+outputted ../Output/greedy/ID053_path_156/ID053_path_156Temporal.xml!
+Inference on ID205_clinic_599, number 85
+Outputting document
+outputted ../Output/greedy/ID205_clinic_599/ID205_clinic_599Temporal.xml!
+Inference on ID011_clinic_033, number 86
+Outputting document
+outputted ../Output/greedy/ID011_clinic_033/ID011_clinic_033Temporal.xml!
+Inference on ID188_path_548, number 87
+Outputting document
+outputted ../Output/greedy/ID188_path_548/ID188_path_548Temporal.xml!
+Inference on ID069_path_204, number 88
+Outputting document
+outputted ../Output/greedy/ID069_path_204/ID069_path_204Temporal.xml!
+Inference on ID027_path_080, number 89
+Outputting document
+outputted ../Output/greedy/ID027_path_080/ID027_path_080Temporal.xml!
+Inference on ID176_clinic_416, number 90
+Outputting document
+outputted ../Output/greedy/ID176_clinic_416/ID176_clinic_416Temporal.xml!
+Inference on ID042_path_122, number 91
+Outputting document
+outputted ../Output/greedy/ID042_path_122/ID042_path_122Temporal.xml!
+Inference on ID195_clinic_571, number 92
+Outputting document
+outputted ../Output/greedy/ID195_clinic_571/ID195_clinic_571Temporal.xml!
+Inference on ID137_clinic_404, number 93
+Outputting document
+outputted ../Output/greedy/ID137_clinic_404/ID137_clinic_404Temporal.xml!
+Inference on ID017_path_050a, number 94
+Outputting document
+outputted ../Output/greedy/ID017_path_050a/ID017_path_050aTemporal.xml!
+Inference on ID152_clinic_449, number 95
+Outputting document
+outputted ../Output/greedy/ID152_clinic_449/ID152_clinic_449Temporal.xml!
+Inference on ID034_clinic_100, number 96
+Outputting document
+outputted ../Output/greedy/ID034_clinic_100/ID034_clinic_100Temporal.xml!
+Inference on ID001_path_002, number 97
+Outputting document
+outputted ../Output/greedy/ID001_path_002/ID001_path_002Temporal.xml!
+Inference on ID020_clinic_060, number 98
+Outputting document
+outputted ../Output/greedy/ID020_clinic_060/ID020_clinic_060Temporal.xml!
+Inference on ID128_clinic_375, number 99
+Outputting document
+outputted ../Output/greedy/ID128_clinic_375/ID128_clinic_375Temporal.xml!
+Inference on ID112_path_329a, number 100
+Outputting document
+outputted ../Output/greedy/ID112_path_329a/ID112_path_329aTemporal.xml!
+Inference on ID044_clinic_127, number 101
+Outputting document
+outputted ../Output/greedy/ID044_clinic_127/ID044_clinic_127Temporal.xml!
+Inference on ID188_clinic_547, number 102
+Outputting document
+outputted ../Output/greedy/ID188_clinic_547/ID188_clinic_547Temporal.xml!
+Inference on ID106_path_311, number 103
+Outputting document
+outputted ../Output/greedy/ID106_path_311/ID106_path_311Temporal.xml!
+Inference on ID069_clinic_205, number 104
+Outputting document
+outputted ../Output/greedy/ID069_clinic_205/ID069_clinic_205Temporal.xml!
+Inference on ID139_path_409a, number 105
+Outputting document
+outputted ../Output/greedy/ID139_path_409a/ID139_path_409aTemporal.xml!
+Inference on ID155_path_457, number 106
+Outputting document
+outputted ../Output/greedy/ID155_path_457/ID155_path_457Temporal.xml!
+Inference on ID213_path_621a, number 107
+Outputting document
+outputted ../Output/greedy/ID213_path_621a/ID213_path_621aTemporal.xml!
+Inference on ID200_clinic_588, number 108
+Outputting document
+outputted ../Output/greedy/ID200_clinic_588/ID200_clinic_588Temporal.xml!
+Inference on ID112_clinic_328, number 109
+Outputting document
+outputted ../Output/greedy/ID112_clinic_328/ID112_clinic_328Temporal.xml!
+Inference on ID178_clinic_522, number 110
+Outputting document
+outputted ../Output/greedy/ID178_clinic_522/ID178_clinic_522Temporal.xml!
+Inference on ID145_clinic_426, number 111
+Outputting document
+outputted ../Output/greedy/ID145_clinic_426/ID145_clinic_426Temporal.xml!
+Inference on ID155_clinic_456, number 112
+Outputting document
+outputted ../Output/greedy/ID155_clinic_456/ID155_clinic_456Temporal.xml!
+Inference on ID028_clinic_082, number 113
+Outputting document
+outputted ../Output/greedy/ID028_clinic_082/ID028_clinic_082Temporal.xml!
+Inference on ID101_path_299, number 114
+Outputting document
+outputted ../Output/greedy/ID101_path_299/ID101_path_299Temporal.xml!
+Inference on ID026_clinic_076, number 115
+Outputting document
+outputted ../Output/greedy/ID026_clinic_076/ID026_clinic_076Temporal.xml!
+Inference on ID132_path_388, number 116
+Outputting document
+outputted ../Output/greedy/ID132_path_388/ID132_path_388Temporal.xml!
+Inference on ID160_clinic_473, number 117
+Outputting document
+outputted ../Output/greedy/ID160_clinic_473/ID160_clinic_473Temporal.xml!
+Inference on ID185_clinic_543, number 118
+Outputting document
+outputted ../Output/greedy/ID185_clinic_543/ID185_clinic_543Temporal.xml!
+Inference on ID035_clinic_105, number 119
+Outputting document
+outputted ../Output/greedy/ID035_clinic_105/ID035_clinic_105Temporal.xml!
+Inference on ID099_clinic_292, number 120
+Outputting document
+outputted ../Output/greedy/ID099_clinic_292/ID099_clinic_292Temporal.xml!
+Inference on ID123_clinic_360, number 121
+Outputting document
+outputted ../Output/greedy/ID123_clinic_360/ID123_clinic_360Temporal.xml!
+Inference on ID179_path_524, number 122
+Outputting document
+outputted ../Output/greedy/ID179_path_524/ID179_path_524Temporal.xml!
+Inference on ID048_path_140, number 123
+Outputting document
+outputted ../Output/greedy/ID048_path_140/ID048_path_140Temporal.xml!
+Inference on ID145_clinic_428, number 124
+Outputting document
+outputted ../Output/greedy/ID145_clinic_428/ID145_clinic_428Temporal.xml!
+Inference on ID042_clinic_123, number 125
+Outputting document
+outputted ../Output/greedy/ID042_clinic_123/ID042_clinic_123Temporal.xml!
+Inference on ID093_clinic_274, number 126
+Outputting document
+outputted ../Output/greedy/ID093_clinic_274/ID093_clinic_274Temporal.xml!
+Inference on ID090_clinic_267, number 127
+Outputting document
+outputted ../Output/greedy/ID090_clinic_267/ID090_clinic_267Temporal.xml!
+Inference on ID171_clinic_400, number 128
+Outputting document
+outputted ../Output/greedy/ID171_clinic_400/ID171_clinic_400Temporal.xml!
+Inference on ID064_clinic_188, number 129
+Outputting document
+outputted ../Output/greedy/ID064_clinic_188/ID064_clinic_188Temporal.xml!
+Inference on ID128_path_376a, number 130
+Outputting document
+outputted ../Output/greedy/ID128_path_376a/ID128_path_376aTemporal.xml!
+Inference on ID129_clinic_378, number 131
+Outputting document
+outputted ../Output/greedy/ID129_clinic_378/ID129_clinic_378Temporal.xml!
+Inference on ID217_clinic_632, number 132
+Outputting document
+outputted ../Output/greedy/ID217_clinic_632/ID217_clinic_632Temporal.xml!
+Inference on ID050_clinic_145, number 133
+Outputting document
+outputted ../Output/greedy/ID050_clinic_145/ID050_clinic_145Temporal.xml!
+Inference on ID041_clinic_120, number 134
+Outputting document
+outputted ../Output/greedy/ID041_clinic_120/ID041_clinic_120Temporal.xml!
+Inference on ID020_path_059, number 135
+Outputting document
+outputted ../Output/greedy/ID020_path_059/ID020_path_059Temporal.xml!
+Inference on ID200_path_589a, number 136
+Outputting document
+outputted ../Output/greedy/ID200_path_589a/ID200_path_589aTemporal.xml!
+Inference on ID003_clinic_009, number 137
+Outputting document
+outputted ../Output/greedy/ID003_clinic_009/ID003_clinic_009Temporal.xml!
+Inference on ID194_path_569a, number 138
+Outputting document
+outputted ../Output/greedy/ID194_path_569a/ID194_path_569aTemporal.xml!
+Inference on ID125_path_367, number 139
+Outputting document
+outputted ../Output/greedy/ID125_path_367/ID125_path_367Temporal.xml!
+Inference on ID145_path_427a, number 140
+Outputting document
+outputted ../Output/greedy/ID145_path_427a/ID145_path_427aTemporal.xml!
+Inference on ID050_clinic_147, number 141
+Outputting document
+outputted ../Output/greedy/ID050_clinic_147/ID050_clinic_147Temporal.xml!
+Inference on ID040_clinic_117, number 142
+Outputting document
+outputted ../Output/greedy/ID040_clinic_117/ID040_clinic_117Temporal.xml!
+Inference on ID067_path_198, number 143
+Outputting document
+outputted ../Output/greedy/ID067_path_198/ID067_path_198Temporal.xml!
+Inference on ID164_clinic_480, number 144
+Outputting document
+outputted ../Output/greedy/ID164_clinic_480/ID164_clinic_480Temporal.xml!
+Inference on ID056_path_165, number 145
+Outputting document
+outputted ../Output/greedy/ID056_path_165/ID056_path_165Temporal.xml!
+Inference on ID076_path_225, number 146
+Outputting document
+outputted ../Output/greedy/ID076_path_225/ID076_path_225Temporal.xml!
+Inference on ID161_clinic_476, number 147
+Outputting document
+outputted ../Output/greedy/ID161_clinic_476/ID161_clinic_476Temporal.xml!
+Inference on ID091_clinic_270, number 148
+Outputting document
+outputted ../Output/greedy/ID091_clinic_270/ID091_clinic_270Temporal.xml!
+Inference on ID060_clinic_178, number 149
+Outputting document
+outputted ../Output/greedy/ID060_clinic_178/ID060_clinic_178Temporal.xml!
+Inference on ID216_path_630, number 150
+Outputting document
+outputted ../Output/greedy/ID216_path_630/ID216_path_630Temporal.xml!
+Inference on ID034_clinic_102, number 151
+Outputting document
+outputted ../Output/greedy/ID034_clinic_102/ID034_clinic_102Temporal.xml!
+Inference on ID192_clinic_561, number 152
+Outputting document
+outputted ../Output/greedy/ID192_clinic_561/ID192_clinic_561Temporal.xml!
+Inference on ID018_clinic_054, number 153
+Outputting document
+outputted ../Output/greedy/ID018_clinic_054/ID018_clinic_054Temporal.xml!
+Inference on ID064_clinic_190, number 154
+Outputting document
+outputted ../Output/greedy/ID064_clinic_190/ID064_clinic_190Temporal.xml!
+Inference on ID141_clinic_416, number 155
+Outputting document
+outputted ../Output/greedy/ID141_clinic_416/ID141_clinic_416Temporal.xml!
+Inference on ID165_clinic_483, number 156
+Outputting document
+outputted ../Output/greedy/ID165_clinic_483/ID165_clinic_483Temporal.xml!
+Inference on ID140_path_412, number 157
+Outputting document
+outputted ../Output/greedy/ID140_path_412/ID140_path_412Temporal.xml!
+Inference on ID051_clinic_150, number 158
+Outputting document
+outputted ../Output/greedy/ID051_clinic_150/ID051_clinic_150Temporal.xml!
+Inference on ID141_clinic_414, number 159
+Outputting document
+outputted ../Output/greedy/ID141_clinic_414/ID141_clinic_414Temporal.xml!
+Inference on ID036_path_107, number 160
+Outputting document
+outputted ../Output/greedy/ID036_path_107/ID036_path_107Temporal.xml!
+Inference on ID121_clinic_356, number 161
+Outputting document
+outputted ../Output/greedy/ID121_clinic_356/ID121_clinic_356Temporal.xml!
+Inference on ID058_clinic_170, number 162
+Outputting document
+outputted ../Output/greedy/ID058_clinic_170/ID058_clinic_170Temporal.xml!
+Inference on ID117_clinic_342, number 163
+Outputting document
+outputted ../Output/greedy/ID117_clinic_342/ID117_clinic_342Temporal.xml!
+Inference on ID043_clinic_126, number 164
+Outputting document
+outputted ../Output/greedy/ID043_clinic_126/ID043_clinic_126Temporal.xml!
+Inference on ID168_clinic_493, number 165
+Outputting document
+outputted ../Output/greedy/ID168_clinic_493/ID168_clinic_493Temporal.xml!
+Inference on ID177_clinic_517, number 166
+Outputting document
+outputted ../Output/greedy/ID177_clinic_517/ID177_clinic_517Temporal.xml!
+Inference on ID120_path_352a, number 167
+Outputting document
+outputted ../Output/greedy/ID120_path_352a/ID120_path_352aTemporal.xml!
+Inference on ID169_clinic_494, number 168
+Outputting document
+outputted ../Output/greedy/ID169_clinic_494/ID169_clinic_494Temporal.xml!
+Inference on ID032_path_095, number 169
+Outputting document
+outputted ../Output/greedy/ID032_path_095/ID032_path_095Temporal.xml!
+Inference on ID141_path_415, number 170
+Outputting document
+outputted ../Output/greedy/ID141_path_415/ID141_path_415Temporal.xml!
+Inference on ID058_clinic_172, number 171
+Outputting document
+outputted ../Output/greedy/ID058_clinic_172/ID058_clinic_172Temporal.xml!
+Inference on ID085_clinic_251, number 172
+Outputting document
+outputted ../Output/greedy/ID085_clinic_251/ID085_clinic_251Temporal.xml!
+Inference on ID140_clinic_411, number 173
+Outputting document
+outputted ../Output/greedy/ID140_clinic_411/ID140_clinic_411Temporal.xml!
+Inference on ID096_path_284a, number 174
+Outputting document
+outputted ../Output/greedy/ID096_path_284a/ID096_path_284aTemporal.xml!
+Inference on ID114_path_335a, number 175
+Outputting document
+outputted ../Output/greedy/ID114_path_335a/ID114_path_335aTemporal.xml!
+Inference on ID212_clinic_619, number 176
+Outputting document
+outputted ../Output/greedy/ID212_clinic_619/ID212_clinic_619Temporal.xml!
+Inference on ID028_clinic_084, number 177
+Outputting document
+outputted ../Output/greedy/ID028_clinic_084/ID028_clinic_084Temporal.xml!
+Inference on ID193_clinic_565, number 178
+Outputting document
+outputted ../Output/greedy/ID193_clinic_565/ID193_clinic_565Temporal.xml!
+Inference on ID146_clinic_431, number 179
+Outputting document
+outputted ../Output/greedy/ID146_clinic_431/ID146_clinic_431Temporal.xml!
+Inference on ID002_path_005, number 180
+Outputting document
+outputted ../Output/greedy/ID002_path_005/ID002_path_005Temporal.xml!
+Inference on ID138_clinic_405, number 181
+Outputting document
+outputted ../Output/greedy/ID138_clinic_405/ID138_clinic_405Temporal.xml!
+Inference on ID019_clinic_055, number 182
+Outputting document
+outputted ../Output/greedy/ID019_clinic_055/ID019_clinic_055Temporal.xml!
+Inference on ID218_path_563, number 183
+Outputting document
+outputted ../Output/greedy/ID218_path_563/ID218_path_563Temporal.xml!
+Inference on ID156_clinic_461, number 184
+Outputting document
+outputted ../Output/greedy/ID156_clinic_461/ID156_clinic_461Temporal.xml!
+Inference on ID064_path_189, number 185
+Outputting document
+outputted ../Output/greedy/ID064_path_189/ID064_path_189Temporal.xml!
+Inference on ID147_clinic_434, number 186
+Outputting document
+outputted ../Output/greedy/ID147_clinic_434/ID147_clinic_434Temporal.xml!
+Inference on ID044_path_128, number 187
+Outputting document
+outputted ../Output/greedy/ID044_path_128/ID044_path_128Temporal.xml!
+Inference on ID098_path_290, number 188
+Outputting document
+outputted ../Output/greedy/ID098_path_290/ID098_path_290Temporal.xml!
+Inference on ID089_path_263a, number 189
+Outputting document
+outputted ../Output/greedy/ID089_path_263a/ID089_path_263aTemporal.xml!
+Inference on ID147_clinic_432, number 190
+Outputting document
+outputted ../Output/greedy/ID147_clinic_432/ID147_clinic_432Temporal.xml!
+Inference on ID060_clinic_176, number 191
+Outputting document
+outputted ../Output/greedy/ID060_clinic_176/ID060_clinic_176Temporal.xml!
+Inference on ID059_clinic_175, number 192
+Outputting document
+outputted ../Output/greedy/ID059_clinic_175/ID059_clinic_175Temporal.xml!
+Inference on ID172_path_504, number 193
+Outputting document
+outputted ../Output/greedy/ID172_path_504/ID172_path_504Temporal.xml!
+Inference on ID021_path_062, number 194
+Outputting document
+outputted ../Output/greedy/ID021_path_062/ID021_path_062Temporal.xml!
+Inference on ID028_path_083, number 195
+Outputting document
+outputted ../Output/greedy/ID028_path_083/ID028_path_083Temporal.xml!
+Inference on ID147_path_433, number 196
+Outputting document
+outputted ../Output/greedy/ID147_path_433/ID147_path_433Temporal.xml!
+Inference on ID130_path_382, number 197
+Outputting document
+outputted ../Output/greedy/ID130_path_382/ID130_path_382Temporal.xml!
+Inference on ID148_path_436a, number 198
+Outputting document
+outputted ../Output/greedy/ID148_path_436a/ID148_path_436aTemporal.xml!
+Inference on ID068_path_201, number 199
+Outputting document
+outputted ../Output/greedy/ID068_path_201/ID068_path_201Temporal.xml!
+Inference on ID073_path_216a, number 200
+Outputting document
+outputted ../Output/greedy/ID073_path_216a/ID073_path_216aTemporal.xml!
+Inference on ID002_clinic_004, number 201
+Outputting document
+outputted ../Output/greedy/ID002_clinic_004/ID002_clinic_004Temporal.xml!
+Inference on ID195_clinic_575, number 202
+Outputting document
+outputted ../Output/greedy/ID195_clinic_575/ID195_clinic_575Temporal.xml!
+Inference on ID072_clinic_212, number 203
+Outputting document
+outputted ../Output/greedy/ID072_clinic_212/ID072_clinic_212Temporal.xml!
+Inference on ID137_path_403, number 204
+Outputting document
+outputted ../Output/greedy/ID137_path_403/ID137_path_403Temporal.xml!
+Inference on ID035_path_104, number 205
+Outputting document
+outputted ../Output/greedy/ID035_path_104/ID035_path_104Temporal.xml!
+Inference on ID113_clinic_331, number 206
+Outputting document
+outputted ../Output/greedy/ID113_clinic_331/ID113_clinic_331Temporal.xml!
+Inference on ID029_path_086, number 207
+Outputting document
+outputted ../Output/greedy/ID029_path_086/ID029_path_086Temporal.xml!
+Inference on ID020_clinic_058, number 208
+Outputting document
+outputted ../Output/greedy/ID020_clinic_058/ID020_clinic_058Temporal.xml!
+Inference on ID170_clinic_499, number 209
+Outputting document
+outputted ../Output/greedy/ID170_clinic_499/ID170_clinic_499Temporal.xml!
+Inference on ID076_clinic_226, number 210
+Outputting document
+outputted ../Output/greedy/ID076_clinic_226/ID076_clinic_226Temporal.xml!
+Inference on ID123_clinic_362, number 211
+Outputting document
+outputted ../Output/greedy/ID123_clinic_362/ID123_clinic_362Temporal.xml!
+Inference on ID057_clinic_169, number 212
+Outputting document
+outputted ../Output/greedy/ID057_clinic_169/ID057_clinic_169Temporal.xml!
+Inference on ID160_clinic_471, number 213
+Outputting document
+outputted ../Output/greedy/ID160_clinic_471/ID160_clinic_471Temporal.xml!
+Inference on ID089_clinic_264, number 214
+Outputting document
+outputted ../Output/greedy/ID089_clinic_264/ID089_clinic_264Temporal.xml!
+Inference on ID164_path_481a, number 215
+Outputting document
+outputted ../Output/greedy/ID164_path_481a/ID164_path_481aTemporal.xml!
+Inference on ID181_clinic_531, number 216
+Outputting document
+outputted ../Output/greedy/ID181_clinic_531/ID181_clinic_531Temporal.xml!
+Inference on ID216_clinic_629, number 217
+Outputting document
+outputted ../Output/greedy/ID216_clinic_629/ID216_clinic_629Temporal.xml!
+Inference on ID048_clinic_141, number 218
+Outputting document
+outputted ../Output/greedy/ID048_clinic_141/ID048_clinic_141Temporal.xml!
+Inference on ID164_clinic_482, number 219
+Outputting document
+outputted ../Output/greedy/ID164_clinic_482/ID164_clinic_482Temporal.xml!
+Inference on ID097_path_287, number 220
+Outputting document
+outputted ../Output/greedy/ID097_path_287/ID097_path_287Temporal.xml!
+Inference on ID133_clinic_392, number 221
+Outputting document
+outputted ../Output/greedy/ID133_clinic_392/ID133_clinic_392Temporal.xml!
+Inference on ID051_clinic_148, number 222
+Outputting document
+outputted ../Output/greedy/ID051_clinic_148/ID051_clinic_148Temporal.xml!
+Inference on ID074_path_219a, number 223
+Outputting document
+outputted ../Output/greedy/ID074_path_219a/ID074_path_219aTemporal.xml!
+Inference on ID156_clinic_459, number 224
+Outputting document
+outputted ../Output/greedy/ID156_clinic_459/ID156_clinic_459Temporal.xml!
+Inference on ID115_path_338, number 225
+Outputting document
+outputted ../Output/greedy/ID115_path_338/ID115_path_338Temporal.xml!
+Inference on ID113_clinic_333, number 226
+Outputting document
+outputted ../Output/greedy/ID113_clinic_333/ID113_clinic_333Temporal.xml!
+Inference on ID026_path_077, number 227
+Outputting document
+outputted ../Output/greedy/ID026_path_077/ID026_path_077Temporal.xml!
+Inference on ID017_clinic_049, number 228
+Outputting document
+outputted ../Output/greedy/ID017_clinic_049/ID017_clinic_049Temporal.xml!
+Inference on ID161_clinic_474, number 229
+Outputting document
+outputted ../Output/greedy/ID161_clinic_474/ID161_clinic_474Temporal.xml!
+Inference on ID012_path_035, number 230
+Outputting document
+outputted ../Output/greedy/ID012_path_035/ID012_path_035Temporal.xml!
+Inference on ID052_clinic_151, number 231
+Outputting document
+outputted ../Output/greedy/ID052_clinic_151/ID052_clinic_151Temporal.xml!
+Inference on ID211_clinic_614, number 232
+Outputting document
+outputted ../Output/greedy/ID211_clinic_614/ID211_clinic_614Temporal.xml!
+Inference on ID124_clinic_363, number 233
+Outputting document
+outputted ../Output/greedy/ID124_clinic_363/ID124_clinic_363Temporal.xml!
+Inference on ID153_path_451a, number 234
+Outputting document
+outputted ../Output/greedy/ID153_path_451a/ID153_path_451aTemporal.xml!
+Inference on ID208_clinic_606, number 235
+Outputting document
+outputted ../Output/greedy/ID208_clinic_606/ID208_clinic_606Temporal.xml!
+Inference on ID200_clinic_590, number 236
+Outputting document
+outputted ../Output/greedy/ID200_clinic_590/ID200_clinic_590Temporal.xml!
+Inference on ID131_path_385, number 237
+Outputting document
+outputted ../Output/greedy/ID131_path_385/ID131_path_385Temporal.xml!
+Inference on ID073_clinic_215, number 238
+Outputting document
+outputted ../Output/greedy/ID073_clinic_215/ID073_clinic_215Temporal.xml!
+Inference on ID210_clinic_611, number 239
+Outputting document
+outputted ../Output/greedy/ID210_clinic_611/ID210_clinic_611Temporal.xml!
+Inference on ID192_clinic_559, number 240
+Outputting document
+outputted ../Output/greedy/ID192_clinic_559/ID192_clinic_559Temporal.xml!
+Inference on ID213_clinic_620, number 241
+Outputting document
+outputted ../Output/greedy/ID213_clinic_620/ID213_clinic_620Temporal.xml!
+Inference on ID029_clinic_087, number 242
+Outputting document
+outputted ../Output/greedy/ID029_clinic_087/ID029_clinic_087Temporal.xml!
+Inference on ID016_clinic_048, number 243
+Outputting document
+outputted ../Output/greedy/ID016_clinic_048/ID016_clinic_048Temporal.xml!
+Inference on ID148_clinic_437, number 244
+Outputting document
+outputted ../Output/greedy/ID148_clinic_437/ID148_clinic_437Temporal.xml!
+Inference on ID013_clinic_037, number 245
+Outputting document
+outputted ../Output/greedy/ID013_clinic_037/ID013_clinic_037Temporal.xml!
+Inference on ID216_clinic_631, number 246
+Outputting document
+outputted ../Output/greedy/ID216_clinic_631/ID216_clinic_631Temporal.xml!
+Inference on ID189_path_551, number 247
+Outputting document
+outputted ../Output/greedy/ID189_path_551/ID189_path_551Temporal.xml!
+Inference on ID114_clinic_334, number 248
+Outputting document
+outputted ../Output/greedy/ID114_clinic_334/ID114_clinic_334Temporal.xml!
+Inference on ID044_clinic_129, number 249
+Outputting document
+outputted ../Output/greedy/ID044_clinic_129/ID044_clinic_129Temporal.xml!
+Inference on ID146_path_430a, number 250
+Outputting document
+outputted ../Output/greedy/ID146_path_430a/ID146_path_430aTemporal.xml!
+Inference on ID041_clinic_118, number 251
+Outputting document
+outputted ../Output/greedy/ID041_clinic_118/ID041_clinic_118Temporal.xml!
+Inference on ID009_clinic_025, number 252
+Outputting document
+outputted ../Output/greedy/ID009_clinic_025/ID009_clinic_025Temporal.xml!
+Inference on ID004_clinic_010, number 253
+Outputting document
+outputted ../Output/greedy/ID004_clinic_010/ID004_clinic_010Temporal.xml!
+Inference on ID017_clinic_051, number 254
+Outputting document
+outputted ../Output/greedy/ID017_clinic_051/ID017_clinic_051Temporal.xml!
+Inference on ID091_clinic_268, number 255
+Outputting document
+outputted ../Output/greedy/ID091_clinic_268/ID091_clinic_268Temporal.xml!
+Inference on ID033_clinic_097, number 256
+Outputting document
+outputted ../Output/greedy/ID033_clinic_097/ID033_clinic_097Temporal.xml!
+Inference on ID197_clinic_581, number 257
+Outputting document
+outputted ../Output/greedy/ID197_clinic_581/ID197_clinic_581Temporal.xml!
+Inference on ID168_path_492a, number 258
+Outputting document
+outputted ../Output/greedy/ID168_path_492a/ID168_path_492aTemporal.xml!
+Inference on ID098_clinic_291, number 259
+Outputting document
+outputted ../Output/greedy/ID098_clinic_291/ID098_clinic_291Temporal.xml!
+Inference on ID173_clinic_506, number 260
+Outputting document
+outputted ../Output/greedy/ID173_clinic_506/ID173_clinic_506Temporal.xml!
+Inference on ID193_clinic_567, number 261
+Outputting document
+outputted ../Output/greedy/ID193_clinic_567/ID193_clinic_567Temporal.xml!
+Inference on ID179_clinic_523, number 262
+Outputting document
+outputted ../Output/greedy/ID179_clinic_523/ID179_clinic_523Temporal.xml!
+Inference on ID066_clinic_194, number 263
+Outputting document
+outputted ../Output/greedy/ID066_clinic_194/ID066_clinic_194Temporal.xml!
+Inference on ID120_clinic_351, number 264
+Outputting document
+outputted ../Output/greedy/ID120_clinic_351/ID120_clinic_351Temporal.xml!
+Inference on ID082_clinic_244, number 265
+Outputting document
+outputted ../Output/greedy/ID082_clinic_244/ID082_clinic_244Temporal.xml!
+Inference on ID065_clinic_191, number 266
+Outputting document
+outputted ../Output/greedy/ID065_clinic_191/ID065_clinic_191Temporal.xml!
+Inference on ID194_clinic_570, number 267
+Outputting document
+outputted ../Output/greedy/ID194_clinic_570/ID194_clinic_570Temporal.xml!
+Inference on ID045_clinic_132, number 268
+Outputting document
+outputted ../Output/greedy/ID045_clinic_132/ID045_clinic_132Temporal.xml!
+Inference on ID074_clinic_220, number 269
+Outputting document
+outputted ../Output/greedy/ID074_clinic_220/ID074_clinic_220Temporal.xml!
+Inference on ID211_clinic_616, number 270
+Outputting document
+outputted ../Output/greedy/ID211_clinic_616/ID211_clinic_616Temporal.xml!
+Inference on ID004_clinic_012, number 271
+Outputting document
+outputted ../Output/greedy/ID004_clinic_012/ID004_clinic_012Temporal.xml!
+Inference on ID153_clinic_450, number 272
+Outputting document
+outputted ../Output/greedy/ID153_clinic_450/ID153_clinic_450Temporal.xml!
+Inference on ID092_clinic_273, number 273
+Outputting document
+outputted ../Output/greedy/ID092_clinic_273/ID092_clinic_273Temporal.xml!
+Inference on ID021_clinic_061, number 274
+Outputting document
+outputted ../Output/greedy/ID021_clinic_061/ID021_clinic_061Temporal.xml!
+Inference on ID026_clinic_078, number 275
+Outputting document
+outputted ../Output/greedy/ID026_clinic_078/ID026_clinic_078Temporal.xml!
+Inference on ID157_path_463, number 276
+Outputting document
+outputted ../Output/greedy/ID157_path_463/ID157_path_463Temporal.xml!
+Inference on ID093_path_275a, number 277
+Outputting document
+outputted ../Output/greedy/ID093_path_275a/ID093_path_275aTemporal.xml!
+Inference on ID059_clinic_173, number 278
+Outputting document
+outputted ../Output/greedy/ID059_clinic_173/ID059_clinic_173Temporal.xml!
+Inference on ID076_clinic_224, number 279
+Outputting document
+outputted ../Output/greedy/ID076_clinic_224/ID076_clinic_224Temporal.xml!
+Inference on ID061_clinic_179, number 280
+Outputting document
+outputted ../Output/greedy/ID061_clinic_179/ID061_clinic_179Temporal.xml!
+Inference on ID027_clinic_081, number 281
+Outputting document
+outputted ../Output/greedy/ID027_clinic_081/ID027_clinic_081Temporal.xml!
+Inference on ID133_clinic_390, number 282
+Outputting document
+outputted ../Output/greedy/ID133_clinic_390/ID133_clinic_390Temporal.xml!
+Inference on ID177_path_518a, number 283
+Outputting document
+outputted ../Output/greedy/ID177_path_518a/ID177_path_518aTemporal.xml!
+Inference on ID157_clinic_464, number 284
+Outputting document
+outputted ../Output/greedy/ID157_clinic_464/ID157_clinic_464Temporal.xml!
+Inference on ID059_path_174, number 285
+Outputting document
+outputted ../Output/greedy/ID059_path_174/ID059_path_174Temporal.xml!
+Inference on ID122_clinic_359, number 286
+Outputting document
+outputted ../Output/greedy/ID122_clinic_359/ID122_clinic_359Temporal.xml!
+Inference on ID019_clinic_057, number 287
+Outputting document
+outputted ../Output/greedy/ID019_clinic_057/ID019_clinic_057Temporal.xml!
+Inference on ID085_path_252a, number 288
+Outputting document
+outputted ../Output/greedy/ID085_path_252a/ID085_path_252aTemporal.xml!
+Inference on ID108_clinic_318, number 289
+Outputting document
+outputted ../Output/greedy/ID108_clinic_318/ID108_clinic_318Temporal.xml!
+Inference on ID212_clinic_617, number 290
+Outputting document
+outputted ../Output/greedy/ID212_clinic_617/ID212_clinic_617Temporal.xml!
+Inference on ID032_clinic_094, number 291
+Outputting document
+outputted ../Output/greedy/ID032_clinic_094/ID032_clinic_094Temporal.xml!
+Inference on ID025_clinic_073, number 292
+Outputting document
+outputted ../Output/greedy/ID025_clinic_073/ID025_clinic_073Temporal.xml!
+Inference on ID003_clinic_007, number 293
+Outputting document
+outputted ../Output/greedy/ID003_clinic_007/ID003_clinic_007Temporal.xml!
+Inference on ID082_clinic_242, number 294
+Outputting document
+outputted ../Output/greedy/ID082_clinic_242/ID082_clinic_242Temporal.xml!
+Inference on ID025_clinic_075, number 295
+Outputting document
+outputted ../Output/greedy/ID025_clinic_075/ID025_clinic_075Temporal.xml!
+Inference on ID077_path_228, number 296
+Outputting document
+outputted ../Output/greedy/ID077_path_228/ID077_path_228Temporal.xml!
+Inference on ID035_clinic_103, number 297
+Outputting document
+outputted ../Output/greedy/ID035_clinic_103/ID035_clinic_103Temporal.xml!
+Inference on ID061_path_180a, number 298
+Outputting document
+outputted ../Output/greedy/ID061_path_180a/ID061_path_180aTemporal.xml!
+Inference on ID165_path_484a, number 299
+Outputting document
+outputted ../Output/greedy/ID165_path_484a/ID165_path_484aTemporal.xml!
+Inference on ID185_clinic_541, number 300
+Outputting document
+outputted ../Output/greedy/ID185_clinic_541/ID185_clinic_541Temporal.xml!
+Inference on ID018_clinic_052, number 301
+Outputting document
+outputted ../Output/greedy/ID018_clinic_052/ID018_clinic_052Temporal.xml!
+Inference on ID097_clinic_286, number 302
+Outputting document
+outputted ../Output/greedy/ID097_clinic_286/ID097_clinic_286Temporal.xml!
+Inference on ID016_path_047, number 303
+Outputting document
+outputted ../Output/greedy/ID016_path_047/ID016_path_047Temporal.xml!
+Inference on ID197_path_580, number 304
+Outputting document
+outputted ../Output/greedy/ID197_path_580/ID197_path_580Temporal.xml!
+Inference on ID184_clinic_537, number 305
+Outputt

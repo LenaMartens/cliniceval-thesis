@@ -4,6 +4,7 @@ from sklearn import svm, linear_model
 import utils
 from data import Relation
 from feature import WordVector, TimeRelationVector
+import scipy.sparse
 
 
 class Classifier:
@@ -41,7 +42,7 @@ class SupportVectorMachine(Classifier):
     def train(self, trainingdata):
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
-
+	input = scipy.sparse.csr_matrix(input)
         self.machine = svm.SVC()
         self.machine.fit(input, output)
 
@@ -104,8 +105,7 @@ def predict_DCT(documents, model=None):
             if entity.get_class() == "Event":
                 feature = WordVector(entity)
                 dct = model.predict(feature)
-                entity.doc_time_rel = dct
-        print(len(document.get_entities()), len(document.get_relations()))
+                entity.doc_time_rel = dct[0]
     return documents
 
 

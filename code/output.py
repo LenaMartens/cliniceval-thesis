@@ -32,7 +32,7 @@ def save_as_xml(document, filename):
             # maybe more...
 
     for relation in document.get_relations():
-        ent = etree.SubElement(root, "entity")
+        ent = etree.SubElement(root, "relation")
 
         id = etree.SubElement(ent, "id")
         id.text = "{}@{}@{}".format(str(relation.id), 'r', doc_id)
@@ -67,7 +67,7 @@ def output_doc(document):
     newpath = os.path.join(utils.outputpath, document.id)
     if not os.path.exists(newpath):
         os.makedirs(newpath)
-    xml_path = os.path.join(newpath, document.id + ".xml")
+    xml_path = os.path.join(newpath, document.id + "Temporal.xml")
     save_as_xml(document, xml_path)
 
 
