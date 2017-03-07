@@ -34,7 +34,7 @@ def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_
         utils.save_model(relation_model, relation_model_name)
     else:
         relation_model = utils.load_model(relation_model_name)
-
+	print(relation_model.machine.classes_)
     print("Inferring document relations")
     # Also outputs the document
     if greedy:
@@ -47,4 +47,4 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[0] == "greedy":
             greedy=True
-    complete(utils.train, utils.dev, retrain_dct=False,repredict_dct=False, retrain_rc=True, greedy=greedy)
+    complete(utils.train, utils.dev, retrain_dct=False,repredict_dct=False, retrain_rc=False, greedy=greedy)

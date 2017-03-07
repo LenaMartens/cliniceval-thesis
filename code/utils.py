@@ -57,8 +57,7 @@ def add_word_to_dictionary(word):
     if word not in dictionary:
         dictionary[word] = dict_id
         dict_id += 1
-    l_word = word
-#    l_word = lemmatize_word(word)
+    l_word = lemmatize_word(word)
     if l_word not in lemma_dictionary:
         lemma_dictionary[l_word] = lemma_id
         lemma_id += 1

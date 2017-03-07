@@ -193,7 +193,7 @@ Specific feature vectors used in training and prediction
 class WordVector(ConcatenatedVector):
     def generate_vector(self):
         self.features.append(WordFeatureVector(self.entity))
-        #self.features.append(LemmaFeatureVector(self.entity))
+        self.features.append(LemmaFeatureVector(self.entity))
         self.features.append(CapitalFeatureVector(self.entity))
         self.features.append(POSFeatureVector(self.entity))
         self.features.append(DocTimeVector(self.entity))
