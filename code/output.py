@@ -63,17 +63,17 @@ def prettify(elem):
     return reparsed.toprettyxml(indent="  ")
 
 
-def output_doc(document):
-    newpath = os.path.join(utils.outputpath, document.id)
+def output_doc(document, outputpath=utils.outputpath):
+    newpath = os.path.join(outputpath, document.id)
     if not os.path.exists(newpath):
         os.makedirs(newpath)
     xml_path = os.path.join(newpath, document.id + "Temporal.xml")
     save_as_xml(document, xml_path)
 
 
-def output_docs_as_xml(documents):
+def output_docs_as_xml(documents, outputpath=utils.outputpath):
     for document in documents:
-        output_doc(document)
+        output_doc(document, outputpath)
 
 
 if __name__ == "__main__":

@@ -3,12 +3,13 @@ import classification
 import inference
 import output
 import utils
+import sys
 
 DCT_model_name = "SupportVectorMachine1.0"
 relation_model_name = "LogisticRegression1.0"
 
 
-def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_rc=True):
+def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_rc=True, greedy=False):
     print("Reading the documents")
     if retrain_dct or retrain_rc:
         train_documents = data.read_all(trainpath)
@@ -36,8 +37,14 @@ def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_
 
     print("Inferring document relations")
     # Also outputs the document
-    inference.greedily_decide_relations(utils.document_generator(), relation_model)
-
+    if greedy:
+         inference.greedily_decide_relations(utils.document_generator(), relation_model)
+    else:
+         inference.infer_relations_on_documents(utils.document_generator(), relation_model)
 
 if __name__ == "__main__":
-    complete(utils.train, utils.dev, retrain_dct=True,repredict_dct=True, retrain_rc=True)
+    greedy=False
+    if len(sys.argv) > 1:
+        if sys.argv[0] == "greedy":
+            greedy=True
+    complete(utils.train, utils.dev, retrain_dct=False,repredict_dct=False, retrain_rc=True, greedy=greedy)

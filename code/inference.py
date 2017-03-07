@@ -62,6 +62,7 @@ def inference(document, logistic_model, doc_time_constraints=0):
     model.Params.OutputFlag = 0
     # Limit number of threads
     model.Params.Threads = 4
+    model.Params.TimeLimit = 30
 
     for candidate in candidates:
         probs = logistic_model.predict(candidate)
@@ -118,10 +119,11 @@ def greedy_decision(document, model, all=False):
         candidates = generate_all_paragraph_candidates(document)
 
     document.clear_relations()
+    print(len(document.get_relations()))
     for candidate in candidates:
         probs = model.predict(candidate)
         positive = probs[0][0]
-        if positive > 0.5:
+        if positive > 0.7:
             document.add_relation(candidate.entity.source.id, candidate.entity.target.id)
 
 
@@ -144,7 +146,7 @@ def greedily_decide_relations(documents, model=None):
         print("Inference on {}".format(document.id) + ", number " + str(i))
         greedy_decision(document, model)
         print("Outputting document")
-        output.output_doc(document)
+        output.output_doc(document, utils.greedy_output_path)
 
 
 if __name__ == "__main__":
