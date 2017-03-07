@@ -67,10 +67,10 @@ def inference(document, logistic_model, doc_time_constraints=0):
     for candidate in candidates:
         probs = logistic_model.predict(candidate)
         # positive variable
-        positive_var = model.addVar(vtype=GRB.BINARY, obj=probs[0][0],
+        positive_var = model.addVar(vtype=GRB.BINARY, obj=probs[0][1],
                                     name="true: {}, {}".format(candidate.entity.source.id, candidate.entity.target.id))
         # negative variable
-        negative_var = model.addVar(vtype=GRB.BINARY, obj=probs[0][1],
+        negative_var = model.addVar(vtype=GRB.BINARY, obj=probs[0][0],
                                     name="false: {}, {}".format(candidate.entity.source.id, candidate.entity.target.id))
         model.addConstr(negative_var + positive_var == 1,
                         'only one label for {}, {}'.format(candidate.entity.source.id, candidate.entity.target.id))
@@ -122,7 +122,7 @@ def greedy_decision(document, model, all=False):
     print(len(document.get_relations()))
     for candidate in candidates:
         probs = model.predict(candidate)
-        positive = probs[0][0]
+        positive = probs[0][1]
         if positive > 0.7:
             document.add_relation(candidate.entity.source.id, candidate.entity.target.id)
 

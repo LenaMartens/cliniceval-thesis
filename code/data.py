@@ -35,20 +35,22 @@ class Document(object):
             self.entities[id] = obj
 
     def process_relation(self, relation):
-        id = relation.find("id").text
-        id = id[:id.find('@')]
+        type = relation.find('properties').find('Type').text
+        if type.lower() == "contains":
+            id = relation.find("id").text
+            id = id[:id.find('@')]
 
-        source_id = relation.find('properties').find('Source').text
-        source_id = source_id[:source_id.find('@')]
-        source = self.entities[source_id]
+            source_id = relation.find('properties').find('Source').text
+            source_id = source_id[:source_id.find('@')]
+            source = self.entities[source_id]
 
-        target_id = relation.find('properties').find('Target').text
-        target_id = target_id[:target_id.find('@')]
-        target = self.entities[target_id]
+            target_id = relation.find('properties').find('Target').text
+            target_id = target_id[:target_id.find('@')]
+            target = self.entities[target_id]
 
-        obj = Relation(source, relation.find('properties').find('Type').text, target, id=id)
-        self.relations[id] = obj
-        self.relation_mapping[source_id] = target_id
+            obj = Relation(source, type, target, id=id)
+            self.relations[id] = obj
+            self.relation_mapping[source_id] = target_id
 
     def clear_relations(self):
         self.relations.clear()
@@ -160,7 +162,7 @@ def read_document(parent_directory, dir):
 
 
 def read_all(directory):
-    utils.load_dictionary(utils.lemma_dictionary)
+    utils.load_dictionary(utils.lemma_path)
     utils.load_dictionary(utils.dictionary_path)
     docs = []
     for dir in os.listdir(directory):
