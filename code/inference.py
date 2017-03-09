@@ -153,4 +153,3 @@ if __name__ == "__main__":
     relation_model = classification.train_relation_classifier(utils.get_documents_from_file())
     for document in utils.get_documents_from_file():
         infer_relations_on_documents(document, relation_model)
-        utils.save_document(document, document.id)

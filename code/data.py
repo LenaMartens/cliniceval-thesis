@@ -170,7 +170,6 @@ def read_all(directory):
         docs.append(doc)
         for k, entity in doc.entities.items():
             utils.add_word_to_dictionary(entity.word)
-        utils.save_document(doc, dir)
     utils.save_dictionary()
     return docs
 
