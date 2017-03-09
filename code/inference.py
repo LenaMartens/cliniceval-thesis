@@ -28,6 +28,18 @@ def generate_prediction_candidates(document, amount=20):
     return feature_vectors
 
 
+def generate_all_sentence_candidates(document):
+    entities = list(document.get_entities())
+    feature_vectors = []
+
+    for entity1 in entities:
+        for entity2 in entities:
+            if entity1 is not entity2 and entity1.sentence == entity2.sentence:
+                relation = Relation(source=entity1, target=entity2, positive=False)
+                feature_vectors.append(TimeRelationVector(relation))
+
+    return feature_vectors
+
 def generate_all_paragraph_candidates(document):
     entities = list(document.get_entities())
     feature_vectors = []
@@ -118,7 +130,7 @@ def greedy_decision(document, model, all=False):
     if all:
         candidates = generate_all_candidates(document)
     else:
-        candidates = generate_all_paragraph_candidates(document)
+        candidates = generate_all_sentence_candidates(document)
 
     document.clear_relations()
     for candidate in candidates:
