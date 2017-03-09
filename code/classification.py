@@ -74,12 +74,14 @@ def generate_training_candidates(documents):
         maxr = len(entities)
         relation_len = len(relations)
         added_dict = {}
-        while added < relation_len:
+        tried = 0
+        while added < relation_len and tried<100000:
+            tried += 1
             [source_id, target_id] = random.sample(range(0, maxr), 2)
             if (source_id, target_id) not in added_dict:
                 source = entities[source_id]
                 target = entities[target_id]
-                if not document.relation_exists(source, target) and source.paragraph == target.paragraph:
+                if not document.relation_exists(source, target) and source.sentence == target.sentence:
                     relation = Relation(source=source, target=target, positive=False)
                     feature_vectors.append(TimeRelationVector(relation))
                     added += 1
