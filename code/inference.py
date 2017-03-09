@@ -99,8 +99,10 @@ def inference(document, logistic_model, doc_time_constraints=0):
 
     # maximize
     model.ModelSense = -1
-
-    model.optimize()
+    try:
+        model.optimize()
+    except GurobiError as e:
+        print(e)
 
     document.clear_relations()
     for var in model.getVars():
@@ -119,7 +121,6 @@ def greedy_decision(document, model, all=False):
         candidates = generate_all_paragraph_candidates(document)
 
     document.clear_relations()
-    print(len(document.get_relations()))
     for candidate in candidates:
         probs = model.predict(candidate)
         positive = probs[0][1]
@@ -143,7 +144,7 @@ def greedily_decide_relations(documents, model=None):
         model = utils.load_model("LogisticRegression_randomcandidate")
 
     for i, document in enumerate(documents):
-        print("Inference on {}".format(document.id) + ", number " + str(i))
+        print("Greedy inference on {}".format(document.id) + ", number " + str(i))
         greedy_decision(document, model)
         print("Outputting document")
         output.output_doc(document, utils.greedy_output_path)

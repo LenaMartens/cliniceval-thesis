@@ -25,7 +25,8 @@ def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_
             DCT_model = utils.load_model(DCT_model_name)
         print("Predicting DCT")
         predicted_docus = classification.predict_DCT(test_documents, DCT_model)
-        for doc in predicted_docus:
+        print(len(predicted_docus))
+	for doc in predicted_docus:
             utils.save_document(doc, doc.id)
 
     if retrain_rc:
@@ -34,7 +35,6 @@ def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_
         utils.save_model(relation_model, relation_model_name)
     else:
         relation_model = utils.load_model(relation_model_name)
-	print(relation_model.machine.classes_)
     print("Inferring document relations")
     # Also outputs the document
     if greedy:
@@ -44,7 +44,8 @@ def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_
 
 if __name__ == "__main__":
     greedy=False
+    print(sys.argv)
     if len(sys.argv) > 1:
-        if sys.argv[0] == "greedy":
+        if sys.argv[1] == "greedy":
             greedy=True
-    complete(utils.train, utils.dev, retrain_dct=False,repredict_dct=False, retrain_rc=False, greedy=greedy)
+    complete(utils.train, utils.dev, retrain_dct=True,repredict_dct=True, retrain_rc=True, greedy=greedy)
