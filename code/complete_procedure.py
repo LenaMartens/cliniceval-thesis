@@ -1,7 +1,6 @@
 import data
 import classification
 import inference
-import output
 import utils
 import sys
 
@@ -26,7 +25,7 @@ def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_
         print("Predicting DCT")
         predicted_docus = classification.predict_DCT(test_documents, DCT_model)
         print(len(predicted_docus))
-	for doc in predicted_docus:
+        for doc in predicted_docus:
             utils.save_document(doc, doc.id)
 
     if retrain_rc:
@@ -38,14 +37,15 @@ def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_
     print("Inferring document relations")
     # Also outputs the document
     if greedy:
-         inference.greedily_decide_relations(utils.document_generator(), relation_model)
+        inference.greedily_decide_relations(utils.document_generator(), relation_model)
     else:
-         inference.infer_relations_on_documents(utils.document_generator(), relation_model)
+        inference.infer_relations_on_documents(utils.document_generator(), relation_model)
+
 
 if __name__ == "__main__":
-    greedy=False
+    greedy = False
     print(sys.argv)
     if len(sys.argv) > 1:
         if sys.argv[1] == "greedy":
-            greedy=True
-    complete(utils.train, utils.dev, retrain_dct=True,repredict_dct=True, retrain_rc=True, greedy=greedy)
+            greedy = True
+    complete(utils.train, utils.dev, retrain_dct=True, repredict_dct=True, retrain_rc=True, greedy=True)
