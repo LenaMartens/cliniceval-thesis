@@ -3,7 +3,7 @@ import random
 from sklearn import svm, linear_model
 import utils
 from data import Relation
-from feature import WordVector, TimeRelationVector
+from feature import TimeRelationVector, WordVectorWithContext
 import scipy.sparse
 
 
@@ -22,7 +22,6 @@ class Classifier:
 
 class LogisticRegression(Classifier):
     def train(self, trainingdata):
-        print(len(trainingdata))
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
         self.machine = linear_model.LogisticRegression()
@@ -57,18 +56,18 @@ def generate_training_data(documents):
     for document in documents:
         for entity in document.get_entities():
             if entity.get_class() == "Event":
-                feature_vectors.append(WordVector(entity))
+                feature_vectors.append(WordVectorWithContext(entity, document))
     return feature_vectors
 
 
-def generate_training_candidates(documents):
+def generate_training_candidates(documents, token_window):
     feature_vectors = []
     for document in documents:
         # Get positive candidates
         entities = list(document.get_entities())
         relations = document.get_relations()
         for relation in relations:
-            feature_vectors.append(TimeRelationVector(relation))
+            feature_vectors.append(TimeRelationVector(relation, document))
         # Generate negative candidates (as many as there are positive)
         added = 0
         maxr = len(entities)
@@ -81,9 +80,9 @@ def generate_training_candidates(documents):
             if (source_id, target_id) not in added_dict:
                 source = entities[source_id]
                 target = entities[target_id]
-                if not document.relation_exists(source, target) and source.sentence == target.sentence:
+                if not document.relation_exists(source, target) and abs(source.token - target.token) < token_window+1:
                     relation = Relation(source=source, target=target, positive=False)
-                    feature_vectors.append(TimeRelationVector(relation))
+                    feature_vectors.append(TimeRelationVector(relation, document))
                     added += 1
                     added_dict[(source_id, target_id)] = True
     return feature_vectors
@@ -95,8 +94,8 @@ def train_doctime_classifier(docs):
     return svm
 
 
-def train_relation_classifier(docs):
-    features = generate_training_candidates(docs)
+def train_relation_classifier(docs, token_window):
+    features = generate_training_candidates(docs, token_window)
     lr = LogisticRegression(features)
     return lr
 
@@ -105,7 +104,7 @@ def predict_DCT(documents, model=None):
     for document in documents:
         for entity in document.get_entities():
             if entity.get_class() == "Event":
-                feature = WordVector(entity)
+                feature = WordVectorWithContext(entity, document)
                 dct = model.predict(feature)
                 entity.doc_time_rel = dct[0]
     return documents

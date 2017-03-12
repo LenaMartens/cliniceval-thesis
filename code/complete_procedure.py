@@ -6,6 +6,7 @@ import sys
 
 DCT_model_name = "SupportVectorMachine1.0"
 relation_model_name = "LogisticRegression1.0"
+token_window = 30
 
 
 def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_rc=True, greedy=False):
@@ -30,16 +31,16 @@ def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_
 
     if retrain_rc:
         print("Training pre-inference classifier")
-        relation_model = classification.train_relation_classifier(train_documents)
+        relation_model = classification.train_relation_classifier(train_documents, token_window)
         utils.save_model(relation_model, relation_model_name)
     else:
         relation_model = utils.load_model(relation_model_name)
     print("Inferring document relations")
     # Also outputs the document
     if greedy:
-        inference.greedily_decide_relations(utils.document_generator(), relation_model)
+        inference.greedily_decide_relations(utils.document_generator(), relation_model, token_window)
     else:
-        inference.infer_relations_on_documents(utils.document_generator(), relation_model)
+        inference.infer_relations_on_documents(utils.document_generator(), relation_model, token_window)
 
 
 if __name__ == "__main__":

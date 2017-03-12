@@ -53,7 +53,8 @@ def save_as_xml(document, filename):
 
     with open(filename, 'w') as f:
         f.write(prettify(data_root))
-    print("outputted "+filename+"!")
+    print("outputted " + filename + "!")
+
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.

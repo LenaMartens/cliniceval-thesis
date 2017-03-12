@@ -47,8 +47,9 @@ class ConcatenatedVector:
         self.generate_vector()
         return np.concatenate([x.get_vector() for x in self.features])
 
-    def __init__(self, entity):
+    def __init__(self, entity, document):
         self.entity = entity
+        self.document = document
         self.features = list()
 
     def generate_vector(self):
@@ -68,6 +69,7 @@ class WordFeatureVector(FeatureVector):
             self.vector[dictionary[word]] = 1
         except KeyError:
             self.vector[len(dictionary)] = 1
+
 
 '''
 One hot encoding of the word in the dictionary of the lematized encountered words.
@@ -159,7 +161,6 @@ class ModalityFeatureVector(FeatureVector):
             try:
                 self.vector[modalities[self.entity.modality]] = 1
             except KeyError:
-                print(self.entity.modality)
                 self.vector[len(modalities)] = 1
         else:
             self.vector[len(modalities)] = 1
@@ -186,6 +187,18 @@ class SameSentenceVector(RelationFeatureVector):
 
 
 '''
+What is the distance between the two entities?
+'''
+
+
+# TODO: ONEHOT of normalisatie
+class DistanceVector(RelationFeatureVector):
+    def generate_vector(self):
+        distance = abs(self.source.token - self.target.token)
+        self.vector = np.asarray([distance])
+
+
+'''
 Specific feature vectors used in training and prediction
 '''
 
@@ -201,9 +214,18 @@ class WordVector(ConcatenatedVector):
         self.features.append(PolarityFeatureVector(self.entity))
 
 
+class WordVectorWithContext(ConcatenatedVector):
+    def generate_vector(self):
+        left_neighbour = self.document.get_neighbour_entity(self.entity, -1)
+        right_neighbour = self.document.get_neighbour_entity(self.entity, +1)
+        self.features.append(WordVector(self.entity, self.document))
+        self.features.append(WordVector(left_neighbour, self.document))
+        self.features.append(WordVector(right_neighbour, self.document))
+
+
 class TimeRelationVector(ConcatenatedVector):
     def generate_vector(self):
-        self.features.append(WordVector(self.entity.source))
-        self.features.append(WordVector(self.entity.target))
+        self.features.append(WordVectorWithContext(self.entity.source, self.document))
+        self.features.append(WordVectorWithContext(self.entity.target, self.document))
         self.features.append(SameParVector(self.entity.source, self.entity.target))
         self.features.append(SameSentenceVector(self.entity.source, self.entity.target))

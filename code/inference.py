@@ -7,6 +7,7 @@ import output
 import utils
 from data import Relation, read_document
 from feature import TimeRelationVector
+from functools import partial
 
 
 def generate_prediction_candidates(document, amount=20):
@@ -22,33 +23,33 @@ def generate_prediction_candidates(document, amount=20):
             source = entities[source_id]
             target = entities[target_id]
             relation = Relation(source=source, target=target, positive=False)
-            feature_vectors.append(TimeRelationVector(relation))
+            feature_vectors.append(TimeRelationVector(relation, document))
             added += 1
             added_dict[(source_id, target_id)] = True
     return feature_vectors
 
 
-def generate_all_sentence_candidates(document):
+def same_sentence(source, target):
+    return source.sentence == target.sentence
+
+
+def same_paragraph(source, target):
+    return source.paragraph == target.paragraph
+
+
+def in_window(window, source, target):
+    return abs(source.token - target.token) < window + 1
+
+
+def constrained_candidates(document, constraint):
     entities = list(document.get_entities())
     feature_vectors = []
 
     for entity1 in entities:
         for entity2 in entities:
-            if entity1 is not entity2 and entity1.sentence == entity2.sentence:
+            if entity1 is not entity2 and constraint(entity1, entity2):
                 relation = Relation(source=entity1, target=entity2, positive=False)
-                feature_vectors.append(TimeRelationVector(relation))
-
-    return feature_vectors
-
-def generate_all_paragraph_candidates(document):
-    entities = list(document.get_entities())
-    feature_vectors = []
-
-    for entity1 in entities:
-        for entity2 in entities:
-            if entity1 is not entity2 and entity1.paragraph == entity2.paragraph:
-                relation = Relation(source=entity1, target=entity2, positive=False)
-                feature_vectors.append(TimeRelationVector(relation))
+                feature_vectors.append(TimeRelationVector(relation, document))
 
     return feature_vectors
 
@@ -61,13 +62,13 @@ def generate_all_candidates(document):
         for entity2 in entities:
             if entity1 is not entity2:
                 relation = Relation(source=entity1, target=entity2, positive=False)
-                feature_vectors.append(TimeRelationVector(relation))
+                feature_vectors.append(TimeRelationVector(relation, document))
 
     return feature_vectors
 
 
-def inference(document, logistic_model, doc_time_constraints=0):
-    candidates = generate_all_paragraph_candidates(document)
+def inference(document, logistic_model, token_window, doc_time_constraints=0):
+    candidates = constrained_candidates(document, partial(in_window(token_window)))
 
     model = Model('Relations in document')
     # No output
@@ -92,11 +93,10 @@ def inference(document, logistic_model, doc_time_constraints=0):
                                     name="false: {}, {}".format(source.id, target.id))
         model.addConstr(negative_var + positive_var == 1,
                         'only one label for {}, {}'.format(source.id, target.id))
-        if doc_time_constraints:
-            if cannot_be_contained(source.doc_time_rel, target.doc_time_rel):
-                model.addConstr(negative_var == 1,
-                                '{} and {} do not have compatible doctimerels'.format(source.id,
-                                                                                      target.id))
+        if cannot_be_contained(source.doc_time_rel, target.doc_time_rel):
+            model.addConstr(negative_var == 1,
+                            '{} and {} do not have compatible doctimerels'.format(source.id,
+                                                                                  target.id))
     model.update()
 
     entities = document.get_entities()
@@ -130,11 +130,11 @@ def inference(document, logistic_model, doc_time_constraints=0):
                     document.add_relation(m.group(1), m.group(2))
 
 
-def greedy_decision(document, model, all=False):
+def greedy_decision(document, model, token_window, all=False):
     if all:
         candidates = generate_all_candidates(document)
     else:
-        candidates = generate_all_sentence_candidates(document)
+        candidates = constrained_candidates(document, partial(in_window(token_window)))
 
     document.clear_relations()
     for candidate in candidates:
@@ -144,24 +144,18 @@ def greedy_decision(document, model, all=False):
             document.add_relation(candidate.entity.source.id, candidate.entity.target.id)
 
 
-def infer_relations_on_documents(documents, model=None):
-    if model is None:
-        model = utils.load_model("LogisticRegression_randomcandidate")
-
+def infer_relations_on_documents(documents, model, token_window):
     for i, document in enumerate(documents):
         print("Inference on {}".format(document.id) + ", number " + str(i))
-        inference(document, model)
+        inference(document, model, token_window)
         print("Outputting document")
         output.output_doc(document)
 
 
-def greedily_decide_relations(documents, model=None):
-    if model is None:
-        model = utils.load_model("LogisticRegression_randomcandidate")
-
+def greedily_decide_relations(documents, model, token_window):
     for i, document in enumerate(documents):
         print("Greedy inference on {}".format(document.id) + ", number " + str(i))
-        greedy_decision(document, model)
+        greedy_decision(document, model, token_window)
         print("Outputting document")
         output.output_doc(document, utils.greedy_output_path)
 
