@@ -3,6 +3,7 @@ import os
 import xml.etree.ElementTree as ET
 import utils
 import re
+import tqdm
 
 
 class Document(object):
@@ -228,7 +229,7 @@ def read_all(directory):
     utils.load_dictionary(utils.lemma_path)
     utils.load_dictionary(utils.dictionary_path)
     docs = []
-    for dir in os.listdir(directory):
+    for dir in tqdm.tqdm(os.listdir(directory)):
         doc = read_document(directory, dir)
         docs.append(doc)
         for k, entity in doc.entities.items():
