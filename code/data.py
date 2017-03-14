@@ -3,7 +3,6 @@ import os
 import xml.etree.ElementTree as ET
 import utils
 import re
-import tqdm
 
 
 class Document(object):
@@ -23,7 +22,7 @@ class Document(object):
         self.sorted_entity_ids = []
 
     def clear_relations(self):
-        self.relations.clear()
+        self.relations = []
 
     '''
     Relation adding helper methods
@@ -60,7 +59,7 @@ class Document(object):
         '''
         place = self.sorted_entity_ids.index(entity.id)
         try:
-            return self.sorted_entity_ids[place + direction]
+            return self.entities[self.sorted_entity_ids[place + direction]]
         except IndexError:
             return None
 
@@ -229,7 +228,7 @@ def read_all(directory):
     utils.load_dictionary(utils.lemma_path)
     utils.load_dictionary(utils.dictionary_path)
     docs = []
-    for dir in tqdm.tqdm(os.listdir(directory)):
+    for dir in os.listdir(directory):
         doc = read_document(directory, dir)
         docs.append(doc)
         for k, entity in doc.entities.items():

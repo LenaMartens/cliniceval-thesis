@@ -2,7 +2,7 @@ import random
 
 from sklearn import svm, linear_model
 import utils
-from data import Relation
+from data import Relation, read_all
 from feature import TimeRelationVector, WordVectorWithContext
 import scipy.sparse
 
@@ -41,6 +41,7 @@ class SupportVectorMachine(Classifier):
     def train(self, trainingdata):
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
+        print(output)
         input = scipy.sparse.csr_matrix(input)
         self.machine = svm.SVC()
         self.machine.fit(input, output)
@@ -113,7 +114,7 @@ def predict_DCT(documents, model=None):
 if __name__ == '__main__':
     from classification import SupportVectorMachine, LogisticRegression
 
-    docs = utils.get_documents_from_file(utils.store_path)
+    docs = read_all(utils.dev)
     train_doctime_classifier(docs)
 # features = generate_training_candidates(docs)
 # lr = LogisticRegression(features)

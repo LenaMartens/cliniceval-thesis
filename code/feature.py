@@ -197,7 +197,13 @@ class DistanceVector(RelationFeatureVector):
         distance = abs(self.source.token - self.target.token)
         self.vector = np.asarray([distance])
 
+vector_length = 0
 
+class EmptyVector(FeatureVector):
+    # verschrikkelijke hack schaam u lena
+    def generate_vector(self):
+        global vector_length
+        self.vector = np.asarray(np.zeros(vector_length))    
 '''
 Specific feature vectors used in training and prediction
 '''
@@ -205,13 +211,20 @@ Specific feature vectors used in training and prediction
 
 class WordVector(ConcatenatedVector):
     def generate_vector(self):
-        self.features.append(WordFeatureVector(self.entity))
-        self.features.append(LemmaFeatureVector(self.entity))
-        self.features.append(CapitalFeatureVector(self.entity))
-        self.features.append(POSFeatureVector(self.entity))
-        self.features.append(DocTimeVector(self.entity))
-        self.features.append(ModalityFeatureVector(self.entity))
-        self.features.append(PolarityFeatureVector(self.entity))
+        global vector_length
+        if self.entity is not None:
+            self.features.append(WordFeatureVector(self.entity))
+            self.features.append(LemmaFeatureVector(self.entity))
+            self.features.append(CapitalFeatureVector(self.entity))
+            self.features.append(POSFeatureVector(self.entity))
+            self.features.append(DocTimeVector(self.entity))
+            self.features.append(ModalityFeatureVector(self.entity))
+            self.features.append(PolarityFeatureVector(self.entity))
+            if vector_length == 0:
+                for feature in self.features:
+                    vector_length += len(feature.get_vector())
+        else:
+            self.features.append(EmptyVector(None))
 
 
 class WordVectorWithContext(ConcatenatedVector):

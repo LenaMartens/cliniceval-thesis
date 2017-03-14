@@ -49,4 +49,4 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "greedy":
             greedy = True
-    complete(utils.train, utils.dev, retrain_dct=True, repredict_dct=True, retrain_rc=True, greedy=True)
+    complete(utils.train, utils.dev, retrain_dct=False, repredict_dct=False, retrain_rc=False, greedy=greedy)
