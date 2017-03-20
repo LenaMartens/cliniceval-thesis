@@ -3,8 +3,6 @@ import os
 import xml.etree.ElementTree as ET
 import utils
 import re
-import tqdm
-
 
 class Document(object):
     def __init__(self, id):
@@ -65,7 +63,7 @@ class Document(object):
             return None
 
     '''
-    Processing methods describing how to turn the raw input to objects
+    Processing methods describing how to turn the raw input into objects
     '''
 
     def process_event(self, entity):
@@ -140,17 +138,6 @@ class Document(object):
 
 
 '''
-Cmp function for sorting of entities
-'''
-
-
-def entity_span_cmp(self, id1, id2):
-    entity1 = self.entities[id1]
-    entity2 = self.entities[id2]
-    return entity1.span[0] - entity2.span[0]
-
-
-'''
 Data classes
 '''
 
@@ -221,7 +208,7 @@ def read_document(parent_directory, dir):
             doc.process_annotations(file_path)
         elif file.find(".") == -1:
             doc.process_file(file_path)
-    doc.close_transitivity()
+    # doc.close_transitivity()
     return doc
 
 
@@ -229,7 +216,7 @@ def read_all(directory):
     utils.load_dictionary(utils.lemma_path)
     utils.load_dictionary(utils.dictionary_path)
     docs = []
-    for dir in tqdm.tqdm(os.listdir(directory)):
+    for dir in os.listdir(directory):
         doc = read_document(directory, dir)
         docs.append(doc)
         for k, entity in doc.entities.items():

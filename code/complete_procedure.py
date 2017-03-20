@@ -45,7 +45,6 @@ def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_
 
 if __name__ == "__main__":
     greedy = False
-    print(sys.argv)
     if len(sys.argv) > 1:
         if sys.argv[1] == "greedy":
             greedy = True

@@ -10,25 +10,6 @@ from feature import TimeRelationVector
 from functools import partial
 
 
-def generate_prediction_candidates(document, amount=20):
-    entities = list(document.get_entities())
-    added = 0
-    maxr = len(entities)
-    added_dict = {}
-    feature_vectors = []
-
-    while added < amount:
-        [source_id, target_id] = random.sample(range(0, maxr), 2)
-        if (source_id, target_id) not in added_dict:
-            source = entities[source_id]
-            target = entities[target_id]
-            relation = Relation(source=source, target=target, positive=False)
-            feature_vectors.append(TimeRelationVector(relation, document))
-            added += 1
-            added_dict[(source_id, target_id)] = True
-    return feature_vectors
-
-
 def same_sentence(source, target):
     return source.sentence == target.sentence
 
@@ -67,7 +48,7 @@ def generate_all_candidates(document):
     return feature_vectors
 
 
-def inference(document, logistic_model, token_window, doc_time_constraints=0):
+def inference(document, logistic_model, token_window, transitive=True):
     candidates = constrained_candidates(document, partial(in_window(token_window)))
 
     model = Model('Relations in document')
@@ -101,17 +82,25 @@ def inference(document, logistic_model, token_window, doc_time_constraints=0):
 
     entities = document.get_entities()
     for i in entities:
+        parents_of_i = []
         for j in entities:
             cji = model.getVarByName("true: {}, {}".format(j.id, i.id))
             cij = model.getVarByName("true: {}, {}".format(i.id, j.id))
+
             if cji is not None and cij is not None:
                 model.addConstr(cji + cij <= 1, "antisymmetry")
-            for k in entities:
-                if i is not j and j is not k and k is not i:
-                    cik = model.getVarByName("true: {}, {}".format(i.id, k.id))
-                    cjk = model.getVarByName("true: {}, {}".format(j.id, k.id))
-                    if cik is not None and cjk is not None and cij is not None:
-                        model.addConstr(cik - cjk - cij >= -1, "transitivity")
+            if transitive:
+                for k in entities:
+                    if i is not j and j is not k and k is not i:
+                        cik = model.getVarByName("true: {}, {}".format(i.id, k.id))
+                        cjk = model.getVarByName("true: {}, {}".format(j.id, k.id))
+                        if cik is not None and cjk is not None and cij is not None:
+                            model.addConstr(cik - cjk - cij >= -1, "transitivity")
+            else:
+                parents_of_i.append(cij)
+        # Apply tree constraints if not transitive (only one parent)
+        if not transitive:
+            model.addConstr(sum(parents_of_i) <= 1, "treestructure")
 
     # maximize
     model.ModelSense = -1

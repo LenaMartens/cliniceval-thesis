@@ -2,7 +2,7 @@ import random
 
 from sklearn import svm, linear_model
 import utils
-from data import Relation
+from data import Relation, read_all
 from feature import TimeRelationVector, WordVectorWithContext
 import scipy.sparse
 
@@ -42,7 +42,10 @@ class SupportVectorMachine(Classifier):
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
         input = scipy.sparse.csr_matrix(input)
-        self.machine = svm.SVC()
+
+        # BALANCED BECAUSE OF DATA BIAS + linear
+        self.machine = svm.LinearSVC(class_weight='balanced')
+
         self.machine.fit(input, output)
 
     def predict(self, sample):
@@ -111,9 +114,10 @@ def predict_DCT(documents, model=None):
 
 
 if __name__ == '__main__':
+    # because of pickle issues
     from classification import SupportVectorMachine, LogisticRegression
 
-    docs = utils.get_documents_from_file(utils.store_path)
+    docs = read_all(utils.dev)
     train_doctime_classifier(docs)
 # features = generate_training_candidates(docs)
 # lr = LogisticRegression(features)

@@ -21,9 +21,6 @@ def save_as_xml(document, filename):
         type = etree.SubElement(ent, "type")
         type.text = entity.get_class().upper()
 
-        # parentstype = etree.SubElement(ent, "parentstype")
-        # parentstype.text =
-
         properties = etree.SubElement(ent, "properties")
 
         if entity.get_class().startswith("E"):

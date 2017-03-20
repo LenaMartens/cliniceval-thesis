@@ -67,8 +67,25 @@ def amount_of_candidates(documents, amount=30):
                 if i != j:
                     if abs(i.token - j.token) < amount + 1:
                         candidates += 1
-    print(candidates)
+    print(candidates/len(documents))
 
+
+def projective_trees(documents):
+    for document in documents:
+        relations = document.get_relations()
+        spans = []
+        for relation in relations:
+            source = relation.source
+            target = relation.target
+            begin = source.span[0]
+            end = target.span[0]
+            spans.append((begin, end))
+        spans.sort(key=lambda x: x[0])
+        non_projective = 0
+        for i in range(len(spans)-1):
+            if spans[i+1][0] <= spans[i][1] <= spans[i+1][1]:
+                non_projective+=1
+        print(non_projective/(len(relations)+1))
 
 if __name__ == "__main__":
     # treeless(train)
@@ -77,10 +94,12 @@ if __name__ == "__main__":
     # samepar_relations(dev)
     # samesentence_relations(train)
     # samesentence_relations(dev)
-    for i in range(10, 15):
-        print("amount: " + str(i))
-        within_amount_of_tokens(train, i)
-        amount_of_candidates(train, i)
-        within_amount_of_tokens(dev, i)
-        amount_of_candidates(dev, i)
-        print("-------------------------------")
+    within_amount_of_tokens(train, 30)
+    # for i in range(10, 15):
+    #     print("amount: " + str(i))
+    #     within_amount_of_tokens(train, i)
+    #     amount_of_candidates(train, i)
+    #     within_amount_of_tokens(dev, i)
+    #     amount_of_candidates(dev, i)
+    #     print("-------------------------------")
+    projective_trees(train)
