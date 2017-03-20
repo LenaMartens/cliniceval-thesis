@@ -4,7 +4,6 @@ import utils
 dev = data.read_all(utils.dev)
 train = data.read_all(utils.train)
 
-
 def treeless(documents):
     treefull = 0
     all = 0

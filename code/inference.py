@@ -8,7 +8,9 @@ import utils
 from data import Relation, read_document
 from feature import TimeRelationVector
 from functools import partial
+from guppy import hpy
 
+hp = hpy()
 
 def generate_prediction_candidates(document, amount=20):
     entities = list(document.get_entities())
@@ -66,10 +68,13 @@ def generate_all_candidates(document):
 
     return feature_vectors
 
-
 def inference(document, logistic_model, token_window, doc_time_constraints=0):
     candidates = constrained_candidates(document, partial(in_window, token_window))
-
+    
+    h = hp.heap()
+    print(len(candidates))
+    print("--------------------------------------------")
+    print(h)
     model = Model('Relations in document')
     # No output
     model.Params.OutputFlag = 0
@@ -98,6 +103,7 @@ def inference(document, logistic_model, token_window, doc_time_constraints=0):
                 model.addConstr(negative_var == 1,
                                 '{} and {} do not have compatible doctimerels'.format(source.id,
                                                                                   target.id))
+    
     model.update()
 
     entities = document.get_entities()
@@ -116,6 +122,12 @@ def inference(document, logistic_model, token_window, doc_time_constraints=0):
 
     # maximize
     model.ModelSense = -1
+    
+    h = hp.heap()
+    
+    print(model.NumVars, model.NumConstrs)
+    print(h)
+
     try:
         model.optimize()
     except GurobiError as e:
@@ -148,9 +160,12 @@ def greedy_decision(document, model, token_window, all=False):
 def infer_relations_on_documents(documents, model, token_window):
     for i, document in enumerate(documents):
         print("Inference on {}".format(document.id) + ", number " + str(i))
-        inference(document, model, token_window)
-        print("Outputting document")
-        output.output_doc(document)
+        #inference(document, model, token_window)
+        print(len(document.get_entities()), len(document.get_relations()))
+        candidates = constrained_candidates(document, partial(in_window, token_window))
+        print(len(candidates))
+        #print("Outputting document")
+        #output.output_doc(document)
 
 
 def greedily_decide_relations(documents, model, token_window):

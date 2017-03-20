@@ -220,7 +220,7 @@ def read_document(parent_directory, dir):
             doc.process_annotations(file_path)
         elif file.find(".") == -1:
             doc.process_file(file_path)
-    doc.close_transitivity()
+    #doc.close_transitivity()
     return doc
 
 

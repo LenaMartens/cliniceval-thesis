@@ -6,7 +6,7 @@ import sys
 
 DCT_model_name = "SupportVectorMachine1.0"
 relation_model_name = "LogisticRegression1.0"
-token_window = 30
+token_window = 15
 
 
 def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_rc=True, greedy=False):
