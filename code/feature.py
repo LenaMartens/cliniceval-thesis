@@ -2,8 +2,6 @@ import nltk
 from nltk.data import load
 import numpy as np
 import utils
-import scipy
-import scipy.sparse
 
 dictionary = utils.get_dictionary()
 lemma_dictionary = utils.get_lemma_dictionary()

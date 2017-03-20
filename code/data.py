@@ -4,7 +4,6 @@ import xml.etree.ElementTree as ET
 import utils
 import re
 
-
 class Document(object):
     def __init__(self, id):
         # array of strings
@@ -64,7 +63,7 @@ class Document(object):
             return None
 
     '''
-    Processing methods describing how to turn the raw input to objects
+    Processing methods describing how to turn the raw input into objects
     '''
 
     def process_event(self, entity):
@@ -136,17 +135,6 @@ class Document(object):
                     if i is not j and j is not k and k is not i:
                         if (i.id, j.id) in mapping and (j.id, k.id) in mapping and (i.id, k.id) not in mapping:
                             self.add_relation(i.id, k.id)
-
-
-'''
-Cmp function for sorting of entities
-'''
-
-
-def entity_span_cmp(self, id1, id2):
-    entity1 = self.entities[id1]
-    entity2 = self.entities[id2]
-    return entity1.span[0] - entity2.span[0]
 
 
 '''

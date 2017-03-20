@@ -43,7 +43,10 @@ class SupportVectorMachine(Classifier):
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
         print(output)
         input = scipy.sparse.csr_matrix(input)
-        self.machine = svm.SVC()
+
+        # BALANCED BECAUSE OF DATA BIAS + linear
+        self.machine = svm.LinearSVC(class_weight='balanced')
+
         self.machine.fit(input, output)
 
     def predict(self, sample):
@@ -112,6 +115,7 @@ def predict_DCT(documents, model=None):
 
 
 if __name__ == '__main__':
+    # because of pickle issues
     from classification import SupportVectorMachine, LogisticRegression
 
     docs = read_all(utils.dev)
