@@ -41,6 +41,7 @@ class SupportVectorMachine(Classifier):
     def train(self, trainingdata):
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
+        print(output)
         input = scipy.sparse.csr_matrix(input)
 
         # BALANCED BECAUSE OF DATA BIAS + linear

@@ -48,15 +48,20 @@ def generate_all_candidates(document):
     return feature_vectors
 
 
+<<<<<<< HEAD
 def inference(document, logistic_model, token_window, transitive=True):
     candidates = constrained_candidates(document, partial(in_window(token_window)))
+=======
+def inference(document, logistic_model, token_window, doc_time_constraints=0):
+    candidates = constrained_candidates(document, partial(in_window, token_window))
+>>>>>>> 1d275b4b55382c871e0a9b44783c838578842bd4
 
     model = Model('Relations in document')
     # No output
     model.Params.OutputFlag = 0
     # Limit number of threads
     model.Params.Threads = 4
-    model.Params.TimeLimit = 10
+    model.Params.TimeLimit = 2
     '''
         CONSTRAINT -> maar 1 label per relatie V
         CONSTRAINT -> transitiviteit Cik - Cjk - Cij >= -1 V
@@ -74,9 +79,10 @@ def inference(document, logistic_model, token_window, transitive=True):
                                     name="false: {}, {}".format(source.id, target.id))
         model.addConstr(negative_var + positive_var == 1,
                         'only one label for {}, {}'.format(source.id, target.id))
-        if cannot_be_contained(source.doc_time_rel, target.doc_time_rel):
-            model.addConstr(negative_var == 1,
-                            '{} and {} do not have compatible doctimerels'.format(source.id,
+        if source.get_class() == "Event" and target.get_class() == "Event":
+            if cannot_be_contained(source.doc_time_rel, target.doc_time_rel):
+                model.addConstr(negative_var == 1,
+                                '{} and {} do not have compatible doctimerels'.format(source.id,
                                                                                   target.id))
     model.update()
 
@@ -123,7 +129,7 @@ def greedy_decision(document, model, token_window, all=False):
     if all:
         candidates = generate_all_candidates(document)
     else:
-        candidates = constrained_candidates(document, partial(in_window(token_window)))
+        candidates = constrained_candidates(document, partial(in_window, token_window))
 
     document.clear_relations()
     for candidate in candidates:

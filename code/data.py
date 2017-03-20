@@ -21,7 +21,7 @@ class Document(object):
         self.sorted_entity_ids = []
 
     def clear_relations(self):
-        self.relations.clear()
+        self.relations = []
 
     '''
     Relation adding helper methods
@@ -58,7 +58,7 @@ class Document(object):
         '''
         place = self.sorted_entity_ids.index(entity.id)
         try:
-            return self.sorted_entity_ids[place + direction]
+            return self.entities[self.sorted_entity_ids[place + direction]]
         except IndexError:
             return None
 
