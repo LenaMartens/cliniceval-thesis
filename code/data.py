@@ -3,6 +3,7 @@ import os
 import xml.etree.ElementTree as ET
 import utils
 import re
+from nltk.tokenize import WhitespaceTokenizer
 
 class Document(object):
     def __init__(self, id):
@@ -104,8 +105,10 @@ class Document(object):
         self.sentences = f_handle.read()
         self.paragraph_delimiters = [m.start() for m in re.finditer('\\n', self.sentences)]
         self.sentence_delimiters = [m.start() for m in re.finditer('\.', self.sentences)]
-        self.token_delimiters = [m.start() for m in re.finditer('\s', self.sentences)]
-
+        span_generator = WhitespaceTokenizer().span_tokenize(self.sentences)
+        self.token_delimiters = [span[0] for span in span_generator]
+        if len(self.token_delimiters) ==0:
+            print(repr(sentences))
         f_handle.close()
 
     def process_annotations(self, annotation_file):
@@ -205,9 +208,11 @@ def read_document(parent_directory, dir):
     for file in os.listdir(os.path.join(parent_directory, dir)):
         file_path = os.path.join(parent_directory, dir, file)
         if file.find("Temporal") > -1:
-            doc.process_annotations(file_path)
+            entity_file = file_path
         elif file.find(".") == -1:
-            doc.process_file(file_path)
+            sentence_file = file_path
+    doc.process_file(sentence_file)
+    doc.process_annotations(entity_file)
     #doc.close_transitivity()
     return doc
 

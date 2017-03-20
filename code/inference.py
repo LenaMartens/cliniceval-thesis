@@ -49,14 +49,10 @@ def generate_all_candidates(document):
 
     return feature_vectors
 
-def inference(document, logistic_model, token_window, doc_time_constraints=0):
+def inference(document, logistic_model, token_window, transitive=False):
     candidates = constrained_candidates(document, partial(in_window, token_window))
     
-    h = hp.heap()
     print(len(candidates))
-    print("--------------------------------------------")
-    print(h)
-
     model = Model('Relations in document')
     # No output
     model.Params.OutputFlag = 0
@@ -97,32 +93,30 @@ def inference(document, logistic_model, token_window, doc_time_constraints=0):
 
             if cji is not None and cij is not None:
                 model.addConstr(cji + cij <= 1, "antisymmetry")
-            if transitive:
-                for k in entities:
-                    if i is not j and j is not k and k is not i:
-                        cik = model.getVarByName("true: {}, {}".format(i.id, k.id))
-                        cjk = model.getVarByName("true: {}, {}".format(j.id, k.id))
-                        if cik is not None and cjk is not None and cij is not None:
-                            model.addConstr(cik - cjk - cij >= -1, "transitivity")
-            else:
-                parents_of_i.append(cij)
+                if transitive:
+                    for k in entities:
+                        if i is not j and j is not k and k is not i:
+                            cik = model.getVarByName("true: {}, {}".format(i.id, k.id))
+                            cjk = model.getVarByName("true: {}, {}".format(j.id, k.id))
+                            if cik is not None and cjk is not None and cij is not None:
+                                model.addConstr(cik - cjk - cij >= -1, "transitivity")
+            if cji is not None and not transitive:
+                parents_of_i.append(cji)
         # Apply tree constraints if not transitive (only one parent)
-        if not transitive:
+        if parents_of_i:
             model.addConstr(sum(parents_of_i) <= 1, "treestructure")
 
     # maximize
     model.ModelSense = -1
     
-    h = hp.heap()
     
     print(model.NumVars, model.NumConstrs)
-    print(h)
 
     try:
         model.optimize()
     except GurobiError as e:
         print(e)
-
+    original = len(document.get_relations())
     document.clear_relations()
     for var in model.getVars():
         if var.X == 1:
@@ -131,6 +125,7 @@ def inference(document, logistic_model, token_window, doc_time_constraints=0):
                 m = re.search(r'true: (.+?), (.+?)$', str)
                 if m:
                     document.add_relation(m.group(1), m.group(2))
+    print(original, len(document.get_relations()))
 
 
 def greedy_decision(document, model, token_window, all=False):
@@ -150,12 +145,9 @@ def greedy_decision(document, model, token_window, all=False):
 def infer_relations_on_documents(documents, model, token_window):
     for i, document in enumerate(documents):
         print("Inference on {}".format(document.id) + ", number " + str(i))
-        #inference(document, model, token_window)
-        print(len(document.get_entities()), len(document.get_relations()))
-        candidates = constrained_candidates(document, partial(in_window, token_window))
-        print(len(candidates))
-        #print("Outputting document")
-        #output.output_doc(document)
+        inference(document, model, token_window)
+        print("Outputting document")
+        output.output_doc(document)
 
 
 def greedily_decide_relations(documents, model, token_window):
