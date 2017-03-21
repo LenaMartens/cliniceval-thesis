@@ -7,14 +7,15 @@ import sys
 DCT_model_name = "SupportVectorMachine1.0"
 relation_model_name = "LogisticRegression1.0"
 token_window = 15
+transitive = True
 
 
 def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_rc=True, greedy=False):
     print("Reading the documents")
     if retrain_dct or retrain_rc:
-        train_documents = data.read_all(trainpath)
+        train_documents = data.read_all(trainpath, transitive)
     if repredict_dct:
-        test_documents = data.read_all(testpath)
+        test_documents = data.read_all(testpath, transitive)
 
     if repredict_dct:
         if retrain_dct:
@@ -40,7 +41,7 @@ def complete(trainpath, testpath, retrain_dct=True, repredict_dct=True, retrain_
     if greedy:
         inference.greedily_decide_relations(utils.document_generator(), relation_model, token_window)
     else:
-        inference.infer_relations_on_documents(utils.document_generator(), relation_model, token_window)
+        inference.infer_relations_on_documents(utils.document_generator(), relation_model, token_window, transitive)
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ import utils
 import re
 from nltk.tokenize import WhitespaceTokenizer
 
+
 class Document(object):
     def __init__(self, id):
         # array of strings
@@ -111,8 +112,6 @@ class Document(object):
         self.sentence_delimiters = [m.start() for m in re.finditer('\.', self.sentences)]
         span_generator = WhitespaceTokenizer().span_tokenize(self.sentences)
         self.token_delimiters = [span[0] for span in span_generator]
-        if len(self.token_delimiters) ==0:
-            print(repr(sentences))
         f_handle.close()
 
     def process_annotations(self, annotation_file):
@@ -217,16 +216,18 @@ def read_document(parent_directory, dir):
             sentence_file = file_path
     doc.process_file(sentence_file)
     doc.process_annotations(entity_file)
-    #doc.close_transitivity()
     return doc
 
 
-def read_all(directory):
+def read_all(directory, transitive=False):
     utils.load_dictionary(utils.lemma_path)
     utils.load_dictionary(utils.dictionary_path)
     docs = []
-    for dir in os.listdir(directory):
-        doc = read_document(directory, dir)
+
+    for direct in os.listdir(directory):
+        doc = read_document(directory, direct)
+        if transitive:
+            doc.close_transitivity()
         docs.append(doc)
         for k, entity in doc.entities.items():
             utils.add_word_to_dictionary(entity.word)
@@ -235,7 +236,5 @@ def read_all(directory):
 
 
 if __name__ == '__main__':
-    from data import Document
-
-    read_all(utils.train)
+    # read_all(utils.train)
     read_all(utils.dev)

@@ -5,53 +5,14 @@ from gurobipy import *
 import classification
 import output
 import utils
-from data import Relation, read_document
-from feature import TimeRelationVector
 from functools import partial
-from guppy import hpy
 
-hp = hpy()
+from candidate_generation import generate_constrained_candidates, generate_all_candidates
 
-def same_sentence(source, target):
-    return source.sentence == target.sentence
-
-
-def same_paragraph(source, target):
-    return source.paragraph == target.paragraph
-
-
-def in_window(window, source, target):
-    return abs(source.token - target.token) < window + 1
-
-
-def constrained_candidates(document, constraint):
-    entities = list(document.get_entities())
-    feature_vectors = []
-
-    for entity1 in entities:
-        for entity2 in entities:
-            if entity1 is not entity2 and constraint(entity1, entity2):
-                relation = Relation(source=entity1, target=entity2, positive=False)
-                feature_vectors.append(TimeRelationVector(relation, document))
-
-    return feature_vectors
-
-
-def generate_all_candidates(document):
-    entities = list(document.get_entities())
-    feature_vectors = []
-
-    for entity1 in entities:
-        for entity2 in entities:
-            if entity1 is not entity2:
-                relation = Relation(source=entity1, target=entity2, positive=False)
-                feature_vectors.append(TimeRelationVector(relation, document))
-
-    return feature_vectors
 
 def inference(document, logistic_model, token_window, transitive=False):
-    candidates = constrained_candidates(document, partial(in_window, token_window))
-    
+    candidates = generate_constrained_candidates(document, token_window)
+
     print(len(candidates))
     model = Model('Relations in document')
     # No output
@@ -80,8 +41,8 @@ def inference(document, logistic_model, token_window, transitive=False):
             if cannot_be_contained(source.doc_time_rel, target.doc_time_rel):
                 model.addConstr(negative_var == 1,
                                 '{} and {} do not have compatible doctimerels'.format(source.id,
-                                                                                  target.id))
-    
+                                                                                      target.id))
+
     model.update()
 
     entities = document.get_entities()
@@ -108,8 +69,7 @@ def inference(document, logistic_model, token_window, transitive=False):
 
     # maximize
     model.ModelSense = -1
-    
-    
+
     print(model.NumVars, model.NumConstrs)
 
     try:
@@ -132,7 +92,7 @@ def greedy_decision(document, model, token_window, all=False):
     if all:
         candidates = generate_all_candidates(document)
     else:
-        candidates = constrained_candidates(document, partial(in_window, token_window))
+        candidates = generate_constrained_candidates(document, token_window)
 
     document.clear_relations()
     for candidate in candidates:
@@ -142,10 +102,10 @@ def greedy_decision(document, model, token_window, all=False):
             document.add_relation(candidate.entity.source.id, candidate.entity.target.id)
 
 
-def infer_relations_on_documents(documents, model, token_window):
+def infer_relations_on_documents(documents, model, token_window, transitive=False):
     for i, document in enumerate(documents):
         print("Inference on {}".format(document.id) + ", number " + str(i))
-        inference(document, model, token_window)
+        inference(document, model, token_window, transitive)
         print("Outputting document")
         output.output_doc(document)
 
