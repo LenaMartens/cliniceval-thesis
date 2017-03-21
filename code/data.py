@@ -23,6 +23,10 @@ class Document(object):
 
     def clear_relations(self):
         self.relations = []
+    
+    def clear_doc_time_rels(self):
+        for entity in self.get_entities():
+            entity.doc_time_rel = ""
 
     '''
     Relation adding helper methods

@@ -106,6 +106,7 @@ def train_relation_classifier(docs, token_window):
 
 def predict_DCT(documents, model=None):
     for document in documents:
+        document.clear_doc_time_rels()
         for entity in document.get_entities():
             if entity.get_class() == "Event":
                 feature = WordVectorWithContext(entity, document)

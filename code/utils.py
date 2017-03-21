@@ -105,7 +105,7 @@ def get_modalities():
 
 
 def document_generator(filepath=store_path):
-    for file in os.listdir(filepath)[5:]:
+    for file in os.listdir(filepath):
         if file.find('doc') != -1:
             with open(os.path.join(filepath, file), 'rb') as doc_file:
                 yield pickle.load(doc_file)
