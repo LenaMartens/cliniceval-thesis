@@ -52,6 +52,10 @@ class Document(object):
     def get_word(self, span):
         return self.sentences[span[0]:span[1]]
 
+    def get_words_inbetween(self, span1, span2):
+        words = self.sentences[span1[1]+1:span2[0]]
+        return words.split(" ")
+
     def get_neighbour_entity(self, entity, direction):
         '''
         :param entity: Entity to get neighbour of
@@ -144,17 +148,23 @@ Data classes
 '''
 
 
-class Event(object):
-    @staticmethod
-    def get_class():
-        return "Event"
-
-    def __init__(self, xml_dict, span, word, id, paragraph, sentence, token):
+class Entity:
+    def __init__(self, span, word, id, paragraph, sentence, token):
         self.paragraph = paragraph
         self.sentence = sentence
         self.token = token
         self.id = id
         self.span = span
+        self.word = word
+
+
+class Event(Entity):
+    @staticmethod
+    def get_class():
+        return "Event"
+
+    def __init__(self, xml_dict, span, word, id, paragraph, sentence, token):
+        super(Event).__init__(span, word, id, paragraph, sentence, token)
         self.doc_time_rel = xml_dict.find('DocTimeRel').text
         self.type_class = xml_dict.find('Type').text
         self.degree = xml_dict.find('Degree').text
@@ -162,28 +172,22 @@ class Event(object):
         self.modality = xml_dict.find('ContextualModality').text
         self.contextual_aspect = xml_dict.find('ContextualAspect').text
         self.permanence = xml_dict.find('Permanence').text
-        self.word = word
 
 
-class Timex(object):
+class Timex(Entity):
     @staticmethod
     def get_class():
         return "TimeX3"
 
     def __init__(self, xml_dict, span, word, id, paragraph, sentence, token):
-        self.paragraph = paragraph
-        self.sentence = sentence
-        self.id = id
-        self.span = span
-        self.token = token
+        super(Timex).__init__(span, word, id, paragraph, sentence, token)
         try:
             self.type_class = xml_dict.find('Class').text
         except AttributeError:
             self.type_class = "SECTIONTIME"
-        self.word = word
 
 
-class Relation(object):
+class Relation:
     def __init__(self, source=None,
                  class_type="",
                  target=None,
