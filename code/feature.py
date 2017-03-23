@@ -195,13 +195,33 @@ class DistanceVector(RelationFeatureVector):
         distance = abs(self.source.token - self.target.token)
         self.vector = np.asarray([distance])
 
+
 vector_length = 0
 
+
 class EmptyVector(FeatureVector):
-    # verschrikkelijke hack schaam u lena
     def generate_vector(self):
         global vector_length
-        self.vector = np.asarray(np.zeros(vector_length))    
+        self.vector = np.asarray(np.zeros(vector_length))
+
+
+class BagOfWords(RelationFeatureVector):
+    def __init__(self, source, target):
+        super(BagOfWords).__init__(source, target)
+        self.document = document
+
+    def generate_vector(self):
+        span1 = self.source.span
+        span2 = self.target.span
+        words = document.get_words_inbetween(span1, span2)
+        for word in words:
+            self.vector = np.zeros(len(dictionary) + 1)
+            try:
+                self.vector[dictionary[word]] = 1
+            except KeyError:
+                self.vector[len(dictionary)] = 1
+
+
 '''
 Specific feature vectors used in training and prediction
 '''
