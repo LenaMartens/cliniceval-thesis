@@ -47,11 +47,25 @@ class Document(object):
     Getters
     '''
 
-    def get_relations(self):
-        return self.relations
+    def get_relations(self, paragraph=-1):
+        if paragraph < 0:
+            return self.relations
+        else:
+            relations = []
+            for relation in self.relations:
+                if relation.source.paragraph == paragraph or relation.target.paragraph == paragraph:
+                    relations.append(relation)
+            return relations
 
-    def get_entities(self):
-        return self.entities.values()
+    def get_entities(self, paragraph=-1):
+        if paragraph < 0:
+            return self.entities.values()
+        else:
+            entities = []
+            for entity in self.entities.values():
+                if entity.source.paragraph == paragraph or entity.target.paragraph == paragraph:
+                    entities.append(entity)
+            return entities
 
     def get_word(self, span):
         return self.sentences[span[0]:span[1]]
@@ -76,6 +90,8 @@ class Document(object):
         except IndexError:
             return None
 
+    def get_amount_of_paragraphs(self):
+        return len(self.paragraph_delimiters)-1
     '''
     Processing methods describing how to turn the raw input into objects
     '''

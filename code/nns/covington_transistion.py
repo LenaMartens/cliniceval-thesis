@@ -1,3 +1,7 @@
+from annotator import Arc
+from data import Entity
+
+
 class Configuration:
     def __init__(self, entities):
         # entity objects
@@ -73,17 +77,17 @@ class Configuration:
     def empty_buffer(self):
         return len(self.buffer) == 0
 
+    def empty_stack(self):
+        return len(self.buffer) == 0
 
-class Arc:
-    def __init__(self, source, sink):
-        self.source = source
-        self.sink = sink
-
-    def __str__(self):
-        return "{} -> {}".format(self.source, self.sink)
+    def get_arcs(self):
+        arcs = []
+        for (i, j) in self.arcs_dict.keys():
+            arcs.append(Arc(i, j))
+        return arcs
 
 
-class RootEntity():
+class RootEntity(Entity):
     @staticmethod
     def get_class():
         return "ROOT"
