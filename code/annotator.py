@@ -65,7 +65,7 @@ class TransitionAnnotator(RelationAnnotator):
         return arcs
 
 
-class Arc:
+class Arc(object):
     def __init__(self, source, sink):
         """
         :param source: entity ID
