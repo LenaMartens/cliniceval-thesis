@@ -23,6 +23,7 @@ class LogisticRegression(Classifier):
     def train(self, trainingdata):
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
+        input = scipy.sparse.csr_matrix(input)
         self.machine = linear_model.LogisticRegression()
         self.machine.fit(input, output)
 
@@ -40,7 +41,6 @@ class SupportVectorMachine(Classifier):
     def train(self, trainingdata):
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
-        print(output)
         input = scipy.sparse.csr_matrix(input)
 
         # BALANCED BECAUSE OF DATA BIAS + linear
@@ -61,7 +61,10 @@ def train_doctime_classifier(docs):
 
 
 def train_relation_classifier(docs, token_window):
-    features = generate_constrained_candidates(docs, token_window)
+    features = []
+    for document in docs:
+        features.extend(generate_constrained_candidates(document, token_window))
+        print(len(features))
     lr = LogisticRegression(features)
     return lr
 

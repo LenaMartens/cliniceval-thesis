@@ -57,6 +57,10 @@ class Document(object):
         return self.sentences[span[0]:span[1]]
 
     def get_words_inbetween(self, span1, span2):
+        if span1[0] > span2[1]:
+            temp = span2
+            span2 = span1
+            span1 = temp
         words = self.sentences[span1[1]+1:span2[0]]
         return words.split(" ")
 
@@ -152,7 +156,7 @@ Data classes
 '''
 
 
-class Entity:
+class Entity(object):
     def __init__(self, span, word, id, paragraph, sentence, token):
         self.paragraph = paragraph
         self.sentence = sentence
@@ -168,7 +172,7 @@ class Event(Entity):
         return "Event"
 
     def __init__(self, xml_dict, span, word, id, paragraph, sentence, token):
-        super(Event).__init__(span, word, id, paragraph, sentence, token)
+        super(Event, self).__init__(span, word, id, paragraph, sentence, token)
         self.doc_time_rel = xml_dict.find('DocTimeRel').text
         self.type_class = xml_dict.find('Type').text
         self.degree = xml_dict.find('Degree').text
@@ -184,7 +188,7 @@ class Timex(Entity):
         return "TimeX3"
 
     def __init__(self, xml_dict, span, word, id, paragraph, sentence, token):
-        super(Timex).__init__(span, word, id, paragraph, sentence, token)
+        super(Timex, self).__init__(span, word, id, paragraph, sentence, token)
         try:
             self.type_class = xml_dict.find('Class').text
         except AttributeError:

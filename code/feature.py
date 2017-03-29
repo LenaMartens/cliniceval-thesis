@@ -10,7 +10,7 @@ A vector denoting a single feature of a word
 '''
 
 
-class FeatureVector:
+class FeatureVector(object):
     def get_vector(self):
         self.generate_vector()
         return self.vector
@@ -40,7 +40,7 @@ A vector consisting of several features. Is implemented as a list of FeatureVect
 '''
 
 
-class ConcatenatedVector:
+class ConcatenatedVector(object):
     def get_vector(self):
         self.generate_vector()
         return np.concatenate([x.get_vector() for x in self.features])
@@ -206,14 +206,14 @@ class EmptyVector(FeatureVector):
 
 
 class BagOfWords(RelationFeatureVector):
-    def __init__(self, source, target):
-        super(BagOfWords).__init__(source, target)
+    def __init__(self, document, source, target):
+        RelationFeatureVector.__init__(self, source, target)
         self.document = document
 
     def generate_vector(self):
         span1 = self.source.span
         span2 = self.target.span
-        words = document.get_words_inbetween(span1, span2)
+        words = self.document.get_words_inbetween(span1, span2)
         for word in words:
             self.vector = np.zeros(len(dictionary) + 1)
             try:
@@ -260,3 +260,4 @@ class TimeRelationVector(ConcatenatedVector):
         self.features.append(WordVectorWithContext(self.entity.target, self.document))
         self.features.append(SameParVector(self.entity.source, self.entity.target))
         self.features.append(SameSentenceVector(self.entity.source, self.entity.target))
+        self.features.append(BagOfWords(self.document, self.entity.source, self.entity.target))
