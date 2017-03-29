@@ -6,7 +6,7 @@ import classification
 import output
 import utils
 
-from annotator import Arc
+from utils import Arc
 from candidate_generation import generate_constrained_candidates, generate_all_candidates
 from data import Document
 

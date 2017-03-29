@@ -1,4 +1,4 @@
-from annotator import Arc
+from utils import Arc
 from data import Entity
 
 

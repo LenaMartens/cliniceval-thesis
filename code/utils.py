@@ -145,3 +145,15 @@ def get_actions():
     :return: Ground truth for what index is what action
     """
     return {"left_arc": 0, "right_arc": 1, "no_arc": 2, "shift": 3}
+
+class Arc(object):
+    def __init__(self, source, sink):
+        """
+        :param source: entity ID
+        :param sink: entity ID
+        """
+        self.source = source
+        self.sink = sink
+
+    def __str__(self):
+        return "{} -> {}".format(self.source, self.sink)

@@ -65,14 +65,4 @@ class TransitionAnnotator(RelationAnnotator):
         return arcs
 
 
-class Arc(object):
-    def __init__(self, source, sink):
-        """
-        :param source: entity ID
-        :param sink: entity ID
-        """
-        self.source = source
-        self.sink = sink
 
-    def __str__(self):
-        return "{} -> {}".format(self.source, self.sink)
