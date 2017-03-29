@@ -1,8 +1,3 @@
-from inference import inference, greedy_decision
-
-from nns.covington_transistion import Configuration
-
-
 def add_arcs_to_document(arcs, document):
     for arc in arcs:
         document.add_relation(arc.source, arc.sink)
@@ -38,11 +33,13 @@ class InferenceAnnotator(RelationAnnotator):
         self.transitive = transitive
 
     def get_arcs(self, document):
+        from inference import inference
         return inference(document, self.model, self.token_window, self.transitive)
 
 
 class GreedyAnnotator(RelationAnnotator):
     def get_arcs(self, document):
+        from inference import greedy_decision
         return greedy_decision(document, self.model, self.token_window)
 
 
@@ -54,6 +51,7 @@ class TransitionAnnotator(RelationAnnotator):
         self.oracle = oracle
 
     def get_arcs(self, document):
+        from nns.covington_transistion import Configuration
         arcs = []
         for paragraph in range(document.get_paragraph_amount()):
             entities = document.get_entities(paragraph=paragraph)
