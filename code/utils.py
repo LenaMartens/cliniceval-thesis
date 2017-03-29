@@ -4,6 +4,8 @@ import pickle
 from sklearn.externals import joblib
 from nltk.stem.wordnet import WordNetLemmatizer
 
+import data
+
 config = configparser.ConfigParser()
 config.read('configuration.INI')
 dev = config['DataLocation']['dev_corpus']
@@ -104,13 +106,42 @@ def get_modalities():
     return {"ACTUAL": 0, "HEDGED": 1, "HYPOTHETICAL": 2, "GENERIC": 3}
 
 
+"""
+GENERATORS FUELING THE ENGINE
+"""
+
+
 def document_generator(filepath=store_path):
-    for file in os.listdir(filepath)[5:]:
+    for file in os.listdir(filepath):
         if file.find('doc') != -1:
             with open(os.path.join(filepath, file), 'rb') as doc_file:
                 yield pickle.load(doc_file)
 
 
+def sentence_generator(filepath=dev):
+    for direct in os.listdir(filepath):
+        for file in os.listdir(os.path.join(filepath, direct)):
+            if file.find(".") < 0:
+                file_path = os.path.join(filepath, direct, file)
+                with open(file_path) as f_handle:
+                    for line in f_handle:
+                        if not (line.startswith("[") and line.endswith("]\n")):
+                            yield [x.lower() for x in line.split()]
+
+
+# Returns Document objects with entities that can be annotated
+def test_document_generator(filepath):
+    for direct in os.listdir(filepath):
+        yield data.read_document(parent_directory=filepath, dir=direct)
+
+
 def lemmatize_word(word):
     lmtzr = WordNetLemmatizer()
     return lmtzr.lemmatize(word)
+
+
+def get_actions():
+    """
+    :return: Ground truth for what index is what action
+    """
+    return {"left_arc": 0, "right_arc": 1, "no_arc": 2, "shift": 3}

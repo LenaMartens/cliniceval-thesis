@@ -5,15 +5,15 @@ from gurobipy import *
 import classification
 import output
 import utils
-from functools import partial
 
+from annotator import Arc
 from candidate_generation import generate_constrained_candidates, generate_all_candidates
+from data import Document
 
 
-def inference(document, logistic_model, token_window, transitive=False):
+def inference(document, logistic_model, token_window, transitive = False):
     candidates = generate_constrained_candidates(document, token_window)
 
-    print(len(candidates))
     model = Model('Relations in document')
     # No output
     model.Params.OutputFlag = 0
@@ -70,22 +70,21 @@ def inference(document, logistic_model, token_window, transitive=False):
     # maximize
     model.ModelSense = -1
 
-    print(model.NumVars, model.NumConstrs)
-
     try:
         model.optimize()
     except GurobiError as e:
         print(e)
-    original = len(document.get_relations())
+
     document.clear_relations()
+    arcs = []
     for var in model.getVars():
         if var.X == 1:
             str = var.VarName
             if str.startswith('true'):
                 m = re.search(r'true: (.+?), (.+?)$', str)
                 if m:
-                    document.add_relation(m.group(1), m.group(2))
-    print(original, len(document.get_relations()))
+                    arcs.append(Arc(m.group(1), m.group(2)))
+    return arcs
 
 
 def greedy_decision(document, model, token_window, all=False):
@@ -95,12 +94,13 @@ def greedy_decision(document, model, token_window, all=False):
         candidates = generate_constrained_candidates(document, token_window)
 
     document.clear_relations()
+    arcs = []
     for candidate in candidates:
         probs = model.predict(candidate)
         positive = probs[0][1]
         if positive > 0.7:
-            document.add_relation(candidate.entity.source.id, candidate.entity.target.id)
-
+            arcs.append(Arc(candidate.entity.source.id, candidate.entity.target.id))
+    return arcs
 
 def infer_relations_on_documents(documents, model, token_window, transitive=False):
     for i, document in enumerate(documents):
