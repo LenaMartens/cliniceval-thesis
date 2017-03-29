@@ -69,14 +69,20 @@ def train_relation_classifier(docs, token_window):
     return lr
 
 
+def predict_DCT_document(document, model):
+    document.clear_doc_time_rels()
+    for entity in document.get_entities():
+        if entity.get_class() == "Event":
+            feature = WordVectorWithContext(entity, document)
+            dct = model.predict(feature)
+            entity.doc_time_rel = dct[0]
+    return document
+
+
+# Maybe this can be removed
 def predict_DCT(documents, model=None):
     for document in documents:
-        document.clear_doc_time_rels()
-        for entity in document.get_entities():
-            if entity.get_class() == "Event":
-                feature = WordVectorWithContext(entity, document)
-                dct = model.predict(feature)
-                entity.doc_time_rel = dct[0]
+        predict_DCT_document(document, model)
     return documents
 
 

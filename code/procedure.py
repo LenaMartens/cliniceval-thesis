@@ -1,12 +1,35 @@
+import os
+
 import classification
 import data
+import output
 import utils
-from annotator import GreedyAnnotator, InferenceAnnotator
+from annotator import GreedyAnnotator, InferenceAnnotator, TransitionAnnotator
+from nns.oracle import NNOracle
 
 
-class BaseProcedure(object):
+class Procedure(object):
+    def predict(self, filepath):
+        documents = utils.test_document_generator(filepath)
+        outputpath = self.generate_output_path(predict_path=filepath)
+        for doc in documents:
+            print("Doc {id}".format(id=doc.id))
+            doc = classification.predict_DCT_document(doc, self.doc_time_model)
+            doc = self.annotator.annotate(doc)
+            output.output_doc(doc, outputpath=outputpath)
+
+    def evaluate(self, filepath):
+        anafora_command = "python -m anafora.evaluate -r {ref} -p {path} -x " \
+                          "\"(?i).*clin.*Temp.*[.]xml$\"".format(ref=filepath, path=self.generate_output_path(filepath))
+        for line in os.popen('cd ../anaforatools/;' + anafora_command).read():
+            print(line)
+
+    def generate_output_path(self, predict_path):
+        return "shouldn't happen"
+
+
+class BaseProcedure(Procedure):
     def __init__(self,
-                 predict_path,
                  train_path="",
                  rel_classifier_path="",
                  doc_time_path="",
@@ -14,18 +37,17 @@ class BaseProcedure(object):
                  greedy=False,
                  transitive=False):
         """
-        :param predict_path: Path to corpus that needs to be annotated
         :param train_path: Path to training corpus (not required if models don't need to be retrained)
         :param token_window: Window in which candidates need to be generated
-        :param rel_classifier: Path to Binary relation classification (YES/NO)
-        :param doc_time_model: Path to Doctime classifier
+        :param rel_classifier_path: Path to Binary relation classification (YES/NO)
+        :param doc_time_path: Path to Doctime classifier
         :param greedy: TRUE: use greedy decision making on binary classifications. FALSE: use ILP inference
         :param transitive: Close data transitively before training and
         """
         self.train_path = train_path
-        self.predict_path = predict_path
         self.transitive = transitive
-        self.token_window= token_window
+        self.token_window = token_window
+        self.greedy = greedy
 
         if greedy:
             self.annotator = GreedyAnnotator(token_window=token_window)
@@ -33,30 +55,46 @@ class BaseProcedure(object):
             self.annotator = InferenceAnnotator(token_window=token_window, transitive=transitive)
 
         if not rel_classifier_path:
-            self.train_rel_classifier()
+            self.annotator.model = self.train_rel_classifier()
         else:
             self.annotator.model = utils.load_model(rel_classifier_path)
 
         if not doc_time_path:
-            self.train_doctime()
-        elif:
+            self.doc_time_model = self.train_doctime()
+        else:
             self.doc_time_model = utils.load_model(doc_time_path)
 
     def train_doctime(self):
         if self.train_path:
             train_documents = data.read_all(self.train_path, transitive=self.transitive)
-            self.doc_time_model = classification.train_doctime_classifier(train_documents)
+            return classification.train_doctime_classifier(train_documents)
         else:
             raise Exception("No path to training corpus provided")
 
     def train_rel_classifier(self):
         if self.train_path:
             train_documents = data.read_all(self.train_path, transitive=self.transitive)
-            self.annotator.model = classification.train_relation_classifier(train_documents, self.token_window)
+            return classification.train_relation_classifier(train_documents, self.token_window)
         else:
             raise Exception("No path to training corpus provided")
 
-    def predict(self, filepath):
-        documents = utils.test_document_generator(filepath)
-        for doc in documents:
-            self.doc_time_model.p
+    def generate_output_path(self, predict_path):
+        p = os.path.split(predict_path)
+        unique = "{decision}{window}{trans}{corpus}".format(decision=("Greedy" if self.greedy else "ILP"),
+                                                            window=self.token_window,
+                                                            trans=("Transitive" if self.transitive else ""),
+                                                            corpus=p[-1])
+        path = os.path.join(utils.outputpath, unique)
+        return path
+
+
+class TransitiveProcedure(Procedure):
+    def __init__(self, nn=None):
+        oracle = NNOracle(network=nn)
+        self.annotator = TransitionAnnotator(oracle=oracle)
+
+    def generate_output_path(self, predict_path):
+        p = os.path.split(predict_path)
+        unique = "Transistion"
+        path = os.path.join(utils.outputpath, unique)
+        return path
