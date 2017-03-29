@@ -20,12 +20,22 @@ class Classifier:
 
 
 class LogisticRegression(Classifier):
+    def chunk_generator(self, trainingdata, chunksize):
+        start = 0
+        while start < len(trainingdata):
+            end = max(start+chunksize, len(trainingdata))
+            x_chunk = [x.get_vector() for x in trainingdata[start:end]]
+            x_chunk = scipy.sparse.csr_matrix(x_chunk)
+            y_chunk = [getattr(x.entity, self.class_to_fy) for x in trainingdata[start:end]]
+            yield x_chunk, y_chunk
+            start += chunksize
+
     def train(self, trainingdata):
-        input = [x.get_vector() for x in trainingdata]
-        output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
-        input = scipy.sparse.csr_matrix(input)
-        self.machine = linear_model.LogisticRegression()
-        self.machine.fit(input, output)
+        generator = self.chunk_generator(trainingdata, 500)
+        # PARTIAL FIT because of memory problems
+        self.machine = linear_model.SGDRegressor(loss="log")
+        for chunkX, chunkY in generator:
+            self.machine.partial_fit(chunkX, chunkY)
 
     def predict(self, sample):
         # returns a log probability distribution
