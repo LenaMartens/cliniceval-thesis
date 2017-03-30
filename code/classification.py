@@ -33,7 +33,7 @@ class LogisticRegression(Classifier):
     def train(self, trainingdata):
         generator = self.chunk_generator(trainingdata, 500)
         # PARTIAL FIT because of memory problems
-        self.machine = linear_model.SGDRegressor(loss="log")
+        self.machine = linear_model.SGDRegressor(loss="huber")
         for chunkX, chunkY in generator:
             self.machine.partial_fit(chunkX, chunkY)
 
