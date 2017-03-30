@@ -10,6 +10,7 @@ from nns.oracle import NNOracle
 
 class Procedure(object):
     def predict(self, filepath):
+        print("Started prediction")
         documents = utils.test_document_generator(filepath)
         outputpath = self.generate_output_path(predict_path=filepath)
         for doc in documents:
@@ -65,15 +66,21 @@ class BaseProcedure(Procedure):
             self.doc_time_model = utils.load_model(doc_time_path)
 
     def train_doctime(self):
+        print("Training doctime classifier")
         if self.train_path:
+            print("Reading documents")
             train_documents = data.read_all(self.train_path, transitive=self.transitive)
+            print("Started training")
             return classification.train_doctime_classifier(train_documents)
         else:
             raise Exception("No path to training corpus provided")
 
     def train_rel_classifier(self):
+        print("Training relation classifier")
         if self.train_path:
+            print("Reading documents")
             train_documents = data.read_all(self.train_path, transitive=self.transitive)
+            print("Started training")
             return classification.train_relation_classifier(train_documents, self.token_window)
         else:
             raise Exception("No path to training corpus provided")

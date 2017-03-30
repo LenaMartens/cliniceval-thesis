@@ -15,7 +15,7 @@ if retrain_REL:
 
 token_window = 15
 transitive = False
-greedy = False
+greedy = True
 """
 SHARED CONFIG
 """

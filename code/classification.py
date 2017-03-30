@@ -5,7 +5,6 @@ from data import read_all
 from feature import WordVectorWithContext
 import scipy.sparse
 
-
 class Classifier:
     def train(self, trainingdata):
         pass
@@ -20,22 +19,14 @@ class Classifier:
 
 
 class LogisticRegression(Classifier):
-    def chunk_generator(self, trainingdata, chunksize):
-        start = 0
-        while start < len(trainingdata):
-            end = max(start+chunksize, len(trainingdata))
-            x_chunk = [x.get_vector() for x in trainingdata[start:end]]
-            x_chunk = scipy.sparse.csr_matrix(x_chunk)
-            y_chunk = [getattr(x.entity, self.class_to_fy) for x in trainingdata[start:end]]
-            yield x_chunk, y_chunk
-            start += chunksize
-
-    def train(self, trainingdata):
-        generator = self.chunk_generator(trainingdata, 500)
+    def train(self, generator):
         # PARTIAL FIT because of memory problems
         self.machine = linear_model.SGDRegressor(loss="huber")
-        for chunkX, chunkY in generator:
-            self.machine.partial_fit(chunkX, chunkY)
+        for data in generator:
+            X = [x.get_vector() for x in data]
+            X = scipy.sparse.csr_matrix(X)
+            Y = [getattr(x.entity, self.class_to_fy) for x in data]
+            self.machine.partial_fit(X, Y)
 
     def predict(self, sample):
         # returns a log probability distribution
@@ -70,12 +61,22 @@ def train_doctime_classifier(docs):
     return svm
 
 
-def train_relation_classifier(docs, token_window):
+def feature_generator(docs, token_window, batch_size):
+    start = 0
     features = []
-    for document in docs:
-        features.extend(generate_constrained_candidates(document, token_window))
-        print(len(features))
-    lr = LogisticRegression(features)
+    while start < range(len(docs)):
+        features = []
+        end = min(start+batch_size, len(docs))
+        for document in docs[start:end]:
+            features.extend(generate_constrained_candidates(document, token_window))
+        if features:    
+            yield features
+        start+=batch_size
+
+
+def train_relation_classifier(docs, token_window):
+    generator = feature_generator(docs, token_window, 5)
+    lr = LogisticRegression(generator)
     return lr
 
 

@@ -214,13 +214,12 @@ class BagOfWords(RelationFeatureVector):
         span1 = self.source.span
         span2 = self.target.span
         words = self.document.get_words_inbetween(span1, span2)
+        self.vector = np.zeros(len(dictionary) + 1)
         for word in words:
-            self.vector = np.zeros(len(dictionary) + 1)
             try:
                 self.vector[dictionary[word]] = 1
             except KeyError:
                 self.vector[len(dictionary)] = 1
-
 
 '''
 Specific feature vectors used in training and prediction
