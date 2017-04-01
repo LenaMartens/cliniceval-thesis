@@ -1,9 +1,12 @@
+import logging
+
 from sklearn import svm, linear_model
 import utils
 from candidate_generation import generate_training_data, generate_constrained_candidates
 from data import read_all
 from feature import WordVectorWithContext
 import scipy.sparse
+
 
 class Classifier:
     def train(self, trainingdata):
@@ -63,19 +66,20 @@ def train_doctime_classifier(docs):
 
 def feature_generator(docs, token_window, batch_size):
     start = 0
-    features = []
-    while start < range(len(docs)):
+    len_docs = len(docs)
+    while start < range(len_docs):
+        logging.info("{start} out of {all}".format(start=start, all=len_docs))
         features = []
-        end = min(start+batch_size, len(docs))
+        end = min(start + batch_size, len(docs))
         for document in docs[start:end]:
             features.extend(generate_constrained_candidates(document, token_window))
-        if features:    
+        if features:
             yield features
-        start+=batch_size
+        start += batch_size
 
 
 def train_relation_classifier(docs, token_window):
-    generator = feature_generator(docs, token_window, 5)
+    generator = feature_generator(docs, token_window, 10)
     lr = LogisticRegression(generator)
     return lr
 

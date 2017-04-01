@@ -1,3 +1,4 @@
+import logging
 import os
 from xml.dom import minidom
 
@@ -50,7 +51,7 @@ def save_as_xml(document, filename):
 
     with open(filename, 'w') as f:
         f.write(prettify(data_root))
-    print("outputted " + filename + "!")
+    logging.info("outputted " + filename + "!")
 
 
 def prettify(elem):

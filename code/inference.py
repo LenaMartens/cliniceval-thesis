@@ -108,16 +108,12 @@ def infer_relations_on_documents(documents, model, token_window, transitive=Fals
     for i, document in enumerate(documents):
         logging.info("Inference on {}".format(document.id) + ", number " + str(i))
         inference(document, model, token_window, transitive)
-        logging.info("Outputting document")
-        output.output_doc(document)
 
 
 def greedily_decide_relations(documents, model, token_window):
     for i, document in enumerate(documents):
-        print("Greedy inference on {}".format(document.id) + ", number " + str(i))
+        logging.info("Greedy inference on {}".format(document.id) + ", number " + str(i))
         greedy_decision(document, model, token_window)
-        print("Outputting document")
-        output.output_doc(document, utils.greedy_output_path)
 
 
 forbidden_love = {

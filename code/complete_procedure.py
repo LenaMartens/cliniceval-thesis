@@ -37,10 +37,11 @@ def complete_base():
         utils.save_model(bp.annotator.model, name=relation_model_name)
     # Where the magic happens
     bp.predict(test_path)
-    print(bp.evaluate(test_path))
+    bp.evaluate(test_path)
 
 
 if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d %I:%M:%S %p')
+    logging.basicConfig(filename='progress.log', level=logging.ERROR)
     logging.info('Start')
     complete_base()

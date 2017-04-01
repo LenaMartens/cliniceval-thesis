@@ -1,4 +1,5 @@
 import configparser
+import logging
 import os
 import pickle
 from sklearn.externals import joblib
@@ -27,7 +28,7 @@ def load_dictionary(dict_path):
         dict = pickle.load(dict_file)
         dict_file.close()
     except Exception as e:
-        print(e)
+        logging.error(e)
         dict = {}
     dictionary_id = len(dict)
     return dict, dictionary_id
@@ -83,14 +84,12 @@ def get_documents_from_file(filepath=store_path):
 
 
 def save_model(sv, name="anonymous"):
-    print("Saving model")
-    with open(os.path.join(model_path, name), 'wb') as file:
-        joblib.dump(sv, os.path.join(model_path, name))
+    logging.info("Saving model")
+    joblib.dump(sv, os.path.join(model_path, name))
 
 
 def load_model(name):
-    with open(os.path.join(model_path, name), 'rb') as file:
-        model = joblib.load(os.path.join(model_path, name))
+    model = joblib.load(os.path.join(model_path, name))
     return model
 
 
