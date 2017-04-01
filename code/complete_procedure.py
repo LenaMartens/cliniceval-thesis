@@ -6,7 +6,7 @@ from procedure import BaseProcedure
 BASE CONFIG
 """
 retrain_DCT = False
-retrain_REL = False
+retrain_REL = True
 DCT_model_name = "SupportVectorMachine1.0"
 relation_model_name = "LogisticRegression1.0"
 if retrain_DCT:
@@ -15,8 +15,8 @@ if retrain_REL:
     relation_model_name = ""
 
 token_window = 15
-transitive = True
-greedy = False
+transitive = False
+greedy = True
 """
 SHARED CONFIG
 """

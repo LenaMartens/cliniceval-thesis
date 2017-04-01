@@ -62,6 +62,8 @@ def prettify(elem):
 
 
 def output_doc(document, outputpath=utils.outputpath):
+    if not os.path.exists(outputpath):
+        os.makedirs(outputpath)
     newpath = os.path.join(outputpath, document.id)
     if not os.path.exists(newpath):
         os.makedirs(newpath)

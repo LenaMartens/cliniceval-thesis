@@ -5,7 +5,6 @@ from data import read_all
 from feature import WordVectorWithContext
 import scipy.sparse
 
-
 class Classifier:
     def train(self, trainingdata):
         pass
@@ -22,9 +21,9 @@ class Classifier:
 class LogisticRegression(Classifier):
     def train(self, generator):
         # PARTIAL FIT because of memory problems
-        self.machine = linear_model.SGDRegressor(loss="log")
+        self.machine = linear_model.SGDRegressor(loss="huber")
         for data in generator:
-            X = [x.get_vector for x in data]
+            X = [x.get_vector() for x in data]
             X = scipy.sparse.csr_matrix(X)
             Y = [getattr(x.entity, self.class_to_fy) for x in data]
             self.machine.partial_fit(X, Y)
@@ -67,10 +66,11 @@ def feature_generator(docs, token_window, batch_size):
     features = []
     while start < range(len(docs)):
         features = []
-        end = max(start+batch_size, len(docs))
+        end = min(start+batch_size, len(docs))
         for document in docs[start:end]:
             features.extend(generate_constrained_candidates(document, token_window))
-        yield features
+        if features:    
+            yield features
         start+=batch_size
 
 

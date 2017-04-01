@@ -29,7 +29,7 @@ class InferenceAnnotator(RelationAnnotator):
         :param token_window: window for candidate generation
         :param transitive: boolean indicating whether or not to apply transitivity constraints
         """
-        super().__init__(model=model, token_window=token_window)
+        super(InferenceAnnotator, self).__init__(model=model, token_window=token_window)
         self.transitive = transitive
 
     def get_arcs(self, document):
