@@ -1,4 +1,5 @@
 import utils
+import logging
 
 from procedure import BaseProcedure
 """
@@ -40,4 +41,6 @@ def complete_base():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d %I:%M:%S %p')
+    logging.info('Start')
     complete_base()

@@ -1,3 +1,4 @@
+import logging
 import random
 
 from gurobipy import *
@@ -11,7 +12,7 @@ from candidate_generation import generate_constrained_candidates, generate_all_c
 from data import Document
 
 
-def inference(document, logistic_model, token_window, transitive = False):
+def inference(document, logistic_model, token_window, transitive=False):
     candidates = generate_constrained_candidates(document, token_window)
 
     model = Model('Relations in document')
@@ -73,7 +74,7 @@ def inference(document, logistic_model, token_window, transitive = False):
     try:
         model.optimize()
     except GurobiError as e:
-        print(e)
+        logging.error(e)
 
     document.clear_relations()
     arcs = []
@@ -102,11 +103,12 @@ def greedy_decision(document, model, token_window, all=False):
             arcs.append(Arc(candidate.entity.source.id, candidate.entity.target.id))
     return arcs
 
+
 def infer_relations_on_documents(documents, model, token_window, transitive=False):
     for i, document in enumerate(documents):
-        print("Inference on {}".format(document.id) + ", number " + str(i))
+        logging.info("Inference on {}".format(document.id) + ", number " + str(i))
         inference(document, model, token_window, transitive)
-        print("Outputting document")
+        logging.info("Outputting document")
         output.output_doc(document)
 
 

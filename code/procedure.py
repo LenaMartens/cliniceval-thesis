@@ -89,12 +89,22 @@ class BaseProcedure(Procedure):
 
 
 class TransitiveProcedure(Procedure):
-    def __init__(self, nn=None):
+    def __init__(self, train_path, nn_path=""):
+        self.train_path = train_path
+        if nn_path:
+            nn = utils.load_model(nn_path)
+        else:
+            nn = self.train_network()
         oracle = NNOracle(network=nn)
         self.annotator = TransitionAnnotator(oracle=oracle)
 
     def generate_output_path(self, predict_path):
-        p = os.path.split(predict_path)
-        unique = "Transistion"
+        train = os.path.split(self.train_path)
+        pred = os.path.split(predict_path)
+        unique = "TransistionTrain{train}Predict{predict}".format(train=train[-1], predict=pred[-1])
         path = os.path.join(utils.outputpath, unique)
         return path
+
+    def train_network(self):
+
+        return
