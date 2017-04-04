@@ -41,7 +41,8 @@ def complete_base():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d %I:%M:%S %p')
-    logging.basicConfig(filename='progress.log', level=logging.ERROR)
-    logging.info('Start')
+    logger = logging.getLogger('progress_logger')
+    logger.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d %I:%M:%S %p')
+    logger.basicConfig(filename='progress.log', level=logging.ERROR)
+    logger.info('Start')
     complete_base()

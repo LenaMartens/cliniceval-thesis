@@ -51,7 +51,9 @@ def save_as_xml(document, filename):
 
     with open(filename, 'w') as f:
         f.write(prettify(data_root))
-    logging.info("outputted " + filename + "!")
+    logger = logging.getLogger('progress_logger')
+
+    logger.info("outputted " + filename + "!")
 
 
 def prettify(elem):

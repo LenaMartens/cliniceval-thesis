@@ -24,7 +24,7 @@ class Document(object):
 
     def clear_relations(self):
         self.relations = []
-    
+
     def clear_doc_time_rels(self):
         for entity in self.get_entities():
             entity.doc_time_rel = ""
@@ -75,7 +75,7 @@ class Document(object):
             temp = span2
             span2 = span1
             span1 = temp
-        words = self.sentences[span1[1]+1:span2[0]]
+        words = self.sentences[span1[1] + 1:span2[0]]
         return words.split(" ")
 
     def get_neighbour_entity(self, entity, direction):
@@ -91,7 +91,8 @@ class Document(object):
             return None
 
     def get_amount_of_paragraphs(self):
-        return len(self.paragraph_delimiters)-1
+        return len(self.paragraph_delimiters) - 1
+
     '''
     Processing methods describing how to turn the raw input into objects
     '''
@@ -181,6 +182,9 @@ class Entity(object):
         self.span = span
         self.word = word
 
+    def __str__(self):
+        return self.id
+
 
 class Event(Entity):
     @staticmethod
@@ -197,6 +201,9 @@ class Event(Entity):
         self.contextual_aspect = xml_dict.find('ContextualAspect').text
         self.permanence = xml_dict.find('Permanence').text
 
+    def __str__(self):
+        return self.id
+
 
 class Timex(Entity):
     @staticmethod
@@ -209,6 +216,9 @@ class Timex(Entity):
             self.type_class = xml_dict.find('Class').text
         except AttributeError:
             self.type_class = "SECTIONTIME"
+
+    def __str__(self):
+        return self.id
 
 
 class Relation:

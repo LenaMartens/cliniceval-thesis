@@ -28,7 +28,9 @@ def load_dictionary(dict_path):
         dict = pickle.load(dict_file)
         dict_file.close()
     except Exception as e:
-        logging.error(e)
+        logger = logging.getLogger('progress_logger')
+
+        logger.error(e)
         dict = {}
     dictionary_id = len(dict)
     return dict, dictionary_id
@@ -84,7 +86,9 @@ def get_documents_from_file(filepath=store_path):
 
 
 def save_model(sv, name="anonymous"):
-    logging.info("Saving model")
+    logger = logging.getLogger('progress_logger')
+
+    logger.info("Saving model")
     joblib.dump(sv, os.path.join(model_path, name))
 
 
@@ -134,8 +138,10 @@ def test_document_generator(filepath):
         yield data.read_document(parent_directory=filepath, dir=direct)
 
 
+lmtzr = WordNetLemmatizer()
+
+
 def lemmatize_word(word):
-    lmtzr = WordNetLemmatizer()
     return lmtzr.lemmatize(word)
 
 

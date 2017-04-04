@@ -74,7 +74,8 @@ def inference(document, logistic_model, token_window, transitive=False):
     try:
         model.optimize()
     except GurobiError as e:
-        logging.error(e)
+        logger = logging.getLogger('progress_logger')
+        logger.error(e)
 
     document.clear_relations()
     arcs = []
@@ -105,14 +106,17 @@ def greedy_decision(document, model, token_window, all=False):
 
 
 def infer_relations_on_documents(documents, model, token_window, transitive=False):
+    logger = logging.getLogger('progress_logger')
     for i, document in enumerate(documents):
-        logging.info("Inference on {}".format(document.id) + ", number " + str(i))
+        logger.info("Inference on {}".format(document.id) + ", number " + str(i))
         inference(document, model, token_window, transitive)
 
 
 def greedily_decide_relations(documents, model, token_window):
+    logger = logging.getLogger('progress_logger')
+
     for i, document in enumerate(documents):
-        logging.info("Greedy inference on {}".format(document.id) + ", number " + str(i))
+        logger.info("Greedy inference on {}".format(document.id) + ", number " + str(i))
         greedy_decision(document, model, token_window)
 
 

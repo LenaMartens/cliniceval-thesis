@@ -51,7 +51,7 @@ class TransitionAnnotator(RelationAnnotator):
         self.oracle = oracle
 
     def get_arcs(self, document):
-        from nns.covington_transistion import Configuration
+        from covington_transistion import Configuration
         arcs = []
         for paragraph in range(document.get_paragraph_amount()):
             entities = document.get_entities(paragraph=paragraph)

@@ -1,6 +1,8 @@
+import copy
+
 import utils
 from data import read_all
-from .covington_transistion import Configuration
+from covington_transistion import Configuration
 
 
 class Oracle(object):
@@ -23,18 +25,18 @@ class KnowingOracle(Oracle):
 
         buffer = configuration.get_buffer_head()
         stack = configuration.get_stack_head()
-        if (buffer, stack) in self.arcs:
+        if (str(buffer), str(stack)) in self.arcs:
             return "left_arc"
-        if (stack, buffer) in self.arcs:
+        if (str(stack), str(buffer)) in self.arcs:
             return "right_arc"
 
-        next = [x[0] for x in self.arcs.keys() if x[1] == buffer]
+        next = [x[0] for x in self.arcs.keys() if x[1] == str(buffer)]
 
         # If entity on buffer has no parent, ROOT is parent
-        if stack.get_class() == "ROOT" and not next:
+        if str(stack) == "ROOT" and not next:
             return "right_arc"
 
-        next.extend([x[1] for x in self.arcs.keys() if x[0] == buffer])
+        next.extend([x[1] for x in self.arcs.keys() if x[0] == str(buffer)])
         for n in next:
             if configuration.on_stack(n):
                 return "no_arc"
@@ -55,14 +57,18 @@ def get_training_sequence(entities, arcs):
     configuration = Configuration(entities)
     oracle = KnowingOracle(arcs)
 
-    sequence = []
+    seqnce = []
     while not configuration.empty_buffer():
         function_string = oracle.next_step(configuration)
-        sequence.append(function_string)
+        seqnce.append(([], function_string))
         # applies function to configuration
         getattr(configuration, function_string)()
-    return sequence
+    return seqnce
 
 
 if __name__ == '__main__':
-    documents = read_all(utils.dev)
+    documents = read_all(utils.dev, transitive=False)
+    for doc in documents:
+        sequence = get_training_sequence(doc.get_entities(), doc.relation_mapping)
+
+        print(len(doc.get_relations()), len([x for x in sequence if x[1] in ["left_arc", "right_arc"]]))

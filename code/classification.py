@@ -58,6 +58,7 @@ class SupportVectorMachine(Classifier):
         return self.machine.predict(sample)
 
 
+
 def train_doctime_classifier(docs):
     features = generate_training_data(docs)
     svm = SupportVectorMachine(features, "doc_time_rel")
@@ -65,10 +66,11 @@ def train_doctime_classifier(docs):
 
 
 def feature_generator(docs, token_window, batch_size):
+    logger = logging.getLogger('progress_logger')
     start = 0
     len_docs = len(docs)
     while start < range(len_docs):
-        logging.info("{start} out of {all}".format(start=start, all=len_docs))
+        logger.info("{start} out of {all}".format(start=start, all=len_docs))
         features = []
         end = min(start + batch_size, len(docs))
         for document in docs[start:end]:

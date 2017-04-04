@@ -6,26 +6,28 @@ import data
 import output
 import utils
 from annotator import GreedyAnnotator, InferenceAnnotator, TransitionAnnotator
-from nns.oracle import NNOracle
+from oracle import NNOracle
 
 
 class Procedure(object):
     def predict(self, filepath):
-        logging.info("Started prediction")
+        logger = logging.getLogger('progress_logger')
+        logger.info("Started prediction")
         documents = utils.test_document_generator(filepath)
         outputpath = self.generate_output_path(predict_path=filepath)
         for doc in documents:
-            logging.info("Doc {id}".format(id=doc.id))
+            logger.info("Doc {id}".format(id=doc.id))
             doc = classification.predict_DCT_document(doc, self.doc_time_model)
             doc = self.annotator.annotate(doc)
             output.output_doc(doc, outputpath=outputpath)
 
     def evaluate(self, filepath):
-        logging.info("Evaluation:")
+        logger = logging.getLogger('progress_logger')
+        logger.info("Evaluation:")
         anafora_command = "python -m anafora.evaluate -r {ref} -p {path} -x " \
                           "\"(?i).*clin.*Temp.*[.]xml$\"".format(ref=filepath, path=self.generate_output_path(filepath))
         for line in os.popen('cd ../anaforatools/;' + anafora_command).read():
-            logging.info(line)
+            logger.info(line)
 
     def generate_output_path(self, predict_path):
         return "shouldn't happen"
