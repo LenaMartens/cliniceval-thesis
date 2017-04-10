@@ -69,6 +69,14 @@ class SupportVectorMachine(Classifier):
         return self.machine.predict(sample)
 
 
+class NNActions(Classifier):
+    def train(self, trainingdata):
+        self.machine = None
+
+    def predict(self, sample):
+        index = self.machine.predict(sample)
+        return utils.get_actions()[index]
+
 
 def train_doctime_classifier(docs):
     features = generate_training_data(docs)

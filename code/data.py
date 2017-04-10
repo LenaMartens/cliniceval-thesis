@@ -70,6 +70,13 @@ class Document(object):
     def get_word(self, span):
         return self.sentences[span[0]:span[1]]
 
+    def get_sentence(self, entity):
+        index = entity.sentence
+        span = (self.sentence_delimiters[index], self.sentence_delimiters[index+1])
+        sentence = self.sentences[span[0]+1:span[1]]
+        print(entity.word, sentence)
+        return sentence.split(" ")
+
     def get_words_inbetween(self, span1, span2):
         if span1[0] > span2[1]:
             temp = span2
