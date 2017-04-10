@@ -64,7 +64,7 @@ def constrained_candidates(document, constraint):
     for entity1 in entities:
         for entity2 in entities:
             if entity1 is not entity2 and constraint(entity1, entity2):
-                relation = Relation(source=entity1, target=entity2, positive=False)
+                relation = Relation(source=entity1, target=entity2, positive=document.relation_exists(entity1, entity2))
                 feature_vectors.append(TimeRelationVector(relation, document))
 
     return feature_vectors

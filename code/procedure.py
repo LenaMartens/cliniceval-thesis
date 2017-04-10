@@ -26,8 +26,7 @@ class Procedure(object):
         logger.info("Evaluation:")
         anafora_command = "python -m anafora.evaluate -r {ref} -p {path} -x " \
                           "\"(?i).*clin.*Temp.*[.]xml$\"".format(ref=filepath, path=self.generate_output_path(filepath))
-        for line in os.popen('cd ../anaforatools/;' + anafora_command).read():
-            logger.info(line)
+        os.system('cd ../anaforatools/;' + anafora_command + "> results.txt")
 
     def generate_output_path(self, predict_path):
         return "shouldn't happen"

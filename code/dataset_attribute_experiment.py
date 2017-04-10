@@ -58,7 +58,8 @@ def within_amount_of_tokens(documents, amount=30):
 
 
 def amount_of_candidates(documents, amount=30):
-    max = 0
+    positive = 0
+    negative = 0
     for document in documents:
         candidates = 0
         entities = document.get_entities()
@@ -66,10 +67,11 @@ def amount_of_candidates(documents, amount=30):
             for j in entities:
                 if i != j:
                     if abs(i.token - j.token) < amount + 1:
-                        candidates += 1
-        if candidates > max:
-             max = candidates
-    print(max)
+                        if document.relation_exists(i, j):        
+                            positive += 1
+                        else:
+                            negative += 1
+    return positive, negative
 
 
 def projective_trees(documents):
@@ -96,11 +98,6 @@ if __name__ == "__main__":
     # samepar_relations(dev)
     # samesentence_relations(train)
     # samesentence_relations(dev)
-    for i in range(10, 30):
-        print("amount: " + str(i))
-        within_amount_of_tokens(train, i)
-        amount_of_candidates(train, i)
-        within_amount_of_tokens(dev, i)
-        amount_of_candidates(dev, i)
-        print("-------------------------------")
+    amount_of_candidates(train, 30)
+    amount_of_candidates(dev, 30)
     # projective_trees(train)
