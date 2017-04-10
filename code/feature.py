@@ -18,9 +18,10 @@ class FeatureVector(object):
     def generate_vector(self):
         self.vector = []
 
-    def __init__(self, entity):
+    def __init__(self, entity, document=None):
         self.entity = entity
         self.vector = []
+        self.document = document
 
 
 '''
@@ -123,10 +124,12 @@ One hot encoding of part of speech tag.
 
 class POSFeatureVector(FeatureVector):
     def generate_vector(self):
-        word = self.entity.word
+        sentence = self.document.get_sentence(self.entity)
         self.vector = np.zeros(len(tag_list))
-        if word:
-            [(word, tag)] = nltk.pos_tag([word])
+        if sentence:
+            # Pass whole sentence to get a better tagging
+            tags = nltk.pos_tag(sentence)
+            (word, tag) = tags[sentence.index(self.entity.word)]
             self.vector[tag_list.index(tag)] = 1
 
 
@@ -193,7 +196,7 @@ What is the distance between the two entities?
 class DistanceVector(RelationFeatureVector):
     def generate_vector(self):
         distance = abs(self.source.token - self.target.token)
-        self.vector = np.asarray([distance])
+        self.vector = np.asarray([distance/30])
 
 
 vector_length = 0
@@ -233,7 +236,7 @@ class WordVector(ConcatenatedVector):
             self.features.append(WordFeatureVector(self.entity))
             self.features.append(LemmaFeatureVector(self.entity))
             self.features.append(CapitalFeatureVector(self.entity))
-            self.features.append(POSFeatureVector(self.entity))
+            self.features.append(POSFeatureVector(self.entity, document=self.document))
             self.features.append(DocTimeVector(self.entity))
             self.features.append(ModalityFeatureVector(self.entity))
             self.features.append(PolarityFeatureVector(self.entity))
