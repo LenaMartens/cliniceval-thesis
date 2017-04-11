@@ -24,9 +24,10 @@ class Procedure(object):
     def evaluate(self, filepath):
         logger = logging.getLogger('progress_logger')
         logger.info("Evaluation:")
+        outputpath = self.generate_output_path(filepath)
         anafora_command = "python -m anafora.evaluate -r {ref} -p {path} -x " \
-                          "\"(?i).*clin.*Temp.*[.]xml$\"".format(ref=filepath, path=self.generate_output_path(filepath))
-        os.system('cd ../anaforatools/;' + anafora_command + "> results.txt")
+                          "\"(?i).*clin.*Temp.*[.]xml$\"".format(ref=filepath, path=outputpath)
+        os.system('cd ../anaforatools/;' + anafora_command + "> {path}".format(path=os.join(outputpath, "results.txt")))
 
     def generate_output_path(self, predict_path):
         return "shouldn't happen"

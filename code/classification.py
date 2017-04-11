@@ -48,7 +48,7 @@ class LogisticRegression(Classifier):
     def __init__(self, trainingdata, class_weights):
         # List of FeatureVectors
         self.class_to_fy = "positive"
-        self.machine = linear_model.SGDClassifier(loss="log", penalty="l2", class_weight=class_weights)
+        self.machine = linear_model.SGDClassifier(loss="log", penalty="l2")
         self.train(trainingdata)
 
 

@@ -6,12 +6,12 @@ from procedure import BaseProcedure
 BASE CONFIG
 """
 retrain_DCT = False
-retrain_REL = False
+retrain_REL = True
 DCT_model_name = "SupportVectorMachine1.0"
 relation_model_name = "LogisticRegression1.0"
 token_window = 30
-transitive = False
-greedy = True
+transitive = True
+greedy = False
 """
 SHARED CONFIG
 """
