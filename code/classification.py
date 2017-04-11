@@ -3,12 +3,15 @@ import dataset_attribute_experiment
 from sklearn import svm, linear_model
 from sklearn.metrics import accuracy_score
 import numpy as np
+import oracle
 import utils
 from candidate_generation import generate_training_data, generate_constrained_candidates
 from data import read_all
-from feature import WordVectorWithContext
+from feature import WordVectorWithContext, ConfigurationVector
 import scipy.sparse
 import random
+from keras.models import Sequential
+from keras.layers import Dense, Activation
 
 
 class Classifier:
@@ -70,8 +73,35 @@ class SupportVectorMachine(Classifier):
 
 
 class NNActions(Classifier):
+    def generate_training_data(self, docs):
+        x = []
+        y = []
+        for doc in docs:
+            for paragraph in range(doc.get_amount_of_paragraphs()):
+                entities = doc.get_entities(paragraph=paragraph)
+                relations = doc.get_realtions(paragraph=paragraph)
+                for (configuration, action) in oracle.get_training_sequence(entities, relations):
+                    feature = ConfigurationFeature(feature).get_vector()
+                    x.append(feature)
+                    y.append(utils.get_actions()[action])
+
     def train(self, trainingdata):
-        self.machine = None
+        """
+        :param trainingdata: [X, Y], [[samples x features], [samples x 1] ], [feature vectors, indexes of actions]
+        """
+        X = trainingdata[0]
+        Y = trainingdata[1]
+        model = Sequential()
+        model.add(Dense(units=200, input_dim=X.shape[1]))
+        model.add(Activation('softmax'))
+        model.add(Dense(units=200))
+        model.add(Activation('softmax'))
+        model.compile(loss='categorical_crossentropy',
+                      optimizer='sgd',
+                      metrics=['accuracy'])
+
+        model.fit(X, Y, epochs=5, batch_size=32)
+        self.machine = model
 
     def predict(self, sample):
         index = self.machine.predict(sample)
