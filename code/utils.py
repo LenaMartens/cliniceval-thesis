@@ -88,7 +88,7 @@ def get_documents_from_file(filepath=store_path):
 def save_model(sv, name="anonymous"):
     logger = logging.getLogger('progress_logger')
 
-    logger.info("Saving model")
+    logger.info("Saving model: "+name)
     joblib.dump(sv, os.path.join(model_path, name))
 
 

@@ -72,10 +72,15 @@ class Document(object):
 
     def get_sentence(self, entity):
         index = entity.sentence
-        span = (self.sentence_delimiters[index], self.sentence_delimiters[index+1])
+        end = max(index, len(self.sentence_delimiters)-1)
+        span = (self.sentence_delimiters[index], self.sentence_delimiters[end])
         sentence = self.sentences[span[0]+1:span[1]]
-        print(entity.word, sentence)
-        return sentence.split(" ")
+        sentence = [x.strip().strip("\"\':.,-") for x in sentence.split(" ") if x != ""]
+        e_word = entity.word
+        for i, word in enumerate(sentence):
+            if e_word.startswith(word):
+                sentence[i] = e_word
+        return sentence  
 
     def get_words_inbetween(self, span1, span2):
         if span1[0] > span2[1]:

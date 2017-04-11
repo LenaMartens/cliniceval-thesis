@@ -13,14 +13,16 @@ from data import Document
 
 
 def inference(document, logistic_model, token_window, transitive=False):
+    logger = logging.getLogger('progress_logger')
     candidates = generate_constrained_candidates(document, token_window)
+    
+    logger.info("Inference on doc {id}".format(id=document.id))    
 
     model = Model('Relations in document')
     # No output
     model.Params.OutputFlag = 0
     # Limit number of threads
     model.Params.Threads = 4
-    model.Params.TimeLimit = 2
     '''
         CONSTRAINT -> maar 1 label per relatie V
         CONSTRAINT -> transitiviteit Cik - Cjk - Cij >= -1 V
@@ -74,10 +76,8 @@ def inference(document, logistic_model, token_window, transitive=False):
     try:
         model.optimize()
     except GurobiError as e:
-        logger = logging.getLogger('progress_logger')
         logger.error(e)
-
-    document.clear_relations()
+    
     arcs = []
     for var in model.getVars():
         if var.X == 1:
@@ -86,10 +86,12 @@ def inference(document, logistic_model, token_window, transitive=False):
                 m = re.search(r'true: (.+?), (.+?)$', str)
                 if m:
                     arcs.append(Arc(m.group(1), m.group(2)))
+    logger.info("predicted: {pred}".format(pred=len(arcs)))
     return arcs
 
 
 def greedy_decision(document, model, token_window, all=False):
+    logger = logging.getLogger('progress_logger')
     if all:
         candidates = generate_all_candidates(document)
     else:
@@ -100,7 +102,7 @@ def greedy_decision(document, model, token_window, all=False):
     for candidate in candidates:
         probs = model.predict(candidate)
         positive = probs[0][1]
-        if positive > 0.7:
+        if positive > 0.5:
             arcs.append(Arc(candidate.entity.source.id, candidate.entity.target.id))
     return arcs
 

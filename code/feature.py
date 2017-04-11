@@ -128,8 +128,12 @@ class POSFeatureVector(FeatureVector):
         self.vector = np.zeros(len(tag_list))
         if sentence:
             # Pass whole sentence to get a better tagging
-            tags = nltk.pos_tag(sentence)
-            (word, tag) = tags[sentence.index(self.entity.word)]
+            try:
+                i = sentence.index(self.entity.word)
+                tags = nltk.pos_tag(sentence)
+		(word, tag) = tags[i]
+            except ValueError:
+                (word, tag) = nltk.pos_tag(self.entity.word)[0]
             self.vector[tag_list.index(tag)] = 1
 
 

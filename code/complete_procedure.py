@@ -9,14 +9,9 @@ retrain_DCT = False
 retrain_REL = True
 DCT_model_name = "SupportVectorMachine1.0"
 relation_model_name = "LogisticRegression1.0"
-if retrain_DCT:
-    DCT_model_name = ""
-if retrain_REL:
-    relation_model_name = ""
-
-token_window = 15
-transitive = False
-greedy = True
+token_window = 30
+transitive = True
+greedy = False
 """
 SHARED CONFIG
 """
@@ -25,10 +20,16 @@ test_path = utils.dev
 
 
 def complete_base():
+    DCT = DCT_model_name
+    relation_model = relation_model_name
+    if retrain_DCT:
+        DCT = ""
+    if retrain_REL:
+        relation_model = ""
     bp = BaseProcedure(train_path=train_path,
                        token_window=token_window,
-                       doc_time_path=DCT_model_name,
-                       rel_classifier_path=relation_model_name,
+                       doc_time_path=DCT,
+                       rel_classifier_path=relation_model,
                        greedy=greedy,
                        transitive=transitive)
     if retrain_DCT:
@@ -42,7 +43,12 @@ def complete_base():
 
 if __name__ == "__main__":
     logger = logging.getLogger('progress_logger')
-    logger.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d %I:%M:%S %p')
-    logger.basicConfig(filename='progress.log', level=logging.ERROR)
+    logger.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    fh = logging.FileHandler('progress.log')
+    fh.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
     logger.info('Start')
     complete_base()

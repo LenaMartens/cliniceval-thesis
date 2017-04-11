@@ -1,13 +1,15 @@
 import logging
-
+import dataset_attribute_experiment
 from sklearn import svm, linear_model
-
+from sklearn.metrics import accuracy_score
+import numpy as np
 import oracle
 import utils
 from candidate_generation import generate_doctime_training_data, generate_constrained_candidates
 from data import read_all
 from feature import WordVectorWithContext, ConfigurationVector
 import scipy.sparse
+import random
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 
@@ -37,21 +39,29 @@ class LogisticRegression(Classifier):
 
     def train(self, generator):
         # PARTIAL FIT because of memory problems
-        self.machine = linear_model.SGDRegressor(loss="huber")
-        for data in generator:
-            X = [x.get_vector() for x in data]
-            X = scipy.sparse.csr_matrix(X)
-            Y = [getattr(x.entity, self.class_to_fy) for x in data]
-            self.machine.partial_fit(X, Y)
+        classes = None
+        iterations=5
+        for i in range(iterations):
+            print("Iteration: " + str(i))
+            for data in generator:
+                X = [x.get_vector() for x in data]
+                X = scipy.sparse.csr_matrix(X)
+                Y = [getattr(x.entity, self.class_to_fy) for x in data]
+                if classes == None:
+                    classes = np.unique(Y)
+                    print(classes)
+                self.machine.partial_fit(X, Y, classes=classes)
 
     def predict(self, sample):
         # returns a log probability distribution
         sample = sample.get_vector().reshape(1, -1)
         return self.machine.predict_proba(sample)
 
-    def __init__(self, trainingdata):
+    def __init__(self, trainingdata, class_weights):
         # List of FeatureVectors
-        Classifier.__init__(self, trainingdata, "positive")
+        self.class_to_fy = "positive"
+        self.machine = linear_model.SGDClassifier(loss="log", penalty="l2")
+        self.train(trainingdata)
 
 
 class SupportVectorMachine(Classifier):
@@ -120,20 +130,25 @@ def feature_generator(docs, token_window, batch_size):
     logger = logging.getLogger('progress_logger')
     start = 0
     len_docs = len(docs)
-    while start < range(len_docs):
+    random.seed()
+    random.shuffle(docs)
+    while start < len_docs:
         logger.info("{start} out of {all}".format(start=start, all=len_docs))
         features = []
         end = min(start + batch_size, len(docs))
         for document in docs[start:end]:
             features.extend(generate_constrained_candidates(document, token_window))
         if features:
+            logger.info("Features length:{l}".format(l=len(features)))
             yield features
         start += batch_size
 
 
 def train_relation_classifier(docs, token_window):
     generator = feature_generator(docs, token_window, 10)
-    lr = LogisticRegression(generator)
+    candidate_counts = dataset_attribute_experiment.amount_of_candidates(docs, token_window)
+    class_weights = {True:len(docs)/(2*candidate_counts[0]), False:len(docs)/(2*candidate_counts[1])}
+    lr = LogisticRegression(generator, class_weights)
     return lr
 
 
