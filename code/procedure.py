@@ -123,6 +123,6 @@ class TransitiveProcedure(Procedure):
             train_documents = data.read_all(self.train_path)
             print("Started training")
             model = classification.NNActions(train_documents)
-            return classification.train_doctime_classifier(train_documents)
+            return model
         else:
             raise Exception("No path to training corpus provided")
