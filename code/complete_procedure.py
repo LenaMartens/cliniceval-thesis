@@ -1,7 +1,8 @@
 import utils
 import logging
 
-from procedure import BaseProcedure
+from procedure import BaseProcedure, TransitiveProcedure
+
 """
 BASE CONFIG
 """
@@ -40,6 +41,11 @@ def complete_base():
     bp.predict(test_path)
     bp.evaluate(test_path)
 
+
+def complete_transition():
+    tp = TransitiveProcedure(train_path=train_path)
+    tp.predict(test_path)
+    tp.evaluate(test_path)
 
 if __name__ == "__main__":
     logger = logging.getLogger('progress_logger')

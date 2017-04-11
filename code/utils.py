@@ -88,7 +88,7 @@ def get_documents_from_file(filepath=store_path):
 def save_model(sv, name="anonymous"):
     logger = logging.getLogger('progress_logger')
 
-    logger.info("Saving model: "+name)
+    logger.info("Saving model: " + name)
     joblib.dump(sv, os.path.join(model_path, name))
 
 
@@ -150,6 +150,7 @@ def get_actions():
     :return: Ground truth for what index is what action
     """
     return {"left_arc": 0, "right_arc": 1, "no_arc": 2, "shift": 3}
+
 
 class Arc(object):
     def __init__(self, source, sink):
