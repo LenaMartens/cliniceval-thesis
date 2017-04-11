@@ -266,7 +266,7 @@ class TimeRelationVector(ConcatenatedVector):
         self.features.append(BagOfWords(self.document, self.entity.source, self.entity.target))
 
 
-class ConfigurationFeature(ConcatenatedVector):
+class ConfigurationVector(ConcatenatedVector):
     def generate_vector(self):
         for entity in self.entity.get_top_entities("stack1", 3):
             self.features.append(WordVectorWithContext(self.document.entities[entity], document=self.document))

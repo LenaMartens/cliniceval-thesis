@@ -5,7 +5,7 @@ from feature import WordVectorWithContext, TimeRelationVector
 
 
 # DOCTIME candidates
-def generate_training_data(documents):
+def generate_doctime_training_data(documents):
     feature_vectors = []
     for document in documents:
         for entity in document.get_entities():

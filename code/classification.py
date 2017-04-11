@@ -4,7 +4,7 @@ from sklearn import svm, linear_model
 
 import oracle
 import utils
-from candidate_generation import generate_training_data, generate_constrained_candidates
+from candidate_generation import generate_doctime_training_data, generate_constrained_candidates
 from data import read_all
 from feature import WordVectorWithContext, ConfigurationVector
 import scipy.sparse
@@ -19,13 +19,22 @@ class Classifier:
     def predict(self, sample):
         pass
 
-    def __init__(self, trainingdata, class_to_fy):
-        # List of FeatureVectors
+    def generate_training_data(self, docs):
+        pass
+
+    def __init__(self, trainingdata, class_to_fy=None):
+        """
+        :param trainingdata: docs
+        :param class_to_fy:
+        """
         self.class_to_fy = class_to_fy
-        self.train(trainingdata)
+        self.train(self.generate_training_data(trainingdata))
 
 
 class LogisticRegression(Classifier):
+    def generate_training_data(self, docs):
+        return docs
+
     def train(self, generator):
         # PARTIAL FIT because of memory problems
         self.machine = linear_model.SGDRegressor(loss="huber")
@@ -46,6 +55,9 @@ class LogisticRegression(Classifier):
 
 
 class SupportVectorMachine(Classifier):
+    def generate_training_data(self, docs):
+        return generate_doctime_training_data(docs)
+
     def train(self, trainingdata):
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
@@ -71,9 +83,10 @@ class NNActions(Classifier):
                 entities = doc.get_entities(paragraph=paragraph)
                 relations = doc.get_realtions(paragraph=paragraph)
                 for (configuration, action) in oracle.get_training_sequence(entities, relations):
-                    feature = ConfigurationFeature(feature).get_vector()
+                    feature = ConfigurationFeature(configuration).get_vector()
                     x.append(feature)
                     y.append(utils.get_actions()[action])
+        return (x, y)
 
     def train(self, trainingdata):
         """
@@ -99,8 +112,7 @@ class NNActions(Classifier):
 
 
 def train_doctime_classifier(docs):
-    features = generate_training_data(docs)
-    svm = SupportVectorMachine(features, "doc_time_rel")
+    svm = SupportVectorMachine(docs, "doc_time_rel")
     return svm
 
 
