@@ -57,13 +57,11 @@ def get_training_sequence(entities, arcs):
     configuration = Configuration(entities)
     oracle = KnowingOracle(arcs)
 
-    seqnce = []
     while not configuration.empty_buffer():
         function_string = oracle.next_step(configuration)
-        seqnce.append(([], function_string))
+        yield (configuration, function_string)
         # applies function to configuration
         getattr(configuration, function_string)()
-    return seqnce
 
 
 if __name__ == '__main__':

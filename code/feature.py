@@ -196,7 +196,7 @@ What is the distance between the two entities?
 class DistanceVector(RelationFeatureVector):
     def generate_vector(self):
         distance = abs(self.source.token - self.target.token)
-        self.vector = np.asarray([distance/30])
+        self.vector = np.asarray([distance / 30])
 
 
 vector_length = 0
@@ -223,6 +223,7 @@ class BagOfWords(RelationFeatureVector):
                 self.vector[dictionary[word]] = 1
             except KeyError:
                 self.vector[len(dictionary)] = 1
+
 
 '''
 Specific feature vectors used in training and prediction
@@ -263,3 +264,18 @@ class TimeRelationVector(ConcatenatedVector):
         self.features.append(SameParVector(self.entity.source, self.entity.target))
         self.features.append(SameSentenceVector(self.entity.source, self.entity.target))
         self.features.append(BagOfWords(self.document, self.entity.source, self.entity.target))
+
+
+class ConfigurationFeature(ConcatenatedVector):
+    def generate_vector(self):
+        for entity in self.entity.get_top_entities("stack1", 3):
+            self.features.append(WordVectorWithContext(self.document.entities[entity], document=self.document))
+        for entity in self.entity.get_top_entities("stack2", 3):
+            self.features.append(WordVectorWithContext(self.document.entities[entity], document=self.document))
+        for entity in self.entity.get_top_entities("buffer", 3):
+            self.features.append(WordVectorWithContext(self.document.entities[entity], document=self.document))
+        stack = self.document.entities[self.entity.get_stack_head()]
+        buffer = self.document.entities[self.entity.get_buffer_head()]
+        self.features.append(SameParVector(stack, buffer))
+        self.features.append(SameSentenceVector(stack, buffer))
+        self.features.append(BagOfWords(self.document, stack, buffer))

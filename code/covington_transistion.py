@@ -87,6 +87,18 @@ class Configuration:
             arcs.append(Arc(i, j))
         return arcs
 
+    def get_top_entities(self, stack, amount):
+        if stack == "stack1":
+            n = min(len(self.stack1), amount)
+            return self.stack1[-n:]
+        if stack == "stack2":
+            n = min(len(self.stack2), amount)
+            return self.stack2[:n]
+        if stack == "buffer":
+            n = min(len(self.buffer), amount)
+            return self.buffer[:n]
+        raise Exception(stack + " is :ot a valid option")
+
     def __str__(self):
         buffer = [str(i) for i in self.buffer]
         stack1 = [str(i) for i in self.stack1]
