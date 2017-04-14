@@ -6,7 +6,7 @@ from procedure import BaseProcedure, TransitiveProcedure
 """
 BASE CONFIG
 """
-retrain_DCT = False
+retrain_DCT = True
 retrain_REL = True
 DCT_model_name = "SupportVectorMachine1.0"
 relation_model_name = "LogisticRegression1.0"
@@ -57,4 +57,4 @@ if __name__ == "__main__":
     fh.setFormatter(formatter)
     logger.addHandler(fh)
     logger.info('Start')
-    complete_transition()
+    complete_base()
