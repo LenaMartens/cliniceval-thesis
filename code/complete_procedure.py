@@ -51,10 +51,10 @@ if __name__ == "__main__":
     logger = logging.getLogger('progress_logger')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
-    fh = logging.FileHandler('progress.log')
+    fh = logging.FileHandler('transistion.log')
     fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     fh.setFormatter(formatter)
     logger.addHandler(fh)
     logger.info('Start')
-    complete_base()
+    complete_transition()

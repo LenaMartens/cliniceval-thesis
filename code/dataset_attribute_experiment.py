@@ -28,9 +28,9 @@ def samepar_relations(documents):
         relations = document.get_relations()
         amount_of_relations += len(relations)
         for relation in relations:
-            if relation.source.paragraph == relation.target.paragraph:
+            if abs(relation.source.paragraph - relation.target.paragraph) < 4:
                 amount_of_samepars += 1
-    print(amount_of_samepars / amount_of_relations)
+    print(amount_of_samepars,  amount_of_relations)
 
 
 def samesentence_relations(documents):
@@ -94,8 +94,8 @@ def projective_trees(documents):
 if __name__ == "__main__":
     # treeless(train)
     # treeless(dev)
-    # samepar_relations(train)
-    # samepar_relations(dev)
+    samepar_relations(train)
+    samepar_relations(dev)
     # samesentence_relations(train)
     # samesentence_relations(dev)
     amount_of_candidates(train, 30)

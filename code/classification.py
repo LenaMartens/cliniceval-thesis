@@ -91,34 +91,36 @@ class NNActions(Classifier):
         for doc in docs:
             for paragraph in range(doc.get_amount_of_paragraphs()):
                 entities = doc.get_entities(paragraph=paragraph)
-                relations = doc.get_realtions(paragraph=paragraph)
+                relations = doc.get_relations(paragraph=paragraph)
                 for (configuration, action) in oracle.get_training_sequence(entities, relations):
-                    feature = ConfigurationFeature(configuration).get_vector()
+                    feature = ConfigurationVector(configuration, doc).get_vector()
                     x.append(feature)
                     y.append(utils.get_actions()[action])
-        return (x, y)
+        return (np.asarray(x), np.asarray(y))
 
     def train(self, trainingdata):
         """
         :param trainingdata: [X, Y], [[samples x features], [samples x 1] ], [feature vectors, indexes of actions]
         """
         X = trainingdata[0]
+        print(X.shape)
         Y = trainingdata[1]
+        Y = Y.reshape((-1, 1))
+        print(Y.shape)
         model = Sequential()
         model.add(Dense(units=200, input_dim=X.shape[1]))
         model.add(Activation('softmax'))
-        model.add(Dense(units=200))
+        model.add(Dense(output_dim=4))
         model.add(Activation('softmax'))
-        model.compile(loss='categorical_crossentropy',
+        model.compile(loss='sparse_categorical_crossentropy',
                       optimizer='sgd',
                       metrics=['accuracy'])
 
         model.fit(X, Y, epochs=5, batch_size=32)
         self.machine = model
 
-    def predict(self, sample):
-        index = self.machine.predict(sample)
-        return utils.get_actions()[index]
+    def predict(self, sample, doc):
+        return self.machine.predict(ConfigurationVector(sample, doc).get_vector())
 
 
 def train_doctime_classifier(docs):
@@ -145,7 +147,7 @@ def feature_generator(docs, token_window, batch_size):
 
 
 def train_relation_classifier(docs, token_window):
-    generator = feature_generator(docs, token_window, 10)
+    generator = feature_generator(docs, token_window, 5)
     candidate_counts = dataset_attribute_experiment.amount_of_candidates(docs, token_window)
     class_weights = {True:len(docs)/(2*candidate_counts[0]), False:len(docs)/(2*candidate_counts[1])}
     lr = LogisticRegression(generator, class_weights)

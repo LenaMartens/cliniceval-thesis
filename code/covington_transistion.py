@@ -60,7 +60,7 @@ class Configuration:
         b1 = self.buffer.pop(0)
         self.stack1.extend(self.stack2)
         self.stack1.append(b1)
-        self.stack2.clear()
+        self.stack2 = []
 
     def no_arc(self):
         i = self.stack1.pop()
@@ -89,15 +89,21 @@ class Configuration:
 
     def get_top_entities(self, stack, amount):
         if stack == "stack1":
-            n = min(len(self.stack1), amount)
-            return self.stack1[-n:]
+            if amount > len(self.stack1):
+                return self.stack1 + [None]*(amount-len(self.stack1))
+            else:
+                return self.stack1[-amount:]
         if stack == "stack2":
-            n = min(len(self.stack2), amount)
-            return self.stack2[:n]
+            if amount > len(self.stack2):
+                return self.stack2 + [None]*(amount-len(self.stack2))
+            else:
+                return self.stack2[-amount:]
         if stack == "buffer":
-            n = min(len(self.buffer), amount)
-            return self.buffer[:n]
-        raise Exception(stack + " is :ot a valid option")
+            if amount > len(self.buffer):
+                return self.buffer + [None]*(amount-len(self.buffer))
+            else:
+                return self.buffer[-amount:]
+        raise Exception(stack + " is not a valid option")
 
     def __str__(self):
         buffer = [str(i) for i in self.buffer]

@@ -203,7 +203,7 @@ class DistanceVector(RelationFeatureVector):
         self.vector = np.asarray([distance / 30])
 
 
-vector_length = 0
+vector_length = 15209
 
 
 class EmptyVector(FeatureVector):
@@ -272,14 +272,14 @@ class TimeRelationVector(ConcatenatedVector):
 
 class ConfigurationVector(ConcatenatedVector):
     def generate_vector(self):
-        for entity in self.entity.get_top_entities("stack1", 3):
-            self.features.append(WordVectorWithContext(self.document.entities[entity], document=self.document))
-        for entity in self.entity.get_top_entities("stack2", 3):
-            self.features.append(WordVectorWithContext(self.document.entities[entity], document=self.document))
-        for entity in self.entity.get_top_entities("buffer", 3):
-            self.features.append(WordVectorWithContext(self.document.entities[entity], document=self.document))
-        stack = self.document.entities[self.entity.get_stack_head()]
-        buffer = self.document.entities[self.entity.get_buffer_head()]
-        self.features.append(SameParVector(stack, buffer))
-        self.features.append(SameSentenceVector(stack, buffer))
-        self.features.append(BagOfWords(self.document, stack, buffer))
+        self.add_entities("stack1", 3)
+        self.add_entities("stack2", 3)
+        self.add_entities("buffer", 3)
+ 
+    def add_entities(self, stack, amount):
+        for entity in self.entity.get_top_entities(stack, amount):
+            if entity and str(entity) != "ROOT":
+                ent = self.document.entities[entity]
+            else:
+                ent = None
+            self.features.append(WordVector(ent, document=self.document))

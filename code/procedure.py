@@ -7,7 +7,7 @@ import output
 import utils
 from annotator import GreedyAnnotator, InferenceAnnotator, TransitionAnnotator
 from oracle import NNOracle
-
+from keras.models import load_model
 
 class Procedure(object):
     def predict(self, filepath):
@@ -103,7 +103,7 @@ class TransitiveProcedure(Procedure):
     def __init__(self, train_path, nn_path=""):
         self.train_path = train_path
         if nn_path:
-            nn = utils.load_model(nn_path)
+            nn = load_model(nn_path)
         else:
             nn = self.train_network()
         oracle = NNOracle(network=nn)
@@ -120,9 +120,10 @@ class TransitiveProcedure(Procedure):
         print("Training doctime classifier")
         if self.train_path:
             print("Reading documents")
-            train_documents = data.read_all(self.train_path)
+            train_documents = data.read_all(self.train_path)[:10]
             print("Started training")
             model = classification.NNActions(train_documents)
+            model.save("../Models/NN.h5")
             return model
         else:
             raise Exception("No path to training corpus provided")

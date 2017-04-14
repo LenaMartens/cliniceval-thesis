@@ -58,7 +58,7 @@ class TransitionAnnotator(RelationAnnotator):
             if entities:
                 configuration = Configuration(entities)
                 while not configuration.empty_buffer():
-                    action_string = self.oracle.next_step(configuration)
+                    action_string = self.oracle.next_step(configuration, document)
                     # applies function to configuration
                     getattr(configuration, action_string)()
                 arcs.extend(configuration.get_arcs())

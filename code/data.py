@@ -23,6 +23,7 @@ class Document(object):
         self.sorted_entity_ids = []
 
     def clear_relations(self):
+        print("HEY THERE")
         self.relations = []
 
     def clear_doc_time_rels(self):
@@ -51,11 +52,11 @@ class Document(object):
         if paragraph < 0:
             return self.relations
         else:
-            relations = []
+            rels = []
             for relation in self.relations:
                 if relation.source.paragraph == paragraph or relation.target.paragraph == paragraph:
-                    relations.append(relation)
-            return relations
+                    rels.append(relation)
+            return rels
 
     def get_entities(self, paragraph=-1):
         if paragraph < 0:
@@ -63,7 +64,7 @@ class Document(object):
         else:
             entities = []
             for entity in self.entities.values():
-                if entity.source.paragraph == paragraph or entity.target.paragraph == paragraph:
+                if entity.paragraph == paragraph:
                     entities.append(entity)
             return entities
 
