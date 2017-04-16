@@ -53,7 +53,7 @@ class TransitionAnnotator(RelationAnnotator):
     def get_arcs(self, document):
         from covington_transistion import Configuration
         arcs = []
-        for paragraph in range(document.get_paragraph_amount()):
+        for paragraph in range(document.get_amount_of_paragraphs()):
             entities = document.get_entities(paragraph=paragraph)
             if entities:
                 configuration = Configuration(entities)

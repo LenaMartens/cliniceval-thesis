@@ -120,7 +120,9 @@ class NNActions(Classifier):
         self.machine = model
 
     def predict(self, sample, doc):
-        return self.machine.predict(ConfigurationVector(sample, doc).get_vector())
+        feature_vector = ConfigurationVector(sample, doc).get_vector()
+        feature_vector = feature_vector.reshape((-1, 1))
+        return self.machine.predict(feature_vector)
 
 
 def train_doctime_classifier(docs):

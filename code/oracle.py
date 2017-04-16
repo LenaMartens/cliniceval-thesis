@@ -48,7 +48,7 @@ class NNOracle(Oracle):
         self.network = network
 
     def next_step(self, configuration, doc):
-        ind = self.network.predict(configuration)
+        ind = self.network.predict(configuration, doc)
         actions = utils.get_actions()
         return actions.keys()[actions.values().index(ind)]
 

@@ -17,7 +17,8 @@ class Procedure(object):
         outputpath = self.generate_output_path(predict_path=filepath)
         for doc in documents:
             logger.info("Doc {id}".format(id=doc.id))
-            doc = classification.predict_DCT_document(doc, self.doc_time_model)
+            if self.doc_time_model: 
+                doc = classification.predict_DCT_document(doc, self.doc_time_model)
             doc = self.annotator.annotate(doc)
             output.output_doc(doc, outputpath=outputpath)
 
@@ -107,7 +108,8 @@ class TransitiveProcedure(Procedure):
         else:
             nn = self.train_network()
         oracle = NNOracle(network=nn)
-        self.annotator = TransitionAnnotator(oracle=oracle)
+        self.annotator = TransitionAnnotator(oracle=oracle)	
+        self.doc_time_model = None
 
     def generate_output_path(self, predict_path):
         train = os.path.split(self.train_path)
@@ -123,7 +125,6 @@ class TransitiveProcedure(Procedure):
             train_documents = data.read_all(self.train_path)[:10]
             print("Started training")
             model = classification.NNActions(train_documents)
-            model.save("../Models/NN.h5")
             return model
         else:
             raise Exception("No path to training corpus provided")

@@ -57,4 +57,4 @@ if __name__ == "__main__":
     fh.setFormatter(formatter)
     logger.addHandler(fh)
     logger.info('Start')
-    complete_base()
+    complete_transition()
