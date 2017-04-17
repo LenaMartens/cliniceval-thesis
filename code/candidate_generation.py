@@ -1,7 +1,7 @@
 from functools import partial
 
 from data import Relation
-from feature import WordVectorWithContext, TimeRelationVector
+from feature import WordVectorWithContext, TimeRelationVector, WordEmbeddingVectorWithContext
 
 
 # DOCTIME candidates
@@ -10,8 +10,12 @@ def generate_doctime_training_data(documents):
     for document in documents:
         for entity in document.get_entities():
             if entity.get_class() == "Event":
-                feature_vectors.append(WordVectorWithContext(entity, document))
+                feature_vectors.append(doc_time_feature(entity, document))
     return feature_vectors
+
+
+def doc_time_feature(entity, document):
+    return WordEmbeddingVectorWithContext(entity, document)
 
 
 '''

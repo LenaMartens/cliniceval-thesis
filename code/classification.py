@@ -5,7 +5,7 @@ from sklearn.metrics import accuracy_score
 import numpy as np
 import oracle
 import utils
-from candidate_generation import generate_doctime_training_data, generate_constrained_candidates
+from candidate_generation import generate_doctime_training_data, generate_constrained_candidates, doc_time_feature
 from data import read_all
 from feature import WordVectorWithContext, ConfigurationVector
 import scipy.sparse
@@ -158,7 +158,7 @@ def predict_DCT_document(document, model):
     document.clear_doc_time_rels()
     for entity in document.get_entities():
         if entity.get_class() == "Event":
-            feature = WordVectorWithContext(entity, document)
+            feature = doc_time_feature(entity, document)
             dct = model.predict(feature)
             entity.doc_time_rel = dct[0]
     return document
