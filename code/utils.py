@@ -121,15 +121,20 @@ def document_generator(filepath=store_path):
                 yield pickle.load(doc_file)
 
 
-def sentence_generator(filepath=dev):
-    for direct in os.listdir(filepath):
-        for file in os.listdir(os.path.join(filepath, direct)):
-            if file.find(".") < 0:
-                file_path = os.path.join(filepath, direct, file)
-                with open(file_path) as f_handle:
-                    for line in f_handle:
-                        if not (line.startswith("[") and line.endswith("]\n")):
-                            yield [x.lower() for x in line.split()]
+class Sentences(object):
+    def __init__(self, filepath):
+        self.filepath = filepath
+
+    def __iter__(self):
+        filepath = self.filepath
+        for direct in os.listdir(filepath):
+            for file in os.listdir(os.path.join(filepath, direct)):
+                if file.find(".") < 0:
+                    file_path = os.path.join(filepath, direct, file)
+                    with open(file_path) as f_handle:
+                        for line in f_handle:
+                            if not (line.startswith("[") and line.endswith("]\n")):
+                                yield [x.lower() for x in line.split()]
 
 
 # Returns Document objects with entities that can be annotated
