@@ -249,7 +249,7 @@ class WordEmbedding(FeatureVector):
 
 
 def train_model(filepath):
-    sentences = utils.sentence_generator(filepath)
+    sentences = utils.Sentences(filepath)
     return gensim.models.Word2Vec(sentences)
 
 
