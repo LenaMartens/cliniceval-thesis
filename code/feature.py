@@ -1,3 +1,4 @@
+import gensim
 import nltk
 from nltk.data import load
 import numpy as np
@@ -131,7 +132,7 @@ class POSFeatureVector(FeatureVector):
             try:
                 i = sentence.index(self.entity.word)
                 tags = nltk.pos_tag(sentence)
-		(word, tag) = tags[i]
+                (word, tag) = tags[i]
             except ValueError:
                 (word, tag) = nltk.pos_tag(self.entity.word)[0]
             self.vector[tag_list.index(tag)] = 1
@@ -230,6 +231,29 @@ class BagOfWords(RelationFeatureVector):
 
 
 '''
+Word embeddings
+'''
+
+
+class WordEmbedding(FeatureVector):
+    # shared by all instances
+    model = None
+
+    def __init__(self, entity, filepath):
+        super().__init__(entity)
+        if self.model is None:
+            self.model = train_model(filepath)
+
+    def generate_vector(self):
+        return self.model[self.entity.word.lower()]
+
+
+def train_model(filepath):
+    sentences = utils.sentence_generator(filepath)
+    return gensim.models.Word2Vec(sentences)
+
+
+'''
 Specific feature vectors used in training and prediction
 '''
 
@@ -261,6 +285,15 @@ class WordVectorWithContext(ConcatenatedVector):
         self.features.append(WordVector(right_neighbour, self.document))
 
 
+class WordEmbeddingVectorWithContext(ConcatenatedVector):
+    def generate_vector(self):
+        left_neighbour = self.document.get_neighbour_entity(self.entity, -1)
+        right_neighbour = self.document.get_neighbour_entity(self.entity, +1)
+        self.features.append(WordEmbedding(self.entity, utils.train))
+        self.features.append(WordEmbedding(left_neighbour, utils.train))
+        self.features.append(WordEmbedding(right_neighbour, utils.train))
+
+
 class TimeRelationVector(ConcatenatedVector):
     def generate_vector(self):
         self.features.append(WordVectorWithContext(self.entity.source, self.document))
@@ -275,7 +308,7 @@ class ConfigurationVector(ConcatenatedVector):
         self.add_entities("stack1", 3)
         self.add_entities("stack2", 3)
         self.add_entities("buffer", 3)
- 
+
     def add_entities(self, stack, amount):
         for entity in self.entity.get_top_entities(stack, amount):
             if entity and str(entity) != "ROOT":
