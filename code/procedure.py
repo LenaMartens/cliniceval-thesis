@@ -62,15 +62,15 @@ class BaseProcedure(Procedure):
         else:
             self.annotator = InferenceAnnotator(token_window=token_window, transitive=transitive)
 
+        if retrain_dct:
+            self.doc_time_model = self.train_doctime(doc_time_path)
+        else:
+            self.doc_time_model = utils.load_model(doc_time_path)
+ 
         if retrain_rel:
             self.annotator.model = self.train_rel_classifier(rel_classifier_path)
         else:
             self.annotator.model = utils.load_model(rel_classifier_path)
-
-        if retrain_dct:
-            self.doc_time_model = self.train_doctime(rel_classifier_path)
-        else:
-            self.doc_time_model = utils.load_model(doc_time_path)
 
     def train_doctime(self, save_path):
         print("Training doctime classifier")
