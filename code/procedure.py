@@ -122,7 +122,7 @@ class TransitiveProcedure(Procedure):
         print("Training doctime classifier")
         if self.train_path:
             print("Reading documents")
-            train_documents = data.read_all(self.train_path)[:10]
+            train_documents = data.read_all(self.train_path)
             print("Started training")
             model = classification.NNActions(train_documents)
             return model

@@ -86,17 +86,15 @@ class SupportVectorMachine(Classifier):
 
 class NNActions(Classifier):
     def generate_training_data(self, docs):
-        x = []
-        y = []
         for doc in docs:
             for paragraph in range(doc.get_amount_of_paragraphs()):
                 entities = doc.get_entities(paragraph=paragraph)
                 relations = doc.get_relations(paragraph=paragraph)
                 for (configuration, action) in oracle.get_training_sequence(entities, relations):
                     feature = ConfigurationVector(configuration, doc).get_vector()
-                    x.append(feature)
-                    y.append(utils.get_actions()[action])
-        return (np.asarray(x), np.asarray(y))
+                    x = feature
+                    y = utils.get_actions()[action]
+                    yield (x, y)
 
     def train(self, trainingdata):
         """
@@ -121,9 +119,9 @@ class NNActions(Classifier):
 
     def predict(self, sample, doc):
         feature_vector = ConfigurationVector(sample, doc).get_vector()
-        feature_vector = feature_vector.reshape((-1, 1))
-        return self.machine.predict(feature_vector)
-
+        feature_vector = np.array(feature_vector)[np.newaxis]
+        distribution = self.machine.predict(feature_vector)
+        return distribution
 
 def train_doctime_classifier(docs):
     svm = SupportVectorMachine(docs, "doc_time_rel")
