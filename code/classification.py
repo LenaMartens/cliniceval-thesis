@@ -40,7 +40,7 @@ class LogisticRegression(Classifier):
     def train(self, generator):
         # PARTIAL FIT because of memory problems
         classes = None
-        iterations=5
+        iterations = 5
         for i in range(iterations):
             print("Iteration: " + str(i))
             for data in generator:
@@ -86,27 +86,29 @@ class SupportVectorMachine(Classifier):
 
 class NNActions(Classifier):
     def generate_training_data(self, docs):
-        for doc in docs:
-            for paragraph in range(doc.get_amount_of_paragraphs()):
-                entities = doc.get_entities(paragraph=paragraph)
-                relations = doc.get_relations(paragraph=paragraph)
-                for (configuration, action) in oracle.get_training_sequence(entities, relations):
-                    feature = ConfigurationVector(configuration, doc).get_vector()
-                    x = feature
-                    y = utils.get_actions()[action]
-                    yield (x, y)
+        batch_size = 100
+        while 1:
+            x_train = []
+            y_train = []
+            for doc in docs:
+                for paragraph in range(doc.get_amount_of_paragraphs()):
+                    entities = doc.get_entities(paragraph=paragraph)
+                    relations = doc.get_relations(paragraph=paragraph)
+                    for (configuration, action) in oracle.get_training_sequence(entities, relations):
+                        feature = ConfigurationVector(configuration, doc).get_vector()
+                        x_train.append(feature)
+                        y_train.append(utils.get_actions()[action])
+                        if len(x_train) == batch_size:
+                            yield (x_train, y_train)
+                            x_train = []
+                            y_train = []
 
     def train(self, trainingdata):
         """
-        :param trainingdata: [X, Y], [[samples x features], [samples x 1] ], [feature vectors, indexes of actions]
+        :param trainingdata: batch generator
         """
-        X = trainingdata[0]
-        print(X.shape)
-        Y = trainingdata[1]
-        Y = Y.reshape((-1, 1))
-        print(Y.shape)
         model = Sequential()
-        model.add(Dense(units=200, input_dim=X.shape[1]))
+        model.add(Dense(units=200))
         model.add(Activation('softmax'))
         model.add(Dense(output_dim=4))
         model.add(Activation('softmax'))
@@ -114,7 +116,7 @@ class NNActions(Classifier):
                       optimizer='sgd',
                       metrics=['accuracy'])
 
-        model.fit(X, Y, epochs=5, batch_size=32)
+        model.fit_generator(trainingdata, verbose=0, nb_epoch=2)
         self.machine = model
 
     def predict(self, sample, doc):
@@ -122,6 +124,7 @@ class NNActions(Classifier):
         feature_vector = np.array(feature_vector)[np.newaxis]
         distribution = self.machine.predict(feature_vector)
         return distribution
+
 
 def train_doctime_classifier(docs):
     svm = SupportVectorMachine(docs, "doc_time_rel")
@@ -149,7 +152,7 @@ def feature_generator(docs, token_window, batch_size):
 def train_relation_classifier(docs, token_window):
     generator = feature_generator(docs, token_window, 5)
     candidate_counts = dataset_attribute_experiment.amount_of_candidates(docs, token_window)
-    class_weights = {True:len(docs)/(2*candidate_counts[0]), False:len(docs)/(2*candidate_counts[1])}
+    class_weights = {True: len(docs) / (2 * candidate_counts[0]), False: len(docs) / (2 * candidate_counts[1])}
     lr = LogisticRegression(generator, class_weights)
     return lr
 

@@ -21,22 +21,14 @@ test_path = utils.dev
 
 
 def complete_base():
-    DCT = DCT_model_name
-    relation_model = relation_model_name
-    if retrain_DCT:
-        DCT = ""
-    if retrain_REL:
-        relation_model = ""
     bp = BaseProcedure(train_path=train_path,
                        token_window=token_window,
-                       doc_time_path=DCT,
-                       rel_classifier_path=relation_model,
+                       retrain_rel=retrain_REL,
+                       retrain_dct=retrain_DCT,
+                       doc_time_path=DCT_model_name,
+                       rel_classifier_path=relation_model_name,
                        greedy=greedy,
                        transitive=transitive)
-    if retrain_DCT:
-        utils.save_model(bp.doc_time_model, name=DCT_model_name)
-    if retrain_REL:
-        utils.save_model(bp.annotator.model, name=relation_model_name)
     # Where the magic happens
     bp.predict(test_path)
     bp.evaluate(test_path)
@@ -44,7 +36,7 @@ def complete_base():
 
 def complete_transition():
     tp = TransitiveProcedure(train_path=train_path)
-    #tp.predict(test_path)
+    tp.predict(test_path)
     tp.evaluate(test_path)
 
 if __name__ == "__main__":
