@@ -17,7 +17,8 @@ class Procedure(object):
         outputpath = self.generate_output_path(predict_path=filepath)
         for doc in documents:
             logger.info("Doc {id}".format(id=doc.id))
-            doc = classification.predict_DCT_document(doc, self.doc_time_model)
+            if self.doc_time_model: 
+                doc = classification.predict_DCT_document(doc, self.doc_time_model)
             doc = self.annotator.annotate(doc)
             output.output_doc(doc, outputpath=outputpath)
 
@@ -36,6 +37,8 @@ class Procedure(object):
 class BaseProcedure(Procedure):
     def __init__(self,
                  train_path="",
+                 retrain_rel=False,
+                 retrain_dct=False,
                  rel_classifier_path="",
                  doc_time_path="",
                  token_window=30,
@@ -59,33 +62,35 @@ class BaseProcedure(Procedure):
         else:
             self.annotator = InferenceAnnotator(token_window=token_window, transitive=transitive)
 
-        if not rel_classifier_path:
-            self.annotator.model = self.train_rel_classifier()
+        if retrain_rel:
+            self.annotator.model = self.train_rel_classifier(rel_classifier_path)
         else:
             self.annotator.model = utils.load_model(rel_classifier_path)
 
-        if not doc_time_path:
-            self.doc_time_model = self.train_doctime()
+        if retrain_dct:
+            self.doc_time_model = self.train_doctime(rel_classifier_path)
         else:
             self.doc_time_model = utils.load_model(doc_time_path)
 
-    def train_doctime(self):
+    def train_doctime(self, save_path):
         print("Training doctime classifier")
         if self.train_path:
             print("Reading documents")
             train_documents = data.read_all(self.train_path, transitive=self.transitive)
             print("Started training")
-            return classification.train_doctime_classifier(train_documents)
+            model = classification.train_doctime_classifier(train_documents)
+            utils.save_model(model, name=save_path)
         else:
             raise Exception("No path to training corpus provided")
 
-    def train_rel_classifier(self):
+    def train_rel_classifier(self, save_path):
         print("Training relation classifier")
         if self.train_path:
             print("Reading documents")
             train_documents = data.read_all(self.train_path, transitive=self.transitive)
             print("Started training")
-            return classification.train_relation_classifier(train_documents, self.token_window)
+            model = classification.train_relation_classifier(train_documents, self.token_window)
+            utils.save_model(model, save_path)
         else:
             raise Exception("No path to training corpus provided")
 
@@ -107,7 +112,8 @@ class TransitiveProcedure(Procedure):
         else:
             nn = self.train_network()
         oracle = NNOracle(network=nn)
-        self.annotator = TransitionAnnotator(oracle=oracle)
+        self.annotator = TransitionAnnotator(oracle=oracle)	
+        self.doc_time_model = None
 
     def generate_output_path(self, predict_path):
         train = os.path.split(self.train_path)
@@ -120,10 +126,9 @@ class TransitiveProcedure(Procedure):
         print("Training doctime classifier")
         if self.train_path:
             print("Reading documents")
-            train_documents = data.read_all(self.train_path)[:10]
+            train_documents = data.read_all(self.train_path)
             print("Started training")
             model = classification.NNActions(train_documents)
-            model.save("../Models/NN.h5")
             return model
         else:
             raise Exception("No path to training corpus provided")

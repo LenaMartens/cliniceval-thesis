@@ -1,8 +1,11 @@
 import data
+import oracle
 import utils
+from oracle import get_training_sequence
 
 dev = data.read_all(utils.dev)
 train = data.read_all(utils.train)
+
 
 def treeless(documents):
     treefull = 0
@@ -30,7 +33,7 @@ def samepar_relations(documents):
         for relation in relations:
             if abs(relation.source.paragraph - relation.target.paragraph) < 4:
                 amount_of_samepars += 1
-    print(amount_of_samepars,  amount_of_relations)
+    print(amount_of_samepars, amount_of_relations)
 
 
 def samesentence_relations(documents):
@@ -67,7 +70,7 @@ def amount_of_candidates(documents, amount=30):
             for j in entities:
                 if i != j:
                     if abs(i.token - j.token) < amount + 1:
-                        if document.relation_exists(i, j):        
+                        if document.relation_exists(i, j):
                             positive += 1
                         else:
                             negative += 1
@@ -86,18 +89,41 @@ def projective_trees(documents):
             spans.append((begin, end))
         spans.sort(key=lambda x: x[0])
         non_projective = 0
-        for i in range(len(spans)-1):
-            if spans[i+1][0] <= spans[i][1] <= spans[i+1][1]:
-                non_projective+=1
-        print(non_projective/(len(relations)+1))
+        for i in range(len(spans) - 1):
+            if spans[i + 1][0] <= spans[i][1] <= spans[i + 1][1]:
+                non_projective += 1
+        print(non_projective / (len(relations) + 1))
+
+
+def action_class_imbalance_paragraphs(documents):
+    frequencies = {"left_arc": 0, "right_arc": 0, "no_arc": 0, "shift": 0}
+    al = 0
+    par=0
+    for doc in documents:
+        for paragraph in range(doc.get_amount_of_paragraphs()):
+            par+=1
+            entities = doc.get_entities(paragraph=paragraph)
+            relations = doc.get_relations(paragraph=paragraph)
+            for (configuration, action) in oracle.get_training_sequence(entities, relations):
+                frequencies[action] += 1
+                al += 1
+    print(frequencies, al, par)
+
+
+def action_class_imbalance(documents):
+    frequencies = {"left_arc": 0, "right_arc": 0, "no_arc": 0, "shift": 0}
+    al = 0
+    for doc in documents:
+        entities = doc.get_entities()
+        relations = doc.get_relations()
+        for (configuration, action) in oracle.get_training_sequence(entities, relations):
+            frequencies[action] += 1
+            al += 1
+    print(frequencies, al, len(documents))
+
 
 if __name__ == "__main__":
-    # treeless(train)
-    # treeless(dev)
-    samepar_relations(train)
-    samepar_relations(dev)
-    # samesentence_relations(train)
-    # samesentence_relations(dev)
-    amount_of_candidates(train, 30)
-    amount_of_candidates(dev, 30)
-    # projective_trees(train)
+    #action_class_imbalance(dev)
+    #action_class_imbalance(train)
+    #action_class_imbalance_paragraphs(dev)
+    action_class_imbalance_paragraphs(train)

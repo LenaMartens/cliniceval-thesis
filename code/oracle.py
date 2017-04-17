@@ -48,9 +48,17 @@ class NNOracle(Oracle):
         self.network = network
 
     def next_step(self, configuration, doc):
-        ind = self.network.predict(configuration)
+        distribution = self.network.predict(configuration, doc)
         actions = utils.get_actions()
-        return actions.keys()[actions.values().index(ind)]
+        distribution = distribution.tolist()[0]
+        en = list(enumerate(distribution))
+        en.sort(key=lambda tup: tup[1])
+        for (ind, val) in en[::-1]:
+            action = actions.keys()[actions.values().index(ind)]
+            if configuration.action_possible(action):
+                return action
+        print("This should not print")
+        return None
 
 
 def get_training_sequence(entities, arcs):

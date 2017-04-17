@@ -23,22 +23,24 @@ class Configuration:
         return False
 
     def can_do_left_arc(self):
+        if not self.stack1:
+            return False
         i = self.stack1[-1]
         j = self.buffer[0]
         ROOT_CONDITION = (str(i) != "ROOT")
         HEAD_CONDITION = (i not in self.children_dict)
         NO_CYCLE_CONDITION = (j not in self.children_dict) or (not self.reachable(i, j, {}))
-        if not ROOT_CONDITION and HEAD_CONDITION and NO_CYCLE_CONDITION:
-            print(ROOT_CONDITION, HEAD_CONDITION, NO_CYCLE_CONDITION)
+        return ROOT_CONDITION and HEAD_CONDITION and NO_CYCLE_CONDITION
 
     def can_do_right_arc(self):
+        if not self.stack1:
+            return False
         j = self.stack1[-1]
         i = self.buffer[0]
         ROOT_CONDITION = (str(i) != "ROOT")
         HEAD_CONDITION = (i not in self.children_dict)
         NO_CYCLE_CONDITION = (j not in self.children_dict) or (not self.reachable(i, j, []))
-        if not ROOT_CONDITION and HEAD_CONDITION and NO_CYCLE_CONDITION:
-            print(ROOT_CONDITION, HEAD_CONDITION, NO_CYCLE_CONDITION)
+        return ROOT_CONDITION and HEAD_CONDITION and NO_CYCLE_CONDITION
 
     # buffer to stack
     def left_arc(self):
@@ -104,6 +106,13 @@ class Configuration:
             else:
                 return self.buffer[-amount:]
         raise Exception(stack + " is not a valid option")
+
+    def action_possible(self, action_str):
+        if action_str == "left_arc":
+            return self.can_do_left_arc()
+        if action_str == "right_arc":
+            return self.can_do_right_arc()
+        return True
 
     def __str__(self):
         buffer = [str(i) for i in self.buffer]
