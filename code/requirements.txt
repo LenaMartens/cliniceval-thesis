@@ -6,13 +6,11 @@ enum34==1.1.6
 flake8==3.0.0b2
 funcsigs==1.0.2
 gensim==0.13.3
-guppy==0.1.10
-gurobipy==7.0.1
 Keras==2.0.3
 mccabe==0.5.3
 memory-profiler==0.43
 mock==2.0.0
-nltk==3.2.1
+nltk
 nose==1.3.7
 nose-parameterized==0.6.0
 numpy==1.12.1

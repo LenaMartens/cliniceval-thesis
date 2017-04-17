@@ -1,4 +1,8 @@
+env/
+__pycache__/
+*.pyc
 literatuur/
+*.INI
 THYME/
 Documents/
 Output/

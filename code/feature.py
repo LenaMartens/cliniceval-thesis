@@ -131,7 +131,7 @@ class POSFeatureVector(FeatureVector):
             try:
                 i = sentence.index(self.entity.word)
                 tags = nltk.pos_tag(sentence)
-		(word, tag) = tags[i]
+                (word, tag) = tags[i]
             except ValueError:
                 (word, tag) = nltk.pos_tag(self.entity.word)[0]
             self.vector[tag_list.index(tag)] = 1
@@ -203,7 +203,7 @@ class DistanceVector(RelationFeatureVector):
         self.vector = np.asarray([distance / 30])
 
 
-vector_length = 15209
+vector_length = 0
 
 
 class EmptyVector(FeatureVector):
@@ -272,9 +272,9 @@ class TimeRelationVector(ConcatenatedVector):
 
 class ConfigurationVector(ConcatenatedVector):
     def generate_vector(self):
-        self.add_entities("stack1", 3)
-        self.add_entities("stack2", 3)
-        self.add_entities("buffer", 3)
+        self.add_entities("buffer", 1)
+        self.add_entities("stack1", 1)
+        self.add_entities("stack2", 1)
  
     def add_entities(self, stack, amount):
         for entity in self.entity.get_top_entities(stack, amount):
