@@ -40,7 +40,7 @@ class LogisticRegression(Classifier):
     def train(self, generator):
         # PARTIAL FIT because of memory problems
         classes = None
-        iterations = 5
+        iterations = 2
         for i in range(iterations):
             print("Iteration: " + str(i))
             for data in generator:
@@ -150,7 +150,7 @@ def feature_generator(docs, token_window, batch_size):
 
 
 def train_relation_classifier(docs, token_window):
-    generator = feature_generator(docs, token_window, 5)
+    generator = feature_generator(docs, token_window, 10)
     candidate_counts = dataset_attribute_experiment.amount_of_candidates(docs, token_window)
     class_weights = {True: len(docs) / (2 * candidate_counts[0]), False: len(docs) / (2 * candidate_counts[1])}
     lr = LogisticRegression(generator, class_weights)

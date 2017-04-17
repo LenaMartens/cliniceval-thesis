@@ -11,7 +11,7 @@ retrain_REL = True
 DCT_model_name = "SupportVectorMachine1.0"
 relation_model_name = "LogisticRegression1.0"
 token_window = 30
-transitive = True
+transitive = False
 greedy = False
 """
 SHARED CONFIG
@@ -49,4 +49,4 @@ if __name__ == "__main__":
     fh.setFormatter(formatter)
     logger.addHandler(fh)
     logger.info('Start')
-    complete_transition()
+    complete_base()

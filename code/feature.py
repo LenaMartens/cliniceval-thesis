@@ -240,7 +240,7 @@ class WordEmbedding(FeatureVector):
     model = None
 
     def __init__(self, entity, filepath):
-        super().__init__(entity)
+        super(WordEmbedding, self).__init__(entity)
         if self.model is None:
             self.model = train_model(filepath)
 
@@ -289,6 +289,7 @@ class WordEmbeddingVectorWithContext(ConcatenatedVector):
     def generate_vector(self):
         left_neighbour = self.document.get_neighbour_entity(self.entity, -1)
         right_neighbour = self.document.get_neighbour_entity(self.entity, +1)
+        print(WordEmbedding(self.entity, utils.train))
         self.features.append(WordEmbedding(self.entity, utils.train))
         self.features.append(WordEmbedding(left_neighbour, utils.train))
         self.features.append(WordEmbedding(right_neighbour, utils.train))
@@ -296,8 +297,8 @@ class WordEmbeddingVectorWithContext(ConcatenatedVector):
 
 class TimeRelationVector(ConcatenatedVector):
     def generate_vector(self):
-        self.features.append(WordVectorWithContext(self.entity.source, self.document))
-        self.features.append(WordVectorWithContext(self.entity.target, self.document))
+        self.features.append(WordEmbeddingVectorWithContext(self.entity.source, self.document))
+        self.features.append(WordEmbeddingVectorWithContext(self.entity.target, self.document))
         self.features.append(SameParVector(self.entity.source, self.entity.target))
         self.features.append(SameSentenceVector(self.entity.source, self.entity.target))
         self.features.append(BagOfWords(self.document, self.entity.source, self.entity.target))
