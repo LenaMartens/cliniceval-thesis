@@ -1,5 +1,6 @@
 import gensim
 import nltk
+from gensim.models import Word2Vec
 from nltk.data import load
 import numpy as np
 import utils
@@ -235,14 +236,24 @@ Word embeddings
 '''
 
 
+def train_model(filepath):
+    sentences = utils.Sentences(filepath)
+    model = gensim.models.Word2Vec(sentences, size=100, window=5, min_count=5, workers=8)
+    return model
+
+
 class WordEmbedding(FeatureVector):
     # shared by all instances
     model = None
 
     def __init__(self, entity, filepath, pretrained_model_path=""):
         super(WordEmbedding, self).__init__(entity)
-        if self.model is None:
-            self.model = train_model(filepath)
+        if not self.model:
+            if not pretrained_model_path:
+                self.model = train_model(filepath)
+                self.model.save(pretrained_model_path)
+            else:
+                self.model = Word2Vec.load(pretrained_model_path)
 
     def generate_vector(self):
         try:
@@ -250,11 +261,6 @@ class WordEmbedding(FeatureVector):
         except:
             self.vector = np.zeros(100)
 
-
-def train_model(filepath):
-    sentences = utils.Sentences(filepath)
-    model =  gensim.models.Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
-    return model
 
 '''
 Specific feature vectors used in training and prediction

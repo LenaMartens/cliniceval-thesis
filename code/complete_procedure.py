@@ -1,6 +1,7 @@
 import utils
 import logging
 
+from feature import WordEmbedding
 from procedure import BaseProcedure, TransitiveProcedure
 
 """
@@ -49,4 +50,6 @@ if __name__ == "__main__":
     fh.setFormatter(formatter)
     logger.addHandler(fh)
     logger.info('Start')
+    # train word embedding model
+    WordEmbedding(None, utils.train, "../Models/WordEmbedding")
     complete_transition()
