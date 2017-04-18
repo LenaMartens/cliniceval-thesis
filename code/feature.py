@@ -246,7 +246,7 @@ class WordEmbedding(FeatureVector):
     # shared by all instances
     model = None
 
-    def __init__(self, entity, filepath, pretrained_model_path=""):
+    def __init__(self, entity, filepath="", pretrained_model_path=""):
         super(WordEmbedding, self).__init__(entity)
         if not self.model:
             if not pretrained_model_path:
@@ -298,9 +298,9 @@ class WordEmbeddingVectorWithContext(ConcatenatedVector):
     def generate_vector(self):
         left_neighbour = self.document.get_neighbour_entity(self.entity, -1)
         right_neighbour = self.document.get_neighbour_entity(self.entity, +1)
-        self.features.append(WordEmbedding(self.entity, utils.train))
-        self.features.append(WordEmbedding(left_neighbour, utils.train))
-        self.features.append(WordEmbedding(right_neighbour, utils.train))
+        self.features.append(WordEmbedding(self.entity))
+        self.features.append(WordEmbedding(left_neighbour))
+        self.features.append(WordEmbedding(right_neighbour))
 
 
 class TimeRelationVector(ConcatenatedVector):
@@ -324,4 +324,4 @@ class ConfigurationVector(ConcatenatedVector):
                 ent = self.document.entities[entity]
             else:
                 ent = None
-            self.features.append(WordVector(ent, document=self.document))
+            self.features.append(WordEmbeddingVectorWithContext(ent, document=self.document))
