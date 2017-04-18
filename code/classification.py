@@ -50,7 +50,6 @@ class LogisticRegression(Classifier):
                 Y = [getattr(x.entity, self.class_to_fy) for x in data]
                 if classes == None:
                     classes = np.unique(Y)
-                    print(classes)
                 self.machine.partial_fit(X, Y, classes=classes)
 
     def predict(self, sample):
@@ -58,10 +57,13 @@ class LogisticRegression(Classifier):
         sample = sample.get_vector().reshape(1, -1)
         return self.machine.predict_proba(sample)
 
-    def __init__(self, trainingdata, class_weights):
+    def __init__(self, trainingdata, class_weights, balanced=False):
         # List of FeatureVectors
         self.class_to_fy = "positive"
-        self.machine = linear_model.SGDClassifier(loss="log", penalty="l2")
+        if balanced:
+            self.machine = linear_model.SGDClassifier(loss="log", penalty="l2", class_weights=class_weights)
+        else:
+            self.machine = linear_model.SGDClassifier(loss="log", penalty="l2")
         self.train(trainingdata)
 
 
@@ -155,11 +157,12 @@ def feature_generator(docs, token_window, batch_size):
         start += batch_size
 
 
-def train_relation_classifier(docs, token_window):
+def train_relation_classifier(docs, token_window, balanced=False):
     generator = feature_generator(docs, token_window, 10)
-    candidate_counts = dataset_attribute_experiment.amount_of_candidates(docs, token_window)
-    class_weights = {True: len(docs) / (2 * candidate_counts[0]), False: len(docs) / (2 * candidate_counts[1])}
-    lr = LogisticRegression(generator, class_weights)
+    if balanced:
+        candidate_counts = dataset_attribute_experiment.amount_of_candidates(docs, token_window)
+        class_weights = {True: len(docs) / (2 * candidate_counts[0]), False: len(docs) / (2 * candidate_counts[1])}
+    lr = LogisticRegression(generator, class_weights, balanced)
     return lr
 
 
