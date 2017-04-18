@@ -1,3 +1,4 @@
+from itertools import tee
 import logging
 import dataset_attribute_experiment
 from sklearn import svm, linear_model
@@ -99,7 +100,7 @@ class NNActions(Classifier):
                         x_train.append(feature)
                         y_train.append(utils.get_actions()[action])
                         if len(x_train) == batch_size:
-                            yield (x_train, y_train)
+                            yield (np.vstack(x_train), np.vstack(y_train))
                             x_train = []
                             y_train = []
 
@@ -108,7 +109,12 @@ class NNActions(Classifier):
         :param trainingdata: batch generator
         """
         model = Sequential()
-        model.add(Dense(units=200))
+
+        t, t_backup = tee(trainingdata)
+        (x, y) = next(t)
+        in_dim = len(x[0])
+
+        model.add(Dense(units=200, input_dim=in_dim))
         model.add(Activation('softmax'))
         model.add(Dense(output_dim=4))
         model.add(Activation('softmax'))
@@ -116,7 +122,7 @@ class NNActions(Classifier):
                       optimizer='sgd',
                       metrics=['accuracy'])
 
-        model.fit_generator(trainingdata, verbose=0, nb_epoch=2)
+        model.fit_generator(t_backup, verbose=1, nb_epoch=2, steps_per_epoch=1208)
         self.machine = model
 
     def predict(self, sample, doc):
