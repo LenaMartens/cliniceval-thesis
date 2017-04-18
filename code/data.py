@@ -97,6 +97,8 @@ class Document(object):
         :param direction: -1 for left, +1 for right
         :return: neighbouring entity based on span
         '''
+        if not entity:
+            return None
         place = self.sorted_entity_ids.index(entity.id)
         try:
             return self.entities[self.sorted_entity_ids[place + direction]]

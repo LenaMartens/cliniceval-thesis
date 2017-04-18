@@ -7,7 +7,7 @@ from procedure import BaseProcedure, TransitiveProcedure
 """
 BASE CONFIG
 """
-retrain_DCT = True
+retrain_DCT = False
 retrain_REL = True
 DCT_model_name = "SupportVectorMachineWordEmbeddings"
 relation_model_name = "LogisticRegressionWordEmbeddings"
@@ -52,4 +52,4 @@ if __name__ == "__main__":
     logger.info('Start')
     # train word embedding model
     WordEmbedding(None, True, utils.train, "../Models/WordEmbedding")
-    complete_transition()
+    complete_base()

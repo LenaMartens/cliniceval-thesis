@@ -81,6 +81,7 @@ class BaseProcedure(Procedure):
             logger.info("Started training")
             model = classification.train_doctime_classifier(train_documents)
             utils.save_model(model, name=save_path)
+            return model
         else:
             raise Exception("No path to training corpus provided")
 
@@ -93,6 +94,7 @@ class BaseProcedure(Procedure):
             logger.info("Started training")
             model = classification.train_relation_classifier(train_documents, self.token_window)
             utils.save_model(model, save_path)
+            return model
         else:
             raise Exception("No path to training corpus provided")
 
