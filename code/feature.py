@@ -239,8 +239,6 @@ Word embeddings
 
 
 def train_model(filepath):
-    logger = logging.getLogger('progress_logger')
-    logger.info("Started word embeddings training")
     sentences = utils.Sentences(filepath)
     model = gensim.models.Word2Vec(sentences, size=100, window=5, min_count=5, workers=8)
     return model
@@ -248,13 +246,22 @@ def train_model(filepath):
 
 class WordEmbedding(FeatureVector):
     # shared by all instances
-    model = None
+    _model = None
+
+    @property
+    def model(self):
+        return self._model
+
+    @model.setter
+    def model(self, model):
+        self._model = model
 
     def __init__(self, entity,
                  retrain=False,
                  trainpath="",
                  pretrained_model_path=""):
         super(WordEmbedding, self).__init__(entity)
+        print(self.model)
         if not self.model:
             logger = logging.getLogger('progress_logger')
             if retrain:
@@ -264,7 +271,7 @@ class WordEmbedding(FeatureVector):
                 logger.info("Saved word embeddings model!")
             else:
                 self.model = Word2Vec.load(pretrained_model_path)
-                logger.info("Saved word embeddings model!")
+                logger.info("Loaded word embeddings model!")
 
     def generate_vector(self):
         try:
