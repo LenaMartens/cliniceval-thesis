@@ -54,7 +54,7 @@ class NNOracle(Oracle):
         en = list(enumerate(distribution))
         en.sort(key=lambda tup: tup[1])
         for (ind, val) in en[::-1]:
-            action = actions.keys()[actions.values().index(ind)]
+            action = actions.keys()[list(actions.values()).index(ind)]
             if configuration.action_possible(action):
                 return action
         print("This should not print")

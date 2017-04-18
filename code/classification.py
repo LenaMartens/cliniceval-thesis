@@ -93,6 +93,8 @@ class NNActions(Classifier):
         while 1:
             x_train = []
             y_train = []
+            random.seed()
+            random.shuffle(docs)
             for doc in docs:
                 for paragraph in range(doc.get_amount_of_paragraphs()):
                     entities = doc.get_entities(paragraph=paragraph)
@@ -118,13 +120,13 @@ class NNActions(Classifier):
 
         model.add(Dense(units=200, input_dim=in_dim))
         model.add(Activation('softmax'))
-        model.add(Dense(output_dim=4))
+        model.add(Dense(units=4))
         model.add(Activation('softmax'))
         model.compile(loss='sparse_categorical_crossentropy',
                       optimizer='sgd',
                       metrics=['accuracy'])
 
-        model.fit_generator(t_backup, verbose=1, nb_epoch=2, steps_per_epoch=1208)
+        model.fit_generator(t_backup, verbose=1, epochs=2, steps_per_epoch=1208)
         self.machine = model
 
     def predict(self, sample, doc):
