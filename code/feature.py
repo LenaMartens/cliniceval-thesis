@@ -1,3 +1,5 @@
+import logging
+
 import gensim
 import nltk
 from gensim.models import Word2Vec
@@ -237,6 +239,8 @@ Word embeddings
 
 
 def train_model(filepath):
+    logger = logging.getLogger('progress_logger')
+    logger.info("Started word embeddings training")
     sentences = utils.Sentences(filepath)
     model = gensim.models.Word2Vec(sentences, size=100, window=5, min_count=5, workers=8)
     return model
@@ -249,11 +253,15 @@ class WordEmbedding(FeatureVector):
     def __init__(self, entity, filepath="", pretrained_model_path=""):
         super(WordEmbedding, self).__init__(entity)
         if not self.model:
+            logger = logging.getLogger('progress_logger')
             if not pretrained_model_path:
+                logger.info("Started word embeddings training")
                 self.model = train_model(filepath)
                 self.model.save(pretrained_model_path)
+                logger.info("Saved word embeddings model!")
             else:
                 self.model = Word2Vec.load(pretrained_model_path)
+                logger.info("Saved word embeddings model!")
 
     def generate_vector(self):
         try:
