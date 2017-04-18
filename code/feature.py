@@ -239,19 +239,22 @@ class WordEmbedding(FeatureVector):
     # shared by all instances
     model = None
 
-    def __init__(self, entity, filepath):
+    def __init__(self, entity, filepath, pretrained_model_path=""):
         super(WordEmbedding, self).__init__(entity)
         if self.model is None:
             self.model = train_model(filepath)
 
     def generate_vector(self):
-        return self.model[self.entity.word.lower()]
+        try:
+            self.vector = self.model[self.entity.word.lower()]
+        except:
+            self.vector = np.zeros(100)
 
 
 def train_model(filepath):
     sentences = utils.Sentences(filepath)
-    return gensim.models.Word2Vec(sentences)
-
+    model =  gensim.models.Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
+    return model
 
 '''
 Specific feature vectors used in training and prediction
@@ -289,7 +292,6 @@ class WordEmbeddingVectorWithContext(ConcatenatedVector):
     def generate_vector(self):
         left_neighbour = self.document.get_neighbour_entity(self.entity, -1)
         right_neighbour = self.document.get_neighbour_entity(self.entity, +1)
-        print(WordEmbedding(self.entity, utils.train))
         self.features.append(WordEmbedding(self.entity, utils.train))
         self.features.append(WordEmbedding(left_neighbour, utils.train))
         self.features.append(WordEmbedding(right_neighbour, utils.train))

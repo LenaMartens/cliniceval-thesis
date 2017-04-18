@@ -8,9 +8,9 @@ BASE CONFIG
 """
 retrain_DCT = True
 retrain_REL = True
-DCT_model_name = "SupportVectorMachine1.0"
-relation_model_name = "LogisticRegression1.0"
-token_window = 30
+DCT_model_name = "SupportVectorMachineWordEmbeddings"
+relation_model_name = "LogisticRegressionWordEmbeddings"
+token_window = 15
 transitive = False
 greedy = False
 """

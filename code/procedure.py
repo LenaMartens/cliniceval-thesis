@@ -73,22 +73,24 @@ class BaseProcedure(Procedure):
             self.annotator.model = utils.load_model(rel_classifier_path)
 
     def train_doctime(self, save_path):
-        print("Training doctime classifier")
+        logger = logging.getLogger('progress_logger')
+        logger.info("Training doctime classifier")
         if self.train_path:
-            print("Reading documents")
+            logger.info("Reading documents")
             train_documents = data.read_all(self.train_path, transitive=self.transitive)
-            print("Started training")
+            logger.info("Started training")
             model = classification.train_doctime_classifier(train_documents)
             utils.save_model(model, name=save_path)
         else:
             raise Exception("No path to training corpus provided")
 
     def train_rel_classifier(self, save_path):
-        print("Training relation classifier")
+        logger = logging.getLogger('progress_logger')
+        logger.info("Training relation classifier")
         if self.train_path:
-            print("Reading documents")
+            logger.info("Reading documents")
             train_documents = data.read_all(self.train_path, transitive=self.transitive)
-            print("Started training")
+            logger.info("Started training")
             model = classification.train_relation_classifier(train_documents, self.token_window)
             utils.save_model(model, save_path)
         else:
@@ -123,11 +125,12 @@ class TransitiveProcedure(Procedure):
         return path
 
     def train_network(self):
-        print("Training doctime classifier")
+        logger = logging.getLogger('progress_logger')
+        logger.info("Training neural network")
         if self.train_path:
-            print("Reading documents")
+            logger.info("Reading documents")
             train_documents = data.read_all(self.train_path)
-            print("Started training")
+            logger.info("Started training")
             model = classification.NNActions(train_documents)
             return model
         else:
