@@ -244,38 +244,31 @@ def train_model(filepath):
     return model
 
 
+wordembedding_model = None
+
+
 class WordEmbedding(FeatureVector):
-    # shared by all instances
-    _model = None
-
-    @property
-    def model(self):
-        return self._model
-
-    @model.setter
-    def model(self, model):
-        self._model = model
-
     def __init__(self, entity,
                  retrain=False,
                  trainpath="",
                  pretrained_model_path=""):
+        global wordembedding_model
         super(WordEmbedding, self).__init__(entity)
-        print(self.model)
-        if not self.model:
+        if not wordembedding_model:
             logger = logging.getLogger('progress_logger')
             if retrain:
                 logger.info("Started word embeddings training")
-                self.model = train_model(trainpath)
-                self.model.save(pretrained_model_path)
+                wordembedding_model = train_model(trainpath)
+                wordembedding_model.save(pretrained_model_path)
                 logger.info("Saved word embeddings model!")
             else:
-                self.model = Word2Vec.load(pretrained_model_path)
+                wordembedding_model = Word2Vec.load(pretrained_model_path)
                 logger.info("Loaded word embeddings model!")
 
     def generate_vector(self):
+        global wordembedding_model
         try:
-            self.vector = self.model[self.entity.word.lower()]
+            self.vector = wordembedding_model[self.entity.word.lower()]
         except:
             self.vector = np.zeros(100)
 
