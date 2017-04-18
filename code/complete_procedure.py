@@ -51,5 +51,5 @@ if __name__ == "__main__":
     logger.addHandler(fh)
     logger.info('Start')
     # train word embedding model
-    WordEmbedding(None, utils.train, "../Models/WordEmbedding")
+    WordEmbedding(None, True, utils.train, "../Models/WordEmbedding")
     complete_transition()

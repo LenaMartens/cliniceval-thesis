@@ -250,13 +250,16 @@ class WordEmbedding(FeatureVector):
     # shared by all instances
     model = None
 
-    def __init__(self, entity, filepath="", pretrained_model_path=""):
+    def __init__(self, entity,
+                 retrain=False,
+                 trainpath="",
+                 pretrained_model_path=""):
         super(WordEmbedding, self).__init__(entity)
         if not self.model:
             logger = logging.getLogger('progress_logger')
-            if not pretrained_model_path:
+            if retrain:
                 logger.info("Started word embeddings training")
-                self.model = train_model(filepath)
+                self.model = train_model(trainpath)
                 self.model.save(pretrained_model_path)
                 logger.info("Saved word embeddings model!")
             else:
