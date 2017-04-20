@@ -2,17 +2,18 @@ from itertools import tee
 import logging
 import dataset_attribute_experiment
 from sklearn import svm, linear_model
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report, f1_score, confusion_matrix
 import numpy as np
 import oracle
 import utils
 from candidate_generation import generate_doctime_training_data, generate_constrained_candidates, doc_time_feature
 from data import read_all
-from feature import WordVectorWithContext, ConfigurationVector
+from feature import WordVectorWithContext, ConfigurationVector, TimeRelationVector
 import scipy.sparse
 import random
 from keras.models import Sequential
 from keras.layers import Dense, Activation
+from keras import metrics
 
 
 class Classifier:
@@ -25,6 +26,9 @@ class Classifier:
     def generate_training_data(self, docs):
         pass
 
+    def evaluate(self, validation):
+        pass
+
     def __init__(self, trainingdata, class_to_fy=None):
         """
         :param trainingdata: docs
@@ -35,36 +39,76 @@ class Classifier:
 
 
 class LogisticRegression(Classifier):
+    def evaluate(self, validation):
+        y_true = []
+        y_pred = []
+        for doc in validation:
+            for candidate in generate_constrained_candidates(validation, self.token_window):
+                y_true.append(candidate.positive)
+                distribution = self.machine.predict_proba(TimeRelationVector(candidate, doc))
+                if distribution[0] > distribution[1]:
+                    y_pred.append(False)
+                else:
+                    y_pred.append(True)
+
+        print(classification_report(y_true, y_pred))
+        print('F1 score:{}'.format(f1_score(y_true, y_pred)))
+        print('confusion matrix:{}'.format(confusion_matrix(y_true, y_pred)))
+
     def generate_training_data(self, docs):
         return docs
 
     def train(self, generator):
         # PARTIAL FIT because of memory problems
-        classes = None
-        iterations = 5
-        for i in range(iterations):
-            print("Iteration: " + str(i))
-            for data in generator:
-                X = [x.get_vector() for x in data]
-                X = scipy.sparse.csr_matrix(X)
-                Y = [getattr(x.entity, self.class_to_fy) for x in data]
-                if classes == None:
-                    classes = np.unique(Y)
-                self.machine.partial_fit(X, Y, classes=classes)
+        if self.batches:
+            classes = None
+            iterations = 2
+            for i in range(iterations):
+                print("Iteration: " + str(i))
+                for data in generator:
+                    X = [x.get_vector() for x in data]
+                    X = scipy.sparse.csr_matrix(X)
+                    Y = [getattr(x.entity, self.class_to_fy) for x in data]
+                    if not classes:
+                        classes = np.unique(Y)
+                    self.machine.partial_fit(X, Y, classes=classes)
+        else:
+            data = [x for x in [x for x in generator]]
+            input = [x.get_vector() for x in data]
+            output = [getattr(x.entity, self.class_to_fy) for x in data]
+            input = scipy.sparse.csr_matrix(input)
+            self.machine.fit(input, output)
 
     def predict(self, sample):
         # returns a log probability distribution
         sample = sample.get_vector().reshape(1, -1)
         return self.machine.predict_proba(sample)
 
-    def __init__(self, trainingdata):
+    def __init__(self, trainingdata, token_window, batches=False):
         # List of FeatureVectors
         self.class_to_fy = "positive"
-        self.machine = linear_model.SGDClassifier(loss="log", penalty="l2")
+        self.token_window = token_window
+        self.batches = batches
+        if batches:
+            self.machine = linear_model.SGDClassifier(loss="log", penalty="l2")
+        else:
+            self.machine = linear_model.LogisticRegression()
         self.train(trainingdata)
 
 
 class SupportVectorMachine(Classifier):
+    def evaluate(self, validation):
+        y_true = []
+        y_pred = []
+        for doc in validation:
+            for entity in doc.get_entities():
+                y_true.append(entity.doc_time_rel)
+                y_pred.append(self.predict(WordVectorWithContext(entity, doc)))
+
+        return (classification_report(y_true, y_pred)) + "\n" + \
+               'F1 score:{}'.format(f1_score(y_true, y_pred)) + "\n" +\
+               'confusion matrix:{}'.format(confusion_matrix(y_true, y_pred))
+
     def generate_training_data(self, docs):
         return generate_doctime_training_data(docs)
 
@@ -121,7 +165,7 @@ class NNActions(Classifier):
         model.add(Activation('softmax'))
         model.compile(loss='sparse_categorical_crossentropy',
                       optimizer='sgd',
-                      metrics=['accuracy'])
+                      metrics=[metrics.accuracy, metrics.categorical_accuracy])
 
         model.fit_generator(t_backup, verbose=1, epochs=2, steps_per_epoch=1208)
         self.machine = model

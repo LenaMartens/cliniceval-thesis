@@ -9,6 +9,7 @@ from annotator import GreedyAnnotator, InferenceAnnotator, TransitionAnnotator
 from oracle import NNOracle
 from keras.models import load_model
 
+
 class Procedure(object):
     def predict(self, filepath):
         logger = logging.getLogger('progress_logger')
@@ -17,7 +18,7 @@ class Procedure(object):
         outputpath = self.generate_output_path(predict_path=filepath)
         for doc in documents:
             logger.info("Doc {id}".format(id=doc.id))
-            if self.doc_time_model: 
+            if self.doc_time_model:
                 doc = classification.predict_DCT_document(doc, self.doc_time_model)
             doc = self.annotator.annotate(doc)
             output.output_doc(doc, outputpath=outputpath)
@@ -37,6 +38,7 @@ class Procedure(object):
 class BaseProcedure(Procedure):
     def __init__(self,
                  train_path="",
+                 validation_path="",
                  retrain_rel=False,
                  retrain_dct=False,
                  rel_classifier_path="",
@@ -66,11 +68,19 @@ class BaseProcedure(Procedure):
             self.doc_time_model = self.train_doctime(doc_time_path)
         else:
             self.doc_time_model = utils.load_model(doc_time_path)
-        self.doc_time_model = None 
         if retrain_rel:
             self.annotator.model = self.train_rel_classifier(rel_classifier_path)
         else:
             self.annotator.model = utils.load_model(rel_classifier_path)
+        # evaluation
+        if validation_path:
+            docs = data.read_all(validation_path, transitive=transitive)
+            dct = os.path.join(utils.model_path, doc_time_path + "_eval.txt")
+            rel = os.path.join(utils.model_path, rel_classifier_path + "_eval.txt")
+            with open(dct, 'w+') as file:
+                file.write(self.doc_time_model.evaluate(docs))
+            with open(rel, 'w+') as file:
+                file.write(self.annotator.model.evaluate(docs))
 
     def train_doctime(self, save_path):
         logger = logging.getLogger('progress_logger')
@@ -85,7 +95,7 @@ class BaseProcedure(Procedure):
         else:
             raise Exception("No path to training corpus provided")
 
-    def train_rel_classifier(self, save_path):
+    def train_rel_classifier(self, save_path, validation=""):
         logger = logging.getLogger('progress_logger')
         logger.info("Training relation classifier")
         if self.train_path:
@@ -116,7 +126,7 @@ class TransitiveProcedure(Procedure):
         else:
             nn = self.train_network()
         oracle = NNOracle(network=nn)
-        self.annotator = TransitionAnnotator(oracle=oracle)	
+        self.annotator = TransitionAnnotator(oracle=oracle)
         self.doc_time_model = None
 
     def generate_output_path(self, predict_path):
