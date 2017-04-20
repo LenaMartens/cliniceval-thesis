@@ -23,7 +23,6 @@ class Document(object):
         self.sorted_entity_ids = []
 
     def clear_relations(self):
-        print("HEY THERE")
         self.relations = []
 
     def clear_doc_time_rels(self):

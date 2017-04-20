@@ -41,14 +41,14 @@ class LogisticRegression(Classifier):
     def train(self, generator):
         # PARTIAL FIT because of memory problems
         classes = None
-        iterations = 2
+        iterations = 5
         for i in range(iterations):
             print("Iteration: " + str(i))
             for data in generator:
                 X = [x.get_vector() for x in data]
                 X = scipy.sparse.csr_matrix(X)
                 Y = [getattr(x.entity, self.class_to_fy) for x in data]
-                if not classes:
+                if classes == None:
                     classes = np.unique(Y)
                 self.machine.partial_fit(X, Y, classes=classes)
 

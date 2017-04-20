@@ -28,7 +28,7 @@ class Procedure(object):
         outputpath = self.generate_output_path(filepath)
         anafora_command = "python -m anafora.evaluate -r {ref} -p {path} -x " \
                           "\"(?i).*clin.*Temp.*[.]xml$\"".format(ref=filepath, path=outputpath)
-        os.system('cd ../anaforatools/;' + anafora_command + "> {path}".format(path=os.join(outputpath, "results.txt")))
+        os.system('cd ../anaforatools/;' + anafora_command + "> {path}".format(path=os.path.join(outputpath, "results.txt")))
 
     def generate_output_path(self, predict_path):
         return "shouldn't happen"
@@ -66,7 +66,7 @@ class BaseProcedure(Procedure):
             self.doc_time_model = self.train_doctime(doc_time_path)
         else:
             self.doc_time_model = utils.load_model(doc_time_path)
- 
+        self.doc_time_model = None 
         if retrain_rel:
             self.annotator.model = self.train_rel_classifier(rel_classifier_path)
         else:
