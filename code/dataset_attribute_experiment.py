@@ -126,4 +126,6 @@ if __name__ == "__main__":
     #action_class_imbalance(dev)
     #action_class_imbalance(train)
     #action_class_imbalance_paragraphs(dev)
-    action_class_imbalance_paragraphs(train)
+    # action_class_imbalance_paragraphs(train)
+    projective_trees(dev)
+    
