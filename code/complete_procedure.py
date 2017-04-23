@@ -24,6 +24,7 @@ test_path = utils.dev
 def complete_base():
     bp = BaseProcedure(train_path=train_path,
                        token_window=token_window,
+                       validation_path=utils.dev,
                        retrain_rel=retrain_REL,
                        retrain_dct=retrain_DCT,
                        doc_time_path=DCT_model_name,

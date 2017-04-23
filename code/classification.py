@@ -106,7 +106,7 @@ class SupportVectorMachine(Classifier):
                 y_pred.append(self.predict(WordVectorWithContext(entity, doc)))
 
         return (classification_report(y_true, y_pred)) + "\n" + \
-               'F1 score:{}'.format(f1_score(y_true, y_pred)) + "\n" +\
+               'F1 score:{}'.format(f1_score(y_true, y_pred)) + "\n" + \
                'confusion matrix:{}'.format(confusion_matrix(y_true, y_pred))
 
     def generate_training_data(self, docs):
@@ -140,7 +140,7 @@ class NNActions(Classifier):
                 for paragraph in range(doc.get_amount_of_paragraphs()):
                     entities = doc.get_entities(paragraph=paragraph)
                     relations = doc.get_relations(paragraph=paragraph)
-                    for (configuration, action) in oracle.get_training_sequence(entities, relations):
+                    for (configuration, action) in oracle.get_training_sequence(entities, relations, doc):
                         feature = ConfigurationVector(configuration, doc).get_vector()
                         x_train.append(feature)
                         y_train.append(utils.get_actions()[action])
@@ -170,8 +170,8 @@ class NNActions(Classifier):
         model.fit_generator(t_backup, verbose=1, epochs=2, steps_per_epoch=1208)
         self.machine = model
 
-    def predict(self, sample, doc):
-        feature_vector = ConfigurationVector(sample, doc).get_vector()
+    def predict(self, sample):
+        feature_vector = ConfigurationVector(sample, sample.get_doc()).get_vector()
         feature_vector = np.array(feature_vector)[np.newaxis]
         distribution = self.machine.predict(feature_vector)
         return distribution

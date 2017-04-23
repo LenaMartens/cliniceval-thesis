@@ -3,11 +3,12 @@ from data import Entity
 
 
 class Configuration:
-    def __init__(self, entities):
+    def __init__(self, entities, document):
         # entity objects
         self.stack1 = [RootEntity()]
         self.stack2 = list()
         self.buffer = [str(x) for x in list(entities)]
+        self.doc = document
         self.children_dict = {}
         self.arcs_dict = {}
 
@@ -113,6 +114,9 @@ class Configuration:
         if action_str == "right_arc":
             return self.can_do_right_arc()
         return True
+
+    def get_doc(self):
+        return self.doc
 
     def __str__(self):
         buffer = [str(i) for i in self.buffer]
