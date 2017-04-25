@@ -127,5 +127,7 @@ if __name__ == "__main__":
     #action_class_imbalance(train)
     #action_class_imbalance_paragraphs(dev)
     # action_class_imbalance_paragraphs(train)
-    projective_trees(dev)
+    # projective_trees(dev)
+    print(amount_of_candidates(train, 25))
+    print(amount_of_candidates(train, 10))
     
