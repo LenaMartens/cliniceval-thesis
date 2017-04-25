@@ -93,20 +93,26 @@ class Configuration:
     def get_top_entities(self, stack, amount):
         if stack == "stack1":
             if amount > len(self.stack1):
-                return self.stack1 + [None]*(amount-len(self.stack1))
+                return self.stack1 + [None] * (amount - len(self.stack1))
             else:
                 return self.stack1[-amount:]
         if stack == "stack2":
             if amount > len(self.stack2):
-                return self.stack2 + [None]*(amount-len(self.stack2))
+                return self.stack2 + [None] * (amount - len(self.stack2))
             else:
                 return self.stack2[-amount:]
         if stack == "buffer":
             if amount > len(self.buffer):
-                return self.buffer + [None]*(amount-len(self.buffer))
+                return self.buffer + [None] * (amount - len(self.buffer))
             else:
                 return self.buffer[-amount:]
         raise Exception(stack + " is not a valid option")
+
+    def get_parent(self, id):
+        if id in self.children_dict:
+            return list(self.arcs_dict.keys())[list(self.arcs_dict.values()).index(id)]
+        else:
+            return None
 
     def action_possible(self, action_str):
         if action_str == "left_arc":

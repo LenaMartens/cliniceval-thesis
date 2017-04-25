@@ -29,7 +29,7 @@ def beam_search(configuration, nn, beam=5):
         for node in live_nodes:
             distribution = nn.predict(node.configuration)
             for (i, prob) in enumerate(distribution):
-                action = actions.keys()[list(actions.values()).index(i)]
+                action = list(actions.keys())[list(actions.values()).index(i)]
                 conf_copy = configuration.deep_copy()
                 # applies action to config
                 getattr(conf_copy, action)()
