@@ -12,6 +12,7 @@ from data import read_all
 from feature import WordVectorWithContext, ConfigurationVector, TimeRelationVector
 import scipy.sparse
 import random
+import keras.backend as K
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras import metrics
@@ -130,6 +131,13 @@ class SupportVectorMachine(Classifier):
         return self.machine.predict(sample)
 
 
+def global_norm(model):
+    def loss(y_true, y_pred):
+        return model.weights
+
+    return loss
+
+
 class NNActions(Classifier):
     def generate_training_data(self, docs):
         batch_size = 100
@@ -165,7 +173,7 @@ class NNActions(Classifier):
         model.add(Activation('softmax'))
         model.add(Dense(units=4))
         model.add(Activation('softmax'))
-        model.compile(loss='sparse_categorical_crossentropy',
+        model.compile(loss=global_norm(model),
                       optimizer='sgd',
                       metrics=[metrics.categorical_accuracy])
 
