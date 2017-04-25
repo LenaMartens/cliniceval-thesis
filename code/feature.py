@@ -128,17 +128,18 @@ One hot encoding of part of speech tag.
 
 class POSFeatureVector(FeatureVector):
     def generate_vector(self):
-        sentence = self.document.get_sentence(self.entity)
         self.vector = np.zeros(len(tag_list))
-        if sentence:
-            # Pass whole sentence to get a better tagging
-            try:
-                i = sentence.index(self.entity.word)
-                tags = nltk.pos_tag(sentence)
-                (word, tag) = tags[i]
-            except ValueError:
-                (word, tag) = nltk.pos_tag(self.entity.word)[0]
-            self.vector[tag_list.index(tag)] = 1
+        if self.entity:
+            sentence = self.document.get_sentence(self.entity)
+            if sentence:
+                # Pass whole sentence to get a better tagging
+                try:
+                    i = sentence.index(self.entity.word)
+                    tags = nltk.pos_tag(sentence)
+                    (word, tag) = tags[i]
+                except ValueError:
+                    (word, tag) = nltk.pos_tag(self.entity.word)[0]
+                self.vector[tag_list.index(tag)] = 1
 
 
 '''
@@ -337,7 +338,7 @@ class ConfigurationVector(ConcatenatedVector):
             else:
                 ent = None
             self.features.append(WordEmbedding(ent))
-            self.features.append(POSFeatureVector(ent))
+            self.features.append(POSFeatureVector(ent, self.document))
             # add parent
-            self.features.append(WordEmbedding(self.entity.get_parent(ent.id)))
+            self.features.append(WordEmbedding(self.entity.get_parent(ent)))
             # TODO: add children

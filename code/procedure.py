@@ -144,7 +144,7 @@ class TransitiveProcedure(Procedure):
         logger.info("Training neural network")
         if self.train_path:
             logger.info("Reading documents")
-            train_documents = data.read_all(self.train_path)
+            train_documents = data.read_all(self.train_path)[:5]
             logger.info("Started training")
             model = classification.NNActions(train_documents)
             return model

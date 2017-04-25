@@ -53,4 +53,4 @@ if __name__ == "__main__":
     logger.info('Start')
     # train word embedding model
     WordEmbedding(None, True, utils.train, "../Models/WordEmbedding")
-    complete_base()
+    complete_transition()

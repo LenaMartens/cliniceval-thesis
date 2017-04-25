@@ -5,7 +5,7 @@ from data import Entity
 class Configuration:
     def __init__(self, entities, document):
         # entity objects
-        self.stack1 = [RootEntity()]
+        self.stack1 = [str(RootEntity())]
         self.stack2 = list()
         self.buffer = [str(x) for x in list(entities)]
         self.doc = document
@@ -109,10 +109,14 @@ class Configuration:
         raise Exception(stack + " is not a valid option")
 
     def get_parent(self, id):
-        if id in self.children_dict:
-            return list(self.arcs_dict.keys())[list(self.arcs_dict.values()).index(id)]
-        else:
+        if id is None:
             return None
+        e = id.id
+        if e in self.children_dict:
+            for (p, k) in self.arcs_dict.keys():
+                if e == k and p != "ROOT":
+                    return p
+        return None
 
     def action_possible(self, action_str):
         if action_str == "left_arc":
