@@ -5,7 +5,7 @@ import classification
 import data
 import output
 import utils
-from annotator import GreedyAnnotator, InferenceAnnotator, TransitionAnnotator
+from annotator import GreedyAnnotator, InferenceAnnotator, TransitionAnnotator, BeamAnnotator
 from oracle import NNOracle
 from keras.models import load_model
 
@@ -129,8 +129,7 @@ class TransitiveProcedure(Procedure):
             nn = load_model(nn_path)
         else:
             nn = self.train_network()
-        oracle = NNOracle(network=nn)
-        self.annotator = TransitionAnnotator(oracle=oracle)
+        self.annotator = BeamAnnotator(network=nn)
         self.doc_time_model = None
 
     def generate_output_path(self, predict_path):

@@ -326,9 +326,9 @@ class TimeRelationVector(ConcatenatedVector):
 
 class ConfigurationVector(ConcatenatedVector):
     def generate_vector(self):
-        self.add_entities("buffer", 1)
-        self.add_entities("stack1", 1)
-        self.add_entities("stack2", 1)
+        self.add_entities("buffer", 3)
+        self.add_entities("stack1", 3)
+        self.add_entities("stack2", 3)
 
     def add_entities(self, stack, amount):
         for entity in self.entity.get_top_entities(stack, amount):
@@ -336,4 +336,8 @@ class ConfigurationVector(ConcatenatedVector):
                 ent = self.document.entities[entity]
             else:
                 ent = None
-            self.features.append(WordEmbeddingVectorWithContext(ent, document=self.document))
+            self.features.append(WordEmbedding(ent))
+            self.features.append(POSFeatureVector(ent))
+            # add parent
+            self.features.append(WordEmbedding(self.entity.get_parent(ent.id)))
+            # TODO: add children

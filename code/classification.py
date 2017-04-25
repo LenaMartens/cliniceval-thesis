@@ -74,7 +74,7 @@ class LogisticRegression(Classifier):
                         classes = np.unique(Y)
                     self.machine.partial_fit(X, Y, classes=classes)
         else:
-            data = [x for sublist in generator for x in sublist]
+            data = [item for sublist in generator for item in sublist]
             input = [x.get_vector() for x in data]
             output = [getattr(x.entity, self.class_to_fy) for x in data]
             input = scipy.sparse.csr_matrix(input)
@@ -108,8 +108,13 @@ class SupportVectorMachine(Classifier):
                     entity.doc_time_rel = None
                     y_pred.append(self.predict(WordVectorWithContext(entity, doc))[0])
         return (classification_report(y_true, y_pred)) + "\n" + \
+<<<<<<< HEAD
                'F1 score:{}'.format(f1_score(y_true, y_pred, average='weighted')) + "\n" +\
                'confusion matrix:\n{}'.format(confusion_matrix(y_true, y_pred))
+=======
+               'F1 score:{}'.format(f1_score(y_true, y_pred)) + "\n" + \
+               'confusion matrix:{}'.format(confusion_matrix(y_true, y_pred))
+>>>>>>> b9dff5ded99997cc580875dbd4cc1ebc17fb19b3
 
     def generate_training_data(self, docs):
         return generate_doctime_training_data(docs)
@@ -142,7 +147,7 @@ class NNActions(Classifier):
                 for paragraph in range(doc.get_amount_of_paragraphs()):
                     entities = doc.get_entities(paragraph=paragraph)
                     relations = doc.get_relations(paragraph=paragraph)
-                    for (configuration, action) in oracle.get_training_sequence(entities, relations):
+                    for (configuration, action) in oracle.get_training_sequence(entities, relations, doc):
                         feature = ConfigurationVector(configuration, doc).get_vector()
                         x_train.append(feature)
                         y_train.append(utils.get_actions()[action])
@@ -167,13 +172,13 @@ class NNActions(Classifier):
         model.add(Activation('softmax'))
         model.compile(loss='sparse_categorical_crossentropy',
                       optimizer='sgd',
-                      metrics=[metrics.accuracy, metrics.categorical_accuracy])
+                      metrics=[metrics.categorical_accuracy])
 
         model.fit_generator(t_backup, verbose=1, epochs=2, steps_per_epoch=1208)
         self.machine = model
 
-    def predict(self, sample, doc):
-        feature_vector = ConfigurationVector(sample, doc).get_vector()
+    def predict(self, sample):
+        feature_vector = ConfigurationVector(sample, sample.get_doc()).get_vector()
         feature_vector = np.array(feature_vector)[np.newaxis]
         distribution = self.machine.predict(feature_vector)
         return distribution
@@ -204,7 +209,11 @@ def feature_generator(docs, token_window, batch_size):
 
 def train_relation_classifier(docs, token_window):
     generator = feature_generator(docs, token_window, 10)
+<<<<<<< HEAD
     lr = LogisticRegression(generator, token_window)
+=======
+    lr = LogisticRegression(generator, token_window, False)
+>>>>>>> b9dff5ded99997cc580875dbd4cc1ebc17fb19b3
     return lr
 
 
