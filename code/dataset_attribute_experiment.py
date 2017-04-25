@@ -78,6 +78,8 @@ def amount_of_candidates(documents, amount=30):
 
 
 def projective_trees(documents):
+    all = 0
+    relations_len = 0
     for document in documents:
         relations = document.get_relations()
         spans = []
@@ -92,7 +94,10 @@ def projective_trees(documents):
         for i in range(len(spans) - 1):
             if spans[i + 1][0] <= spans[i][1] <= spans[i + 1][1]:
                 non_projective += 1
+        all+=non_projective
+        relations_len+=len(relations)
         print(non_projective / (len(relations) + 1))
+    print(all/relations_len)
 
 
 def action_class_imbalance_paragraphs(documents):
@@ -127,5 +132,10 @@ if __name__ == "__main__":
     #action_class_imbalance(train)
     #action_class_imbalance_paragraphs(dev)
     # action_class_imbalance_paragraphs(train)
+    # projective_trees(dev)
+    print(amount_of_candidates(train, 25))
+    print(amount_of_candidates(train, 10))
+    #print(amount_of_candidates(dev))
+    #treeless(dev)
     projective_trees(dev)
     

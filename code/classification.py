@@ -1,3 +1,4 @@
+from tqdm import *
 from itertools import tee
 import logging
 import dataset_attribute_experiment
@@ -44,17 +45,17 @@ class LogisticRegression(Classifier):
         y_true = []
         y_pred = []
         for doc in validation:
-            for candidate in generate_constrained_candidates(validation, self.token_window):
-                y_true.append(candidate.positive)
-                distribution = self.machine.predict_proba(TimeRelationVector(candidate, doc))
-                if distribution[0] > distribution[1]:
+            for candidate in generate_constrained_candidates(doc, 30):
+                y_true.append(candidate.entity.positive)
+                distribution = self.predict(candidate)
+                if distribution[0][0] > distribution[0][1]:
                     y_pred.append(False)
                 else:
                     y_pred.append(True)
 
-        print(classification_report(y_true, y_pred))
-        print('F1 score:{}'.format(f1_score(y_true, y_pred)))
-        print('confusion matrix:{}'.format(confusion_matrix(y_true, y_pred)))
+        return (classification_report(y_true, y_pred)) + "\n" + \
+               'F1 score:{}'.format(f1_score(y_true, y_pred)) + "\n" +\
+               'confusion matrix:{}'.format(confusion_matrix(y_true, y_pred))
 
     def generate_training_data(self, docs):
         return docs
@@ -74,7 +75,7 @@ class LogisticRegression(Classifier):
                         classes = np.unique(Y)
                     self.machine.partial_fit(X, Y, classes=classes)
         else:
-            data = [x for x in [x for x in generator]]
+            data = [item for sublist in generator for item in sublist]
             input = [x.get_vector() for x in data]
             output = [getattr(x.entity, self.class_to_fy) for x in data]
             input = scipy.sparse.csr_matrix(input)
@@ -101,14 +102,20 @@ class SupportVectorMachine(Classifier):
     def evaluate(self, validation):
         y_true = []
         y_pred = []
-        for doc in validation:
+        for doc in tqdm(validation):
             for entity in doc.get_entities():
-                y_true.append(entity.doc_time_rel)
-                y_pred.append(self.predict(WordVectorWithContext(entity, doc)))
-
+                if entity.get_class() == "Event":
+                    y_true.append(entity.doc_time_rel)
+                    entity.doc_time_rel = None
+                    y_pred.append(self.predict(WordVectorWithContext(entity, doc))[0])
         return (classification_report(y_true, y_pred)) + "\n" + \
+<<<<<<< HEAD
+               'F1 score:{}'.format(f1_score(y_true, y_pred, average='weighted')) + "\n" +\
+               'confusion matrix:\n{}'.format(confusion_matrix(y_true, y_pred))
+=======
                'F1 score:{}'.format(f1_score(y_true, y_pred)) + "\n" + \
                'confusion matrix:{}'.format(confusion_matrix(y_true, y_pred))
+>>>>>>> b9dff5ded99997cc580875dbd4cc1ebc17fb19b3
 
     def generate_training_data(self, docs):
         return generate_doctime_training_data(docs)
@@ -173,7 +180,7 @@ class NNActions(Classifier):
         model.add(Activation('softmax'))
         model.compile(loss=global_norm(model),
                       optimizer='sgd',
-                      metrics=[metrics.accuracy, metrics.categorical_accuracy])
+                      metrics=[metrics.categorical_accuracy])
 
         model.fit_generator(t_backup, verbose=1, epochs=2, steps_per_epoch=1208)
         self.machine = model
@@ -201,7 +208,7 @@ def feature_generator(docs, token_window, batch_size):
         features = []
         end = min(start + batch_size, len(docs))
         for document in docs[start:end]:
-            features.extend(generate_constrained_candidates(document, token_window))
+            features.extend(generate_constrained_candidates(document,10101010101010101010))
         if features:
             logger.info("Features length:{l}".format(l=len(features)))
             yield features
@@ -210,7 +217,11 @@ def feature_generator(docs, token_window, batch_size):
 
 def train_relation_classifier(docs, token_window):
     generator = feature_generator(docs, token_window, 10)
-    lr = LogisticRegression(generator)
+<<<<<<< HEAD
+    lr = LogisticRegression(generator, token_window)
+=======
+    lr = LogisticRegression(generator, token_window, False)
+>>>>>>> b9dff5ded99997cc580875dbd4cc1ebc17fb19b3
     return lr
 
 

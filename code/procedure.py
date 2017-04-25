@@ -78,9 +78,13 @@ class BaseProcedure(Procedure):
             dct = os.path.join(utils.model_path, doc_time_path + "_eval.txt")
             rel = os.path.join(utils.model_path, rel_classifier_path + "_eval.txt")
             with open(dct, 'w+') as file:
-                file.write(self.doc_time_model.evaluate(docs))
+                eval_str = self.doc_time_model.evaluate(docs)
+                print(eval_str)
+                file.write(eval_str)
             with open(rel, 'w+') as file:
-                file.write(self.annotator.model.evaluate(docs))
+                eval_str = self.annotator.model.evaluate(docs)
+                print(eval_str)
+                file.write(eval_str)
 
     def train_doctime(self, save_path):
         logger = logging.getLogger('progress_logger')
