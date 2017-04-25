@@ -109,7 +109,7 @@ def action_class_imbalance_paragraphs(documents):
             par+=1
             entities = doc.get_entities(paragraph=paragraph)
             relations = doc.get_relations(paragraph=paragraph)
-            for (configuration, action) in oracle.get_training_sequence(entities, relations):
+            for (configuration, action) in oracle.get_training_sequence(entities, relations, doc):
                 frequencies[action] += 1
                 al += 1
     print(frequencies, al, par)
@@ -121,7 +121,7 @@ def action_class_imbalance(documents):
     for doc in documents:
         entities = doc.get_entities()
         relations = doc.get_relations()
-        for (configuration, action) in oracle.get_training_sequence(entities, relations):
+        for (configuration, action) in oracle.get_training_sequence(entities, relations, doc):
             frequencies[action] += 1
             al += 1
     print(frequencies, al, len(documents))
@@ -135,3 +135,4 @@ if __name__ == "__main__":
     #print(amount_of_candidates(dev))
     #treeless(dev)
     projective_trees(dev)
+    

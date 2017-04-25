@@ -7,11 +7,11 @@ from procedure import BaseProcedure, TransitiveProcedure
 """
 BASE CONFIG
 """
-retrain_DCT = False
+retrain_DCT = True
 retrain_REL = True
-DCT_model_name = "SupportVectorMachineWordEmbeddings"
-relation_model_name = "LogisticRegressionWordEmbeddings"
-token_window = 15
+DCT_model_name = "SupportVectorMachine2.0Embeddings"
+relation_model_name = "LogisticRegression2.0Embeddings"
+token_window = 25
 transitive = False
 greedy = False
 """
@@ -24,6 +24,7 @@ test_path = utils.dev
 def complete_base():
     bp = BaseProcedure(train_path=train_path,
                        token_window=token_window,
+                       validation_path=utils.dev,
                        retrain_rel=retrain_REL,
                        retrain_dct=retrain_DCT,
                        doc_time_path=DCT_model_name,

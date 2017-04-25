@@ -15,7 +15,7 @@ def generate_doctime_training_data(documents):
 
 
 def doc_time_feature(entity, document):
-    return WordEmbeddingVectorWithContext(entity, document)
+    return WordVectorWithContext(entity, document)
 
 
 '''

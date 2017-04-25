@@ -282,8 +282,8 @@ class WordVector(ConcatenatedVector):
     def generate_vector(self):
         global vector_length
         if self.entity is not None:
-            self.features.append(WordFeatureVector(self.entity))
-            self.features.append(LemmaFeatureVector(self.entity))
+            self.features.append(WordEmbedding(self.entity))
+            # self.features.append(LemmaFeatureVector(self.entity))
             self.features.append(CapitalFeatureVector(self.entity))
             self.features.append(POSFeatureVector(self.entity, document=self.document))
             self.features.append(DocTimeVector(self.entity))
@@ -292,6 +292,7 @@ class WordVector(ConcatenatedVector):
             if vector_length == 0:
                 for feature in self.features:
                     vector_length += len(feature.get_vector())
+                print(vector_length)
         else:
             self.features.append(EmptyVector(None))
 
@@ -316,8 +317,8 @@ class WordEmbeddingVectorWithContext(ConcatenatedVector):
 
 class TimeRelationVector(ConcatenatedVector):
     def generate_vector(self):
-        self.features.append(WordEmbeddingVectorWithContext(self.entity.source, self.document))
-        self.features.append(WordEmbeddingVectorWithContext(self.entity.target, self.document))
+        self.features.append(WordVectorWithContext(self.entity.source, self.document))
+        self.features.append(WordVectorWithContext(self.entity.target, self.document))
         self.features.append(SameParVector(self.entity.source, self.entity.target))
         self.features.append(SameSentenceVector(self.entity.source, self.entity.target))
         self.features.append(BagOfWords(self.document, self.entity.source, self.entity.target))
@@ -325,9 +326,9 @@ class TimeRelationVector(ConcatenatedVector):
 
 class ConfigurationVector(ConcatenatedVector):
     def generate_vector(self):
-        self.add_entities("buffer", 1)
-        self.add_entities("stack1", 1)
-        self.add_entities("stack2", 1)
+        self.add_entities("buffer", 3)
+        self.add_entities("stack1", 3)
+        self.add_entities("stack2", 3)
 
     def add_entities(self, stack, amount):
         for entity in self.entity.get_top_entities(stack, amount):
@@ -335,4 +336,8 @@ class ConfigurationVector(ConcatenatedVector):
                 ent = self.document.entities[entity]
             else:
                 ent = None
-            self.features.append(WordEmbeddingVectorWithContext(ent, document=self.document))
+            self.features.append(WordEmbedding(ent))
+            self.features.append(POSFeatureVector(ent))
+            # add parent
+            self.features.append(WordEmbedding(self.entity.get_parent(ent.id)))
+            # TODO: add children

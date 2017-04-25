@@ -1,3 +1,6 @@
+from beam_search import beam_search
+
+
 def add_arcs_to_document(arcs, document):
     for arc in arcs:
         document.add_relation(arc.source, arc.sink)
@@ -46,7 +49,7 @@ class GreedyAnnotator(RelationAnnotator):
 class TransitionAnnotator(RelationAnnotator):
     def __init__(self, oracle):
         """
-        :param oracle: Oracle that decides sequence of steps
+        :param oracle: Oracle that decides greedy sequence of steps
         """
         self.oracle = oracle
 
@@ -56,13 +59,26 @@ class TransitionAnnotator(RelationAnnotator):
         for paragraph in range(document.get_amount_of_paragraphs()):
             entities = document.get_entities(paragraph=paragraph)
             if entities:
-                configuration = Configuration(entities)
+                configuration = Configuration(entities, document)
                 while not configuration.empty_buffer():
-                    action_string = self.oracle.next_step(configuration, document)
+                    action_string = self.oracle.next_step(configuration)
                     # applies function to configuration
                     getattr(configuration, action_string)()
                 arcs.extend(configuration.get_arcs())
         return arcs
 
 
+class BeamAnnotator(RelationAnnotator):
+    def __init__(self, network):
+        self.network = network
 
+    def get_arcs(self, document):
+        from covington_transistion import Configuration
+        arcs = []
+        for paragraph in range(document.get_amount_of_paragraphs()):
+            entities = document.get_entities(paragraph=paragraph)
+            if entities:
+                config = Configuration(entities, document)
+                best_end = beam_search(config, self.network)
+                arcs.extend(best_end.configuration.get_arcs())
+        return arcs
