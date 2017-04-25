@@ -73,7 +73,7 @@ class LogisticRegression(Classifier):
                         classes = np.unique(Y)
                     self.machine.partial_fit(X, Y, classes=classes)
         else:
-            data = [x for x in [x for x in generator]]
+            data = [item for sublist in generator for item in sublist]
             input = [x.get_vector() for x in data]
             output = [getattr(x.entity, self.class_to_fy) for x in data]
             input = scipy.sparse.csr_matrix(input)
@@ -165,7 +165,7 @@ class NNActions(Classifier):
         model.add(Activation('softmax'))
         model.compile(loss='sparse_categorical_crossentropy',
                       optimizer='sgd',
-                      metrics=[metrics.accuracy, metrics.categorical_accuracy])
+                      metrics=[metrics.categorical_accuracy])
 
         model.fit_generator(t_backup, verbose=1, epochs=2, steps_per_epoch=1208)
         self.machine = model
@@ -202,7 +202,7 @@ def feature_generator(docs, token_window, batch_size):
 
 def train_relation_classifier(docs, token_window):
     generator = feature_generator(docs, token_window, 10)
-    lr = LogisticRegression(generator)
+    lr = LogisticRegression(generator, token_window, False)
     return lr
 
 
