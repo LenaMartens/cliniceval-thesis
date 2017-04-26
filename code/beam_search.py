@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 import utils
 
 
@@ -30,7 +31,7 @@ def beam_search(configuration, nn, beam=5):
             distribution = nn.predict(node.configuration)
             for (i, prob) in enumerate(distribution):
                 action = list(actions.keys())[list(actions.values()).index(i)]
-                conf_copy = configuration.deep_copy()
+                conf_copy = copy.deepcopy(configuration)
                 # applies action to config
                 getattr(conf_copy, action)()
                 if conf_copy.empty_buffer():

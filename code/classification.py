@@ -133,7 +133,8 @@ class SupportVectorMachine(Classifier):
 
 def global_norm(model):
     def loss(y_true, y_pred):
-        return model.weights
+        print(model.layers[0].get_weights())
+        return (y_true-y_pred)
 
     return loss
 
@@ -177,7 +178,7 @@ class NNActions(Classifier):
                       optimizer='sgd',
                       metrics=[metrics.categorical_accuracy])
 
-        model.fit_generator(t_backup, verbose=1, epochs=2, steps_per_epoch=1208)
+        model.fit_generator(t_backup, verbose=1, epochs=2, steps_per_epoch=2)
         self.machine = model
 
     def predict(self, sample):
