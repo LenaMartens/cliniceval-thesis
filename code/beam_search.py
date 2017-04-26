@@ -36,6 +36,7 @@ def beam_search(configuration, nn, beam=5):
                 getattr(conf_copy, action)()
                 if conf_copy.empty_buffer():
                     dead_nodes.append(Node(node, conf_copy, action, score(node, prob)))
+                    beam -= 1
                 else:
                     new_nodes.append(Node(node, conf_copy, action, score(node, prob)))
         new_nodes.sort(key=lambda x: x.score)
