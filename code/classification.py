@@ -1,6 +1,8 @@
 from tqdm import *
 from itertools import tee
 import logging
+
+import beam_search
 import dataset_attribute_experiment
 from sklearn import svm, linear_model
 from sklearn.metrics import classification_report, f1_score, confusion_matrix
@@ -8,6 +10,7 @@ import numpy as np
 import oracle
 import utils
 from candidate_generation import generate_doctime_training_data, generate_constrained_candidates, doc_time_feature
+from covington_transistion import Configuration
 from data import read_all
 from feature import WordVectorWithContext, ConfigurationVector, TimeRelationVector
 import scipy.sparse
@@ -54,7 +57,7 @@ class LogisticRegression(Classifier):
                     y_pred.append(True)
 
         return (classification_report(y_true, y_pred)) + "\n" + \
-               'F1 score:{}'.format(f1_score(y_true, y_pred)) + "\n" +\
+               'F1 score:{}'.format(f1_score(y_true, y_pred)) + "\n" + \
                'confusion matrix:{}'.format(confusion_matrix(y_true, y_pred))
 
     def generate_training_data(self, docs):
@@ -109,7 +112,7 @@ class SupportVectorMachine(Classifier):
                     entity.doc_time_rel = None
                     y_pred.append(self.predict(WordVectorWithContext(entity, doc))[0])
         return (classification_report(y_true, y_pred)) + "\n" + \
-               'F1 score:{}'.format(f1_score(y_true, y_pred, average='weighted')) + "\n" +\
+               'F1 score:{}'.format(f1_score(y_true, y_pred, average='weighted')) + "\n" + \
                'confusion matrix:\n{}'.format(confusion_matrix(y_true, y_pred))
 
     def generate_training_data(self, docs):
@@ -131,17 +134,42 @@ class SupportVectorMachine(Classifier):
         return self.machine.predict(sample)
 
 
-def global_norm(model):
-    def loss(y_true, y_pred):
-        print(model.layers[0].get_weights())
-        return (y_true-y_pred)
+def global_norm_loss(y_true, y_pred):
+    # y_true is a tuple:
+    # (sum of predictions for golden beam
+    # ln of sum of sum of predictions of all beams)
+    return - y_true[0] + K.logsumexp(y_true[1])
 
-    return loss
+
+def early_update_generator(docs, model):
+    while 1:
+        random.seed()
+        random.shuffle(docs)
+        for doc in docs:
+            for paragraph in range(doc.get_amount_of_paragraphs()):
+                entities = doc.get_entities(paragraph=paragraph)
+                relations = doc.get_relations(paragraph=paragraph)
+                golden_sum = 0
+                golden_sequence = []
+
+                for (configuration, action) in oracle.get_training_sequence(entities, relations, doc):
+                    golden_sequence.append(action)
+                    index = utils.get_actions()[action]
+                    distribution = model.predict(configuration)
+                    value = distribution[index]
+                    golden_sum += value
+
+                configuration = Configuration(entities, doc)
+                beam_list = beam_search.in_beam_search(configuration, model, golden_sequence)
+                list_of_beam_values = []
+                for beam in beam_list:
+                    list_of_beam_values.append(beam.score)
+                yield ([ConfigurationVector(configuration, doc)],
+                       [(golden_sum, list_of_beam_values)])
 
 
 class NNActions(Classifier):
-    def generate_training_data(self, docs):
-        batch_size = 100
+    def generate_training_data(self, docs, batch_size=100):
         while 1:
             x_train = []
             y_train = []
@@ -204,7 +232,7 @@ def feature_generator(docs, token_window, batch_size):
         features = []
         end = min(start + batch_size, len(docs))
         for document in docs[start:end]:
-            features.extend(generate_constrained_candidates(document,10101010101010101010))
+            features.extend(generate_constrained_candidates(document, 10))
         if features:
             logger.info("Features length:{l}".format(l=len(features)))
             yield features
