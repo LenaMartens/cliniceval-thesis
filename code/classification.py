@@ -1,3 +1,5 @@
+import functools
+
 from tqdm import *
 from itertools import tee
 import logging
@@ -193,7 +195,7 @@ class NNActions(Classifier):
         :param trainingdata: batch generator
         """
         model = Sequential()
-
+        trainingdata = trainingdata(model)
         t, t_backup = tee(trainingdata)
         (x, y) = next(t)
         in_dim = len(x[0])
@@ -202,7 +204,7 @@ class NNActions(Classifier):
         model.add(Activation('softmax'))
         model.add(Dense(units=4))
         model.add(Activation('softmax'))
-        model.compile(loss=global_norm(model),
+        model.compile(loss=global_norm_loss,
                       optimizer='sgd',
                       metrics=[metrics.categorical_accuracy])
 
@@ -214,6 +216,13 @@ class NNActions(Classifier):
         feature_vector = np.array(feature_vector)[np.newaxis]
         distribution = self.machine.predict(feature_vector)
         return distribution
+
+    def __init__(self, training_data, global_norm=False):
+        self.machine = None
+        if global_norm:
+            self.train(functools.partial(early_update_generator,training_data)
+        else:
+            self.train(self.generate_training_data(training_data))
 
 
 def train_doctime_classifier(docs):
