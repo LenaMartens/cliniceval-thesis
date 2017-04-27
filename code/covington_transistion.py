@@ -17,8 +17,11 @@ class Configuration:
             return True
         visited[i] = True
 
+        # all ks that are adjacent to i
         for k in [x[1] for x in self.arcs_dict.keys() if x[0] == i]:
-            if k in visited:
+            # don't visit nodes again
+            if k not in visited:
+                # recursive call :^)
                 if self.reachable(k, j, visited):
                     return True
         return False
@@ -40,7 +43,7 @@ class Configuration:
         i = self.buffer[0]
         ROOT_CONDITION = (str(i) != "ROOT")
         HEAD_CONDITION = (i not in self.children_dict)
-        NO_CYCLE_CONDITION = (j not in self.children_dict) or (not self.reachable(i, j, []))
+        NO_CYCLE_CONDITION = (j not in self.children_dict) or (not self.reachable(i, j, {}))
         return ROOT_CONDITION and HEAD_CONDITION and NO_CYCLE_CONDITION
 
     # buffer to stack
@@ -87,7 +90,8 @@ class Configuration:
     def get_arcs(self):
         arcs = []
         for (i, j) in self.arcs_dict.keys():
-            arcs.append(Arc(i, j))
+            if i != "ROOT":
+                arcs.append(Arc(i, j))
         return arcs
 
     def get_top_entities(self, stack, amount):
@@ -123,6 +127,8 @@ class Configuration:
             return self.can_do_left_arc()
         if action_str == "right_arc":
             return self.can_do_right_arc()
+        if action_str == "no_arc":
+            return len(self.stack1) != 0
         return True
 
     def get_doc(self):

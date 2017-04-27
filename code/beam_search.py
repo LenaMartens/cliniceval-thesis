@@ -41,11 +41,10 @@ def beam_search(configuration, nn, beam=5):
                     else:
                         new_nodes.append(Node(node, conf_copy, action, score(node, prob)))
         new_nodes.sort(key=lambda x: x.score)
-        print(len(new_nodes))
         end = min(beam, len(new_nodes))
         live_nodes = new_nodes[:end]
     best = max(dead_nodes, key=lambda x: x.score)
-    print(best)
+    print(best.score)
     return best
 
 
