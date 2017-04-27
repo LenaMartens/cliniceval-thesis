@@ -29,20 +29,23 @@ def beam_search(configuration, nn, beam=5):
         new_nodes = []
         for node in live_nodes:
             distribution = nn.predict(node.configuration)
-            for (i, prob) in enumerate(distribution):
+            for i, prob in enumerate(distribution[0]):
                 action = list(actions.keys())[list(actions.values()).index(i)]
-                conf_copy = copy.deepcopy(configuration)
-                # applies action to config
-                getattr(conf_copy, action)()
-                if conf_copy.empty_buffer():
-                    dead_nodes.append(Node(node, conf_copy, action, score(node, prob)))
-                    beam -= 1
-                else:
-                    new_nodes.append(Node(node, conf_copy, action, score(node, prob)))
+                if node.configuration.action_possible(action):
+                    conf_copy = copy.deepcopy(node.configuration)
+                    # applies action to config
+                    getattr(conf_copy, action)()
+                    if conf_copy.empty_buffer():
+                        dead_nodes.append(Node(node, conf_copy, action, score(node, prob)))
+                        beam -= 1
+                    else:
+                        new_nodes.append(Node(node, conf_copy, action, score(node, prob)))
         new_nodes.sort(key=lambda x: x.score)
+        print(len(new_nodes))
         end = min(beam, len(new_nodes))
         live_nodes = new_nodes[:end]
     best = max(dead_nodes, key=lambda x: x.score)
+    print(best)
     return best
 
 
