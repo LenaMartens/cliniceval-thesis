@@ -1,5 +1,5 @@
 import functools
-
+import tensorflow as tf
 from tqdm import *
 from itertools import tee
 import logging
@@ -17,7 +17,7 @@ from data import read_all
 from feature import WordVectorWithContext, ConfigurationVector, TimeRelationVector
 import scipy.sparse
 import random
-import keras.backend as K
+from keras import backend as K
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras import metrics
@@ -140,7 +140,7 @@ def global_norm_loss(y_true, y_pred):
     # y_true is a tuple:
     # (sum of predictions for golden beam
     # ln of sum of sum of predictions of all beams)
-    return - y_true[0] + K.logsumexp(y_true[1])
+    return - y_true[0] + K.log(K.sum(K.exp((y_true[1]))))
 
 
 def early_update_generator(docs, model):
@@ -166,6 +166,7 @@ def early_update_generator(docs, model):
                 list_of_beam_values = []
                 for beam in beam_list:
                     list_of_beam_values.append(beam.score)
+                print(golden_sum, list_of_beam_values)
                 yield ([ConfigurationVector(configuration, doc)],
                        [(golden_sum, list_of_beam_values)])
 
@@ -195,10 +196,7 @@ class NNActions(Classifier):
         :param trainingdata: batch generator
         """
         model = Sequential()
-        trainingdata = trainingdata(model)
-        t, t_backup = tee(trainingdata)
-        (x, y) = next(t)
-        in_dim = len(x[0])
+        in_dim = len(ConfigurationVector(Configuration([], None), None).get_vector())
 
         model.add(Dense(units=200, input_dim=in_dim))
         model.add(Activation('softmax'))
@@ -208,7 +206,7 @@ class NNActions(Classifier):
                       optimizer='sgd',
                       metrics=[metrics.categorical_accuracy])
 
-        model.fit_generator(t_backup, verbose=1, epochs=2, steps_per_epoch=2)
+        model.fit_generator(trainingdata(model), verbose=1, epochs=2, steps_per_epoch=2)
         self.machine = model
 
     def predict(self, sample):
@@ -220,7 +218,7 @@ class NNActions(Classifier):
     def __init__(self, training_data, global_norm=False):
         self.machine = None
         if global_norm:
-            self.train(functools.partial(early_update_generator,training_data)
+            self.train(functools.partial(early_update_generator,training_data))
         else:
             self.train(self.generate_training_data(training_data))
 
