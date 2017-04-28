@@ -1,7 +1,6 @@
 import data
 import oracle
 import utils
-from oracle import get_training_sequence
 
 dev = data.read_all(utils.dev)
 train = data.read_all(utils.train)
@@ -94,19 +93,19 @@ def projective_trees(documents):
         for i in range(len(spans) - 1):
             if spans[i + 1][0] <= spans[i][1] <= spans[i + 1][1]:
                 non_projective += 1
-        all+=non_projective
-        relations_len+=len(relations)
+        all += non_projective
+        relations_len += len(relations)
         print(non_projective / (len(relations) + 1))
-    print(all/relations_len)
+    print(all / relations_len)
 
 
 def action_class_imbalance_paragraphs(documents):
     frequencies = {"left_arc": 0, "right_arc": 0, "no_arc": 0, "shift": 0}
     al = 0
-    par=0
+    par = 0
     for doc in documents:
         for paragraph in range(doc.get_amount_of_paragraphs()):
-            par+=1
+            par += 1
             entities = doc.get_entities(paragraph=paragraph)
             relations = doc.get_relations(paragraph=paragraph)
             for (configuration, action) in oracle.get_training_sequence(entities, relations, doc):
@@ -128,14 +127,13 @@ def action_class_imbalance(documents):
 
 
 if __name__ == "__main__":
-    #action_class_imbalance(dev)
-    #action_class_imbalance(train)
-    #action_class_imbalance_paragraphs(dev)
-    # action_class_imbalance_paragraphs(train)
+    # action_class_imbalance(dev)
+    # action_class_imbalance(train)
+    action_class_imbalance_paragraphs(dev)
+    action_class_imbalance_paragraphs(train)
     # projective_trees(dev)
-    print(amount_of_candidates(train, 25))
-    print(amount_of_candidates(train, 10))
-    #print(amount_of_candidates(dev))
-    #treeless(dev)
-    projective_trees(dev)
-    
+    # print(amount_of_candidates(train, 25))
+    # print(amount_of_candidates(train, 10))
+    # print(amount_of_candidates(dev))
+    # treeless(dev)
+    # projective_trees(dev)
