@@ -108,13 +108,8 @@ class SupportVectorMachine(Classifier):
                     entity.doc_time_rel = None
                     y_pred.append(self.predict(WordVectorWithContext(entity, doc))[0])
         return (classification_report(y_true, y_pred)) + "\n" + \
-<<<<<<< HEAD
                'F1 score:{}'.format(f1_score(y_true, y_pred, average='weighted')) + "\n" +\
                'confusion matrix:\n{}'.format(confusion_matrix(y_true, y_pred))
-=======
-               'F1 score:{}'.format(f1_score(y_true, y_pred)) + "\n" + \
-               'confusion matrix:{}'.format(confusion_matrix(y_true, y_pred))
->>>>>>> b9dff5ded99997cc580875dbd4cc1ebc17fb19b3
 
     def generate_training_data(self, docs):
         return generate_doctime_training_data(docs)
@@ -208,12 +203,8 @@ def feature_generator(docs, token_window, batch_size):
 
 
 def train_relation_classifier(docs, token_window):
-    generator = feature_generator(docs, token_window, 10)
-<<<<<<< HEAD
+    generator = feature_generator(docs, token_window, 6)
     lr = LogisticRegression(generator, token_window)
-=======
-    lr = LogisticRegression(generator, token_window, False)
->>>>>>> b9dff5ded99997cc580875dbd4cc1ebc17fb19b3
     return lr
 
 
