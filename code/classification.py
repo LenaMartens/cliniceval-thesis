@@ -202,11 +202,11 @@ class NNActions(Classifier):
         model.add(Activation('softmax'))
         model.add(Dense(units=4))
         model.add(Activation('softmax'))
-        model.compile(loss=global_norm_loss,
+        model.compile(loss='mean_squared_error',
                       optimizer='sgd',
                       metrics=[metrics.categorical_accuracy])
 
-        model.fit_generator(trainingdata(model), verbose=1, epochs=2, steps_per_epoch=2)
+        model.fit_generator(trainingdata, verbose=1, epochs=2, steps_per_epoch=1228)
         self.machine = model
 
     def predict(self, sample):
