@@ -1,5 +1,8 @@
-import functools
+import math
+import os
 import tensorflow as tf
+import functools
+import globals
 from tqdm import *
 from itertools import tee
 import logging
@@ -140,24 +143,27 @@ def global_norm_loss(y_true, y_pred):
     # y_true is a tuple:
     # (sum of predictions for golden beam
     # ln of sum of sum of predictions of all beams)
-    return - y_true[0] + K.log(K.sum(K.exp((y_true[1]))))
-
+    return (- y_true[0][0] + K.logsumexp(y_true[0]))*y_pred
 
 def early_update_generator(docs, model):
+    logger = logging.getLogger('progress_logger')
+    if not model:
+        yield []
     while 1:
         random.seed()
         random.shuffle(docs)
         for doc in docs:
             for paragraph in range(doc.get_amount_of_paragraphs()):
                 entities = doc.get_entities(paragraph=paragraph)
+                if not entities:
+                    break
                 relations = doc.get_relations(paragraph=paragraph)
                 golden_sum = 0
                 golden_sequence = []
-
                 for (configuration, action) in oracle.get_training_sequence(entities, relations, doc):
                     golden_sequence.append(action)
                     index = utils.get_actions()[action]
-                    distribution = model.predict(configuration)
+                    distribution = model.predict(configuration)[0]
                     value = distribution[index]
                     golden_sum += value
 
@@ -165,11 +171,13 @@ def early_update_generator(docs, model):
                 beam_list = beam_search.in_beam_search(configuration, model, golden_sequence)
                 list_of_beam_values = []
                 for beam in beam_list:
-                    list_of_beam_values.append(beam.score)
-                print(golden_sum, list_of_beam_values)
-                yield ([ConfigurationVector(configuration, doc)],
-                       [(golden_sum, list_of_beam_values)])
-
+                    list_of_beam_values.append(-beam.score)
+                feature_vector = ConfigurationVector(configuration, doc).get_vector()
+                logger.info([golden_sum]+list_of_beam_values)
+                yield (np.vstack([feature_vector]),
+                       np.asarray([[golden_sum] + list_of_beam_values]))
+            #for layer in model.machine.layers:
+             #   print(layer.get_weights())
 
 class NNActions(Classifier):
     def generate_training_data(self, docs, batch_size=100):
@@ -198,27 +206,32 @@ class NNActions(Classifier):
         model = Sequential()
         in_dim = len(ConfigurationVector(Configuration([], None), None).get_vector())
 
-        model.add(Dense(units=200, input_dim=in_dim))
+        model.add(Dense(units=1024, input_dim=in_dim))
         model.add(Activation('softmax'))
         model.add(Dense(units=4))
         model.add(Activation('softmax'))
-        model.compile(loss='mean_squared_error',
-                      optimizer='sgd',
-                      metrics=[metrics.categorical_accuracy])
 
-        model.fit_generator(trainingdata, verbose=1, epochs=2, steps_per_epoch=1228)
+        model.compile(loss=global_norm_loss,
+                      optimizer='sgd')
         self.machine = model
+        globals.init()
+        globals.graph = tf.get_default_graph()
+        model.fit_generator(early_update_generator(trainingdata, self), verbose=1, epochs=2, steps_per_epoch=1640, max_q_size=1)
 
     def predict(self, sample):
-        feature_vector = ConfigurationVector(sample, sample.get_doc()).get_vector()
-        feature_vector = np.array(feature_vector)[np.newaxis]
-        distribution = self.machine.predict(feature_vector)
+        with globals.graph.as_default():
+            feature_vector = ConfigurationVector(sample, sample.get_doc()).get_vector()
+            feature_vector = np.array(feature_vector)[np.newaxis]
+            distribution = self.machine.predict(feature_vector)
         return distribution
+
+    def save(self, filepath):
+        self.machine.save(os.path.join(filepath, "C00l_model.h5"))
 
     def __init__(self, training_data, global_norm=False):
         self.machine = None
         if global_norm:
-            self.train(functools.partial(early_update_generator,training_data))
+            self.train(training_data)
         else:
             self.train(self.generate_training_data(training_data))
 

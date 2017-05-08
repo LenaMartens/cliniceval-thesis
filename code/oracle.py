@@ -69,7 +69,7 @@ def get_training_sequence(entities, arcs, doc):
     while not configuration.empty_buffer():
         function_string = oracle.next_step(configuration)
         conf_copy = copy.deepcopy(configuration)
-        yield (configuration, function_string)
+        yield (conf_copy, function_string)
         # applies function to configuration
         getattr(configuration, function_string)()
 

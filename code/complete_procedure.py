@@ -7,7 +7,7 @@ from procedure import BaseProcedure, TransitiveProcedure
 """
 BASE CONFIG
 """
-retrain_DCT = False
+retrain_DCT = True
 retrain_REL = True
 DCT_model_name = "SupportVectorMachine2.0Embeddings"
 relation_model_name = "LogisticRegression2.0EmbeddingsSmallerTrainingWindow"
