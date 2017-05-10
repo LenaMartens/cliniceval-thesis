@@ -129,6 +129,8 @@ class GlobalNormNN(Classifier):
         inner_sequence_sums = list(map(exp_activation, inner_sequence_sums))
         # Sum all beam sequences together
         outer_sum = Add()(inner_sequence_sums)
+        # Log activation
+        outer_sum = Activation(K.log)(outer_sum)
         # Negate golden sum
         golden_sum = Activation(negativeActivation)(golden_sum)
 
