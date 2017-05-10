@@ -109,13 +109,14 @@ class DocTimeVector(FeatureVector):
     def generate_vector(self):
         doctimes = utils.get_doctimes()
         self.vector = np.zeros(len(doctimes) + 1)
-        if self.entity.get_class() == "Event":
-            try:
-                self.vector[doctimes[self.entity.doc_time_rel]] = 1
-            except KeyError or AttributeError:
+        if self.entity:
+            if self.entity.get_class() == "Event":
+                try:
+                    self.vector[doctimes[self.entity.doc_time_rel]] = 1
+                except KeyError or AttributeError:
+                    self.vector[len(doctimes)] = 1
+            else:
                 self.vector[len(doctimes)] = 1
-        else:
-            self.vector[len(doctimes)] = 1
 
 
 tagdict = load('help/tagsets/upenn_tagset.pickle')
@@ -332,13 +333,21 @@ class ConfigurationVector(ConcatenatedVector):
         self.add_entities("stack2", 3)
 
     def add_entities(self, stack, amount):
-        for entity in self.entity.get_top_entities(stack, amount):
+        l = self.entity.get_top_entities(stack, amount)
+        for entity in l:
             if entity and str(entity) != "ROOT":
                 ent = self.document.entities[entity]
             else:
                 ent = None
             self.features.append(WordEmbedding(ent))
             self.features.append(POSFeatureVector(ent, self.document))
-            # add parent
-            self.features.append(WordEmbedding(self.entity.get_parent(ent)))
-            # TODO: add children
+            self.features.append(DocTimeVector(ent))
+        entity = l[0]
+        if entity and str(entity) != "ROOT":
+            ent = self.document.entities[entity]
+        else:
+            ent = None
+        # add parent
+        self.features.append(WordEmbedding(self.entity.get_parent(ent)))
+        self.features.append(DocTimeVector(ent))
+        # TODO: add children
