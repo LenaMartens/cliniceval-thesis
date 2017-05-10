@@ -3,6 +3,7 @@ import os
 
 import classification
 import data
+import global_norm_nn
 import output
 import utils
 from annotator import GreedyAnnotator, InferenceAnnotator, TransitionAnnotator, BeamAnnotator
@@ -123,7 +124,7 @@ class BaseProcedure(Procedure):
 
 
 class TransitiveProcedure(Procedure):
-    def __init__(self, train_path, nn_path=""):
+    def __init__(self, train_path, nn_path="", global_norm=False):
         self.train_path = train_path
         if nn_path:
             nn = load_model(nn_path)
@@ -131,6 +132,7 @@ class TransitiveProcedure(Procedure):
             nn = self.train_network()
         self.annotator = BeamAnnotator(network=nn)
         self.doc_time_model = None
+        self.global_norm = global_norm
 
     def generate_output_path(self, predict_path):
         train = os.path.split(self.train_path)
@@ -146,7 +148,12 @@ class TransitiveProcedure(Procedure):
             logger.info("Reading documents")
             train_documents = data.read_all(self.train_path)
             logger.info("Started training")
-            model = classification.NNActions(train_documents)
+            if self.global_norm:
+                model = global_norm_nn.GlobalNormNN(train_documents)
+            else:
+                model = classification.NNActions(train_documents)
+            logger.info("Saving model")
+            model.save("../Models/")
             return model
         else:
             raise Exception("No path to training corpus provided")

@@ -1,5 +1,8 @@
-import numpy as np
+import globals
 import copy
+
+import math
+
 import utils
 
 
@@ -9,6 +12,11 @@ class Node(object):
         self.action = action
         self.configuration = configuration
         self.score = score
+
+    def to_list(self):
+        if self.parent is None:
+            return []
+        return self.parent.to_list().append(self.configuration)
 
 
 def beam_search(configuration, nn, beam=5):
@@ -24,7 +32,6 @@ def beam_search(configuration, nn, beam=5):
     dead_nodes = []
     live_nodes = [Node(None, configuration, None, 0)]
     actions = utils.get_actions()
-
     while live_nodes:
         new_nodes = []
         for node in live_nodes:
@@ -48,31 +55,33 @@ def beam_search(configuration, nn, beam=5):
     return best
 
 
-def in_beam_search(configuration, nn, golden_sequence, beam=2):
+def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
     """
         Returns all beams the model predicts up until golden sequence
         falls outside of beam.
         Beam = 1 generalizes to Greedy search.
+        :param k: max length of a sequence
         :param golden_sequence: training sequence
         :param beam: size of beam
         :param nn: Neural network returning probability distribution
         :param configuration: Starting configuration
         :return: All paths in beam
-        """
-
+    """
     dead_nodes = []
     live_nodes = [Node(None, configuration, None, 0)]
     actions = utils.get_actions()
     in_beam = True
-    next_golden_action = 0
+    l = 0
+    golden_sequence = []
 
-    while live_nodes and in_beam:
+    while live_nodes and in_beam and l < k:
+        l += 1
         new_nodes = []
         for node in live_nodes:
             distribution = nn.predict(node.configuration)
             for i, prob in enumerate(distribution[0]):
                 action = list(actions.keys())[list(actions.values()).index(i)]
-                if node.configuration.action_possible(action):
+                if not node.configuration.empty_buffer() and node.configuration.action_possible(action):
                     conf_copy = copy.deepcopy(node.configuration)
                     # applies action to config
                     getattr(conf_copy, action)()
@@ -85,17 +94,19 @@ def in_beam_search(configuration, nn, golden_sequence, beam=2):
         end = min(beam, len(new_nodes))
         live_nodes = new_nodes[:end]
         in_beam = False
+        (next_golden_config, next_golden_action) = golden_sequence.next()
         for node in live_nodes:
-            if node.action == golden_sequence[next_golden_action]:
+            if node.action == next_golden_action:
                 in_beam = True
+                golden_sequence.append(next_golden_config)
                 break
-        next_golden_action += 1
-        if next_golden_action == len(golden_sequence):
-            in_beam = False
-    return dead_nodes.extend(live_nodes)
+    beam_sequences = []
+    for node in dead_nodes + live_nodes:
+        beam_sequences.extend(node.to_list())
+    return golden_sequence, beam_sequences
 
 
 def score(previous, new):
     # smaller is better!!
     # negative log
-    return previous.score - new
+    return previous.score - math.log(new)
