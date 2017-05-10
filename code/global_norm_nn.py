@@ -11,6 +11,7 @@ from classification import Classifier
 from covington_transistion import Configuration
 from feature import ConfigurationVector
 import keras.backend as K
+from keras.optimizers import SGD
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Input, Merge
 from keras.layers.merge import Add
@@ -53,7 +54,6 @@ class GlobalNormNN(Classifier):
         * i:k are Empty vectors
         * b*k:(b*k)+i are first i steps of sequence for all sequences in beam
         * (b*k)+i:(b+1)*k are Empty vectors
-        The sequences i the beam also contain the golden sequence.
         """
         logger = logging.getLogger('progress_logger')
 
@@ -85,7 +85,7 @@ class GlobalNormNN(Classifier):
                     for beam in beam_inputs:
                         features.extend([np.asarray(ConfigurationVector(x, doc).get_vector())[np.newaxis] for x in beam])
                         features.extend([empty_vector] * (self.k - len(beam)))
-                    logger.info("Paragraph:" + str(paragraph))
+                    logger.info("Paragraph:" + str(paragraph) + ", sequence len="+str(i))
                     # y_true is not used
                     yield (features, [empty_vector])
 
@@ -140,7 +140,7 @@ class GlobalNormNN(Classifier):
         model = Model(golden_inputs, output)
         self.machine = model
         self.graph = tf.get_default_graph()
-        model.compile(loss=global_norm_loss, optimizer='sgd')
+        model.compile(loss=global_norm_loss, optimizer=SGD(lr=0.1))
         model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234, max_q_size=1)
 
     def predict(self, sample):
@@ -150,6 +150,9 @@ class GlobalNormNN(Classifier):
             distribution = self.base_model.predict(feature_vector)
         return distribution
 
+    def save(self, filepath):
+        self.machine.save(os.path.join(filepath, "C00l3st_model.h5"))
+    
     def __init__(self, trainingdata):
         """
         :param trainingdata: documents
