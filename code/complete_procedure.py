@@ -8,12 +8,12 @@ from procedure import BaseProcedure, TransitiveProcedure
 BASE CONFIG
 """
 retrain_DCT = False
-retrain_REL = True
+retrain_REL = False
 DCT_model_name = "SupportVectorMachine2.0Embeddings"
 relation_model_name = "LogisticRegression2.0EmbeddingsSmallerTrainingWindow"
 token_window = 30
 transitive = False
-greedy = True
+greedy = False
 """
 SHARED CONFIG
 """
@@ -24,7 +24,6 @@ test_path = utils.dev
 def complete_base():
     bp = BaseProcedure(train_path=train_path,
                        token_window=token_window,
-                       validation_path=utils.dev,
                        retrain_rel=retrain_REL,
                        retrain_dct=retrain_DCT,
                        doc_time_path=DCT_model_name,
@@ -45,7 +44,7 @@ if __name__ == "__main__":
     logger = logging.getLogger('progress_logger')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
-    fh = logging.FileHandler('transistion.log')
+    fh = logging.FileHandler('ilp.log')
     fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     fh.setFormatter(formatter)
@@ -53,4 +52,4 @@ if __name__ == "__main__":
     logger.info('Start')
     # train word embedding model
     WordEmbedding(None, True, utils.train, "../Models/WordEmbedding")
-    complete_transition()
+    complete_base()

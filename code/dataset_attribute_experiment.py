@@ -1,3 +1,4 @@
+import math
 import data
 import oracle
 import utils
@@ -103,15 +104,22 @@ def action_class_imbalance_paragraphs(documents):
     frequencies = {"left_arc": 0, "right_arc": 0, "no_arc": 0, "shift": 0}
     al = 0
     par = 0
+    logs=0
+    b=0
     for doc in documents:
         for paragraph in range(doc.get_amount_of_paragraphs()):
             par += 1
             entities = doc.get_entities(paragraph=paragraph)
             relations = doc.get_relations(paragraph=paragraph)
+            seq = 0
             for (configuration, action) in oracle.get_training_sequence(entities, relations, doc):
                 frequencies[action] += 1
+                seq += 1
                 al += 1
-    print(frequencies, al, par)
+            if len(entities) > 1 and seq > 0:
+                b += 1
+    	        logs+=math.log(seq, len(entities))
+    print(frequencies, al, par, logs/b)
 
 
 def action_class_imbalance(documents):
