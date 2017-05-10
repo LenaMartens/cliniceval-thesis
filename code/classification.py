@@ -139,46 +139,6 @@ class SupportVectorMachine(Classifier):
         return self.machine.predict(sample)
 
 
-def global_norm_loss(y_true, y_pred):
-    # y_true is a tuple:
-    # (sum of predictions for golden beam
-    # ln of sum of sum of predictions of all beams)
-    return (- y_true[0][0] + K.logsumexp(y_true[0]))*y_pred
-
-def early_update_generator(docs, model):
-    logger = logging.getLogger('progress_logger')
-    if not model:
-        yield []
-    while 1:
-        random.seed()
-        random.shuffle(docs)
-        for doc in docs:
-            for paragraph in range(doc.get_amount_of_paragraphs()):
-                entities = doc.get_entities(paragraph=paragraph)
-                if not entities:
-                    break
-                relations = doc.get_relations(paragraph=paragraph)
-                golden_sum = 0
-                golden_sequence = []
-                for (configuration, action) in oracle.get_training_sequence(entities, relations, doc):
-                    golden_sequence.append(action)
-                    index = utils.get_actions()[action]
-                    distribution = model.predict(configuration)[0]
-                    value = distribution[index]
-                    golden_sum += value
-
-                configuration = Configuration(entities, doc)
-                beam_list = beam_search.in_beam_search(configuration, model, golden_sequence)
-                list_of_beam_values = []
-                for beam in beam_list:
-                    list_of_beam_values.append(-beam.score)
-                feature_vector = ConfigurationVector(configuration, doc).get_vector()
-                logger.info([golden_sum]+list_of_beam_values)
-                yield (np.vstack([feature_vector]),
-                       np.asarray([[golden_sum] + list_of_beam_values]))
-            for layer in model.machine.layers:
-                print(layer.get_weights())
-
 class NNActions(Classifier):
     def generate_training_data(self, docs, batch_size=100):
         while 1:
@@ -199,9 +159,9 @@ class NNActions(Classifier):
                             x_train = []
                             y_train = []
 
-    def train(self, trainingdata, global_norm=False):
+    def train(self, trainingdata):
         """
-        :param trainingdata: batch generator
+        :param trainingdata: documents
         """
         model = Sequential()
         in_dim = len(ConfigurationVector(Configuration([], None), None).get_vector())
@@ -210,32 +170,22 @@ class NNActions(Classifier):
         model.add(Activation('softmax'))
         model.add(Dense(units=4))
         model.add(Activation('softmax'))
-        if global_norm:
-            model.compile(loss=global_norm_loss,
-                      optimizer='sgd')
-        else:
-            model.compile(loss='sparse_categorical_crossentropy', optimizer='sgd')
+        model.compile(loss='sparse_categorical_crossentropy', optimizer='sgd')
         self.machine = model
-        globals.init()
-        globals.graph = tf.get_default_graph()
-        if global_norm:
-            model.fit_generator(early_update_generator(trainingdata, self), verbose=1, epochs=2, steps_per_epoch=1640, max_q_size=1)
-        else:
-            model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234)
+        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234)
 
     def predict(self, sample):
-        with globals.graph.as_default():
-            feature_vector = ConfigurationVector(sample, sample.get_doc()).get_vector()
-            feature_vector = np.array(feature_vector)[np.newaxis]
-            distribution = self.machine.predict(feature_vector)
+        feature_vector = ConfigurationVector(sample, sample.get_doc()).get_vector()
+        feature_vector = np.array(feature_vector)[np.newaxis]
+        distribution = self.machine.predict(feature_vector)
         return distribution
 
     def save(self, filepath):
         self.machine.save(os.path.join(filepath, "L3ss_C00l_model.h5"))
 
-    def __init__(self, training_data, global_norm=False):
+    def __init__(self, training_data):
         self.machine = None
-        self.train(training_data, global_norm)
+        self.train(training_data)
 
 
 def train_doctime_classifier(docs):

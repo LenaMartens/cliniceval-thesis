@@ -146,7 +146,7 @@ class TransitiveProcedure(Procedure):
             logger.info("Reading documents")
             train_documents = data.read_all(self.train_path)
             logger.info("Started training")
-            model = classification.NNActions(train_documents, global_norm=False)
+            model = classification.NNActions(train_documents)
             logger.info("Saving model")
             model.save("../Models/")
             return model
