@@ -33,13 +33,15 @@ def global_norm_loss(y_true, y_pred):
     # ln of sum of sum of predictions of all beams)
     return y_pred
 
+def negativeActivation(x):
+    return -x
 
 class GlobalNormNN(Classifier):
     """
     k: maximum length of sequence
     b: beam size
     """
-    k = 2
+    k = 50
     b = 3
 
     def generate_training_data(self, docs):
@@ -75,18 +77,17 @@ class GlobalNormNN(Classifier):
 
                     # How far it decoded before the golden sequence fell out of the beam
                     i = len(golden_input)
-                    empty_vector = ConfigurationVector(Configuration([], None), None).get_vector()
-                    features = [ConfigurationVector(x, doc) for x in golden_input]
+                    empty_vector = np.asarray(ConfigurationVector(Configuration([], None), None).get_vector()[np.newaxis])
+                    features = [np.asarray(ConfigurationVector(x, doc).get_vector())[np.newaxis] for x in golden_input]
                     # Golden inputs padding
                     features.extend([empty_vector] * (self.k - i))
                     # Add beam inputs with intermediate padding
                     for beam in beam_inputs:
-                        features.extend(beam)
-                        features.extend([empty_vector] * (self.k - i))
-                    print(features)
+                        features.extend([np.asarray(ConfigurationVector(x, doc).get_vector())[np.newaxis] for x in beam])
+                        features.extend([empty_vector] * (self.k - len(beam)))
                     logger.info("Paragraph:" + str(paragraph))
                     # y_true is not used
-                    yield (np.asarray(features), [])
+                    yield (features, [empty_vector])
 
     def train(self, trainingdata):
         in_dim = len(ConfigurationVector(Configuration([], None), None).get_vector())
@@ -105,8 +106,6 @@ class GlobalNormNN(Classifier):
         golden = list(map(base_model, golden_inputs))
         # Sum all probabilities in golden sequence
         golden_sum = Add()(golden)
-        print("GOLDEN_SUM")
-        print(golden_sum)
         # All decisions in the beam = MULTIPLE SEQUENCES
         beam = []
         beam_inputs = []
@@ -130,6 +129,9 @@ class GlobalNormNN(Classifier):
         inner_sequence_sums = list(map(exp_activation, inner_sequence_sums))
         # Sum all beam sequences together
         outer_sum = Add()(inner_sequence_sums)
+        # Negate golden sum
+        golden_sum = Activation(negativeActivation)(golden_sum)
+
         output = Add()([golden_sum, outer_sum])
         for beams in beam_inputs:
             golden_inputs.extend(beams)
@@ -137,7 +139,7 @@ class GlobalNormNN(Classifier):
         self.machine = model
         self.graph = tf.get_default_graph()
         model.compile(loss=global_norm_loss, optimizer='sgd')
-        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234)
+        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234, max_q_size=1)
 
     def predict(self, sample):
         with self.graph.as_default():
