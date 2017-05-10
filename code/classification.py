@@ -176,8 +176,8 @@ def early_update_generator(docs, model):
                 logger.info([golden_sum]+list_of_beam_values)
                 yield (np.vstack([feature_vector]),
                        np.asarray([[golden_sum] + list_of_beam_values]))
-            #for layer in model.machine.layers:
-             #   print(layer.get_weights())
+            for layer in model.machine.layers:
+                print(layer.get_weights())
 
 class NNActions(Classifier):
     def generate_training_data(self, docs, batch_size=100):
@@ -199,7 +199,7 @@ class NNActions(Classifier):
                             x_train = []
                             y_train = []
 
-    def train(self, trainingdata):
+    def train(self, trainingdata, global_norm=False):
         """
         :param trainingdata: batch generator
         """
@@ -210,13 +210,18 @@ class NNActions(Classifier):
         model.add(Activation('softmax'))
         model.add(Dense(units=4))
         model.add(Activation('softmax'))
-
-        model.compile(loss=global_norm_loss,
+        if global_norm:
+            model.compile(loss=global_norm_loss,
                       optimizer='sgd')
+        else:
+            model.compile(loss='sparse_categorical_crossentropy', optimizer='sgd')
         self.machine = model
         globals.init()
         globals.graph = tf.get_default_graph()
-        model.fit_generator(early_update_generator(trainingdata, self), verbose=1, epochs=2, steps_per_epoch=1640, max_q_size=1)
+        if global_norm:
+            model.fit_generator(early_update_generator(trainingdata, self), verbose=1, epochs=2, steps_per_epoch=1640, max_q_size=1)
+        else:
+            model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234)
 
     def predict(self, sample):
         with globals.graph.as_default():
@@ -226,14 +231,11 @@ class NNActions(Classifier):
         return distribution
 
     def save(self, filepath):
-        self.machine.save(os.path.join(filepath, "C00l_model.h5"))
+        self.machine.save(os.path.join(filepath, "L3ss_C00l_model.h5"))
 
     def __init__(self, training_data, global_norm=False):
         self.machine = None
-        if global_norm:
-            self.train(training_data)
-        else:
-            self.train(self.generate_training_data(training_data))
+        self.train(training_data, global_norm)
 
 
 def train_doctime_classifier(docs):
