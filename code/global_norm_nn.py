@@ -72,14 +72,14 @@ class GlobalNormNN(Classifier):
 
                     # How far it decoded before the golden sequence fell out of the beam
                     i = len(golden_input)
-                    empty_vector = ConfigurationVector(Configuration([],None), None).get_vector()
+                    empty_vector = ConfigurationVector(Configuration([], None), None).get_vector()
                     features = list(map(ConfigurationVector, golden_input))
                     # Golden inputs padding
-                    features.extend([empty_vector]*(self.k-i))
+                    features.extend([empty_vector] * (self.k - i))
                     # Add beam inputs with intermediate padding
                     for beam in beam_inputs:
                         features.extend(beam)
-                        features.extend([empty_vector]*(self.k-i))
+                        features.extend([empty_vector] * (self.k - i))
                     logger.info("Paragraph:" + paragraph)
                     # y_true is not used
                     yield (features, [])
@@ -89,7 +89,7 @@ class GlobalNormNN(Classifier):
 
         # Shared model
         base_model = make_base_model(in_dim)
-
+        self.base_model = base_model
         # Separate inputs
         # All golden decisions = ONE SEQUENCE
         golden_inputs = []
@@ -138,9 +138,16 @@ class GlobalNormNN(Classifier):
         model.compile(loss=global_norm_loss, optimizer='sgd')
         model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234)
 
+    def predict(self, sample):
+        feature_vector = ConfigurationVector(sample, sample.get_doc()).get_vector()
+        feature_vector = np.array(feature_vector)[np.newaxis]
+        distribution = self.base_model.predict(feature_vector)
+        return distribution
+
     def __init__(self, trainingdata):
         """
         :param trainingdata: documents
         """
         self.machine = None
+        self.base_model = None
         self.train(trainingdata)
