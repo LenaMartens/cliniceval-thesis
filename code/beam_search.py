@@ -13,10 +13,12 @@ class Node(object):
         self.configuration = configuration
         self.score = score
 
-    def to_list(self):
-        if self.parent is None:
-            return []
-        return self.parent.to_list().append(self.configuration)
+def to_list(node):
+    if node.parent is None:
+        return []
+    l = to_list(node.parent)
+    l.append(node.configuration)
+    return l
 
 
 def beam_search(configuration, nn, beam=5):
@@ -72,7 +74,7 @@ def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
     actions = utils.get_actions()
     in_beam = True
     l = 0
-    golden_sequence = []
+    gold_output = []
 
     while live_nodes and in_beam and l < k:
         l += 1
@@ -94,16 +96,16 @@ def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
         end = min(beam, len(new_nodes))
         live_nodes = new_nodes[:end]
         in_beam = False
-        (next_golden_config, next_golden_action) = golden_sequence.next()
+        (next_golden_config, next_golden_action) = next(golden_sequence)
         for node in live_nodes:
             if node.action == next_golden_action:
                 in_beam = True
-                golden_sequence.append(next_golden_config)
+                gold_output.append(next_golden_config)
                 break
     beam_sequences = []
     for node in dead_nodes + live_nodes:
-        beam_sequences.extend(node.to_list())
-    return golden_sequence, beam_sequences
+        beam_sequences.append(to_list(node))
+    return gold_output, beam_sequences
 
 
 def score(previous, new):

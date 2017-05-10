@@ -1,6 +1,6 @@
 import logging
 import random
-
+import tensorflow as tf
 from functools import reduce
 
 import beam_search
@@ -10,6 +10,7 @@ import numpy as np
 from classification import Classifier
 from covington_transistion import Configuration
 from feature import ConfigurationVector
+import keras.backend as K
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Input, Merge
 from keras.layers.merge import Add
@@ -38,7 +39,7 @@ class GlobalNormNN(Classifier):
     k: maximum length of sequence
     b: beam size
     """
-    k = 50
+    k = 2
     b = 3
 
     def generate_training_data(self, docs):
@@ -68,21 +69,24 @@ class GlobalNormNN(Classifier):
                     golden_sequence = oracle.get_training_sequence(entities, relations, doc)
                     configuration = Configuration(entities, doc)
                     # Returns list of configurations
-                    (golden_input, beam_inputs) = beam_search.in_beam_search(configuration, model, golden_sequence)
+                    (golden_input, beam_inputs) = beam_search.in_beam_search(configuration, self, 
+                                                                             golden_sequence, 
+                                                                             beam=self.b, k=self.k)
 
                     # How far it decoded before the golden sequence fell out of the beam
                     i = len(golden_input)
                     empty_vector = ConfigurationVector(Configuration([], None), None).get_vector()
-                    features = list(map(ConfigurationVector, golden_input))
+                    features = [ConfigurationVector(x, doc) for x in golden_input]
                     # Golden inputs padding
                     features.extend([empty_vector] * (self.k - i))
                     # Add beam inputs with intermediate padding
                     for beam in beam_inputs:
                         features.extend(beam)
                         features.extend([empty_vector] * (self.k - i))
-                    logger.info("Paragraph:" + paragraph)
+                    print(features)
+                    logger.info("Paragraph:" + str(paragraph))
                     # y_true is not used
-                    yield (features, [])
+                    yield (np.asarray(features), [])
 
     def train(self, trainingdata):
         in_dim = len(ConfigurationVector(Configuration([], None), None).get_vector())
@@ -98,50 +102,48 @@ class GlobalNormNN(Classifier):
             golden_inputs.append(Input(shape=(in_dim,), name=name))
 
         # Probabilities of decisions under model
-        golden = map(base_model, golden_inputs)
-
+        golden = list(map(base_model, golden_inputs))
         # Sum all probabilities in golden sequence
-        golden_sum = reduce((lambda x, y: Add([x, y])), golden)
-
+        golden_sum = Add()(golden)
+        print("GOLDEN_SUM")
+        print(golden_sum)
         # All decisions in the beam = MULTIPLE SEQUENCES
         beam = []
         beam_inputs = []
         for i in range(self.b):
             sequence = []
             for j in range(self.k):
-                name = "Beam{i},{j}".format(i=i, j=j)
+                name = "Beam{i}.{j}".format(i=i, j=j)
                 sequence.append(Input(shape=(in_dim,), name=name))
             # Probabilities of decisions under model
             beam_inputs.append(sequence)
-            sequence = map(base_model, sequence)
+            sequence = list(map(base_model, sequence))
             beam.append(sequence)
-
         # Make the inner sums over all sequences in the beam
         inner_sequence_sums = []
         for sequence in beam:
-            summation = reduce((lambda x, y: Add([x, y])), sequence)
+            summation = Add()(sequence)
             inner_sequence_sums.append(summation)
 
         # Apply exp to all inner sums
-        exp_activation = Activation('exp')
-        inner_sequence_sums = map(exp_activation, inner_sequence_sums)
-
+        exp_activation = Activation(K.exp)
+        inner_sequence_sums = list(map(exp_activation, inner_sequence_sums))
         # Sum all beam sequences together
-        outer_sum = reduce((lambda x, y: Add([x, y])), inner_sequence_sums)
-
-        output = Add([-golden_sum, outer_sum])
-
-        input = golden_inputs.extend(beam_inputs)
-
-        model = Model(input, output)
+        outer_sum = Add()(inner_sequence_sums)
+        output = Add()([golden_sum, outer_sum])
+        for beams in beam_inputs:
+            golden_inputs.extend(beams)
+        model = Model(golden_inputs, output)
         self.machine = model
+        self.graph = tf.get_default_graph()
         model.compile(loss=global_norm_loss, optimizer='sgd')
         model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234)
 
     def predict(self, sample):
-        feature_vector = ConfigurationVector(sample, sample.get_doc()).get_vector()
-        feature_vector = np.array(feature_vector)[np.newaxis]
-        distribution = self.base_model.predict(feature_vector)
+        with self.graph.as_default():
+            feature_vector = ConfigurationVector(sample, sample.get_doc()).get_vector()
+            feature_vector = np.array(feature_vector)[np.newaxis]
+            distribution = self.base_model.predict(feature_vector)
         return distribution
 
     def __init__(self, trainingdata):

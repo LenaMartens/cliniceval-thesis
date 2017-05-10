@@ -126,13 +126,13 @@ class BaseProcedure(Procedure):
 class TransitiveProcedure(Procedure):
     def __init__(self, train_path, nn_path="", global_norm=False):
         self.train_path = train_path
+        self.global_norm = global_norm
         if nn_path:
             nn = load_model(nn_path)
         else:
             nn = self.train_network()
         self.annotator = BeamAnnotator(network=nn)
         self.doc_time_model = None
-        self.global_norm = global_norm
 
     def generate_output_path(self, predict_path):
         train = os.path.split(self.train_path)
