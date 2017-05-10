@@ -72,16 +72,13 @@ class LogisticRegression(Classifier):
         # PARTIAL FIT because of memory problems
         if self.batches:
             classes = None
-            iterations = 2
-            for i in range(iterations):
-                print("Iteration: " + str(i))
-                for data in generator:
-                    X = [x.get_vector() for x in data]
-                    X = scipy.sparse.csr_matrix(X)
-                    Y = [getattr(x.entity, self.class_to_fy) for x in data]
-                    if not classes:
-                        classes = np.unique(Y)
-                    self.machine.partial_fit(X, Y, classes=classes)
+            for data in generator:
+                X = [x.get_vector() for x in data]
+                X = scipy.sparse.csr_matrix(X)
+                Y = [getattr(x.entity, self.class_to_fy) for x in data]
+                if classes is None:
+                    classes = np.unique(Y)
+                self.machine.partial_fit(X, Y, classes=classes)
         else:
             data = [item for sublist in generator for item in sublist]
             input = [x.get_vector() for x in data]
@@ -195,25 +192,23 @@ def train_doctime_classifier(docs):
 
 def feature_generator(docs, token_window, batch_size):
     logger = logging.getLogger('progress_logger')
-    start = 0
-    len_docs = len(docs)
-    random.seed()
-    random.shuffle(docs)
-    while start < len_docs:
-        logger.info("{start} out of {all}".format(start=start, all=len_docs))
-        features = []
-        end = min(start + batch_size, len(docs))
-        for document in docs[start:end]:
-            features.extend(generate_constrained_candidates(document, 10))
-        if features:
-            logger.info("Features length:{l}".format(l=len(features)))
-            yield features
-        start += batch_size
-
+    features = []
+    iterations = 2
+    for i in range(iterations):
+        start = 0
+        len_docs = len(docs)
+        random.seed()
+        random.shuffle(docs)
+        for i, doc in enumerate(docs):
+            logger.info("{start} out of {all}".format(start=i, all=len_docs))
+            features.extend(generate_constrained_candidates(doc, token_window))
+            if len(features) > batch_size:
+                yield features
+                features = []
 
 def train_relation_classifier(docs, token_window):
-    generator = feature_generator(docs, token_window, 6)
-    lr = LogisticRegression(generator, token_window)
+    generator = feature_generator(docs, 10, 10000)
+    lr = LogisticRegression(generator, token_window, batches=True)
     return lr
 
 
