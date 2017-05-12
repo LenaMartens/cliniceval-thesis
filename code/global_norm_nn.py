@@ -1,8 +1,7 @@
 import logging
 import random
 import tensorflow as tf
-from functools import reduce
-
+import os
 import beam_search
 import oracle
 import utils
@@ -11,6 +10,7 @@ from classification import Classifier
 from covington_transistion import Configuration
 from feature import ConfigurationVector
 import keras.backend as K
+from keras.optimizers import SGD
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Input, Merge
 from keras.layers.merge import Add, Dot
@@ -103,11 +103,15 @@ class GlobalNormNN(Classifier):
 
                     # Add beam inputs with intermediate padding
                     for beam in beam_inputs:
-                        features.extend(
-                            [np.asarray(ConfigurationVector(x, doc).get_vector())[np.newaxis] for x in beam])
-                        features.extend([empty_vector] * (self.k - len(beam)))
+                        for node in beam:
+                            features.append(vectorize_config(node.configuration, doc))
+                            features.append(vectorize_action(node.action))
+                        # Golden inputs padding
+                        for i in range(self.k - len(beam)):
+                            features.append(empty_vector)
+                            features.append(empty_action)
 
-                    logger.info("Paragraph:" + str(paragraph))
+                    logger.info("Paragraph:" + str(paragraph) + ", sequence len=" + str(i))
 
                     # y_true is not used
                     yield (features, [empty_vector])
@@ -185,7 +189,7 @@ class GlobalNormNN(Classifier):
         self.machine = model
         self.graph = tf.get_default_graph()
 
-        model.compile(loss=global_norm_loss, optimizer='sgd')
+        model.compile(loss=global_norm_loss, optimizer=SGD(lr=0.1))
         model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234,
                             max_q_size=1)
 
@@ -195,6 +199,9 @@ class GlobalNormNN(Classifier):
             feature_vector = np.array(feature_vector)[np.newaxis]
             distribution = self.base_model.predict(feature_vector)
         return distribution
+
+    def save(self, filepath):
+        self.machine.save(os.path.join(filepath, "C00l3st_model.h5"))
 
     def __init__(self, trainingdata):
         """
