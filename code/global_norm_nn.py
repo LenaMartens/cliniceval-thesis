@@ -13,7 +13,7 @@ from feature import ConfigurationVector
 import keras.backend as K
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Input, Merge
-from keras.layers.merge import Add
+from keras.layers.merge import Add, Dot
 
 
 def make_base_model(in_dim):
@@ -33,8 +33,23 @@ def global_norm_loss(y_true, y_pred):
     # ln of sum of sum of predictions of all beams)
     return y_pred
 
+
 def negativeActivation(x):
     return -x
+
+
+def vectorize_config(x, doc):
+    return np.asarray(ConfigurationVector(x, doc).get_vector())[np.newaxis]
+
+
+actions = utils.get_actions()
+
+
+def vectorize_action(action):
+    em = np.zeros(len(actions))
+    em[actions[action]] = 1
+    return em
+
 
 class GlobalNormNN(Classifier):
     """
@@ -54,13 +69,13 @@ class GlobalNormNN(Classifier):
         * b*k:(b*k)+i are first i steps of sequence for all sequences in beam
         * (b*k)+i:(b+1)*k are Empty vectors
         The sequences i the beam also contain the golden sequence.
+        A step consists of a feature vector of the state and a one-hot encoded vector of the decision taken
         """
         logger = logging.getLogger('progress_logger')
 
         while 1:
             random.seed()
             random.shuffle(docs)
-            model = self.machine
             for doc in docs:
                 for paragraph in range(doc.get_amount_of_paragraphs()):
                     entities = doc.get_entities(paragraph=paragraph)
@@ -70,22 +85,30 @@ class GlobalNormNN(Classifier):
                     relations = doc.get_relations(paragraph=paragraph)
                     golden_sequence = oracle.get_training_sequence(entities, relations, doc)
                     configuration = Configuration(entities, doc)
-                    # Returns list of configurations
-                    (golden_input, beam_inputs) = beam_search.in_beam_search(configuration, self, 
-                                                                             golden_sequence, 
+                    # Returns list of nodes
+                    (golden_input, beam_inputs) = beam_search.in_beam_search(configuration, self,
+                                                                             golden_sequence,
                                                                              beam=self.b, k=self.k)
 
-                    # How far it decoded before the golden sequence fell out of the beam
-                    i = len(golden_input)
-                    empty_vector = np.asarray(ConfigurationVector(Configuration([], None), None).get_vector()[np.newaxis])
-                    features = [np.asarray(ConfigurationVector(x, doc).get_vector())[np.newaxis] for x in golden_input]
+                    empty_vector = vectorize_config(Configuration([], None), None)
+                    empty_action = np.zeros(len(actions))
+                    features = []
+                    for node in golden_input:
+                        features.append(vectorize_config(node.configuration, doc))
+                        features.append(vectorize_action(node.action))
                     # Golden inputs padding
-                    features.extend([empty_vector] * (self.k - i))
+                    for i in range(self.k - len(golden_input)):
+                        features.append(empty_vector)
+                        features.append(empty_action)
+
                     # Add beam inputs with intermediate padding
                     for beam in beam_inputs:
-                        features.extend([np.asarray(ConfigurationVector(x, doc).get_vector())[np.newaxis] for x in beam])
+                        features.extend(
+                            [np.asarray(ConfigurationVector(x, doc).get_vector())[np.newaxis] for x in beam])
                         features.extend([empty_vector] * (self.k - len(beam)))
+
                     logger.info("Paragraph:" + str(paragraph))
+
                     # y_true is not used
                     yield (features, [empty_vector])
 
@@ -95,17 +118,26 @@ class GlobalNormNN(Classifier):
         # Shared model
         base_model = make_base_model(in_dim)
         self.base_model = base_model
-        # Separate inputs
+
         # All golden decisions = ONE SEQUENCE
+        golden = []
         golden_inputs = []
         for i in range(self.k):
             name = "Golden" + str(i)
-            golden_inputs.append(Input(shape=(in_dim,), name=name))
-
-        # Probabilities of decisions under model
-        golden = list(map(base_model, golden_inputs))
+            # Configuration feature vector input
+            state_input = Input(shape=(in_dim,), name=name)
+            golden_inputs.append(state_input)
+            # Decision input
+            decision_input = Input(shape=(4,))
+            golden_inputs.append(decision_input)
+            # Probabilities of decisions under model
+            distribution = base_model(state_input)
+            # Decision activation
+            output = Dot()(distribution, decision_input)
+            golden.append(output)
         # Sum all probabilities in golden sequence
         golden_sum = Add()(golden)
+
         # All decisions in the beam = MULTIPLE SEQUENCES
         beam = []
         beam_inputs = []
@@ -113,35 +145,49 @@ class GlobalNormNN(Classifier):
             sequence = []
             for j in range(self.k):
                 name = "Beam{i}.{j}".format(i=i, j=j)
-                sequence.append(Input(shape=(in_dim,), name=name))
-            # Probabilities of decisions under model
-            beam_inputs.append(sequence)
-            sequence = list(map(base_model, sequence))
+                # Configuration feature vector input
+                state_input = Input(shape=(in_dim,), name=name)
+                beam_inputs.append(state_input)
+                # Decision input
+                decision_input = Input(shape=(4,))
+                beam_inputs.append(decision_input)
+                # Probabilities of decisions under model
+                distribution = base_model(state_input)
+                # Decision activation
+                output = Dot()(distribution, decision_input)
+                sequence.append(output)
             beam.append(sequence)
+
         # Make the inner sums over all sequences in the beam
-        inner_sequence_sums = []
-        for sequence in beam:
-            summation = Add()(sequence)
-            inner_sequence_sums.append(summation)
+        inner_sequence_sums = list(map(Add(), beam))
 
         # Apply exp to all inner sums
         exp_activation = Activation(K.exp)
         inner_sequence_sums = list(map(exp_activation, inner_sequence_sums))
+
         # Sum all beam sequences together
         outer_sum = Add()(inner_sequence_sums)
+
         # Log activation
         outer_sum = Activation(K.log)(outer_sum)
+
         # Negate golden sum
         golden_sum = Activation(negativeActivation)(golden_sum)
 
         output = Add()([golden_sum, outer_sum])
+
+        # Add beam inputs to all inputs
         for beams in beam_inputs:
             golden_inputs.extend(beams)
+
         model = Model(golden_inputs, output)
+
         self.machine = model
         self.graph = tf.get_default_graph()
+
         model.compile(loss=global_norm_loss, optimizer='sgd')
-        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234, max_q_size=1)
+        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234,
+                            max_q_size=1)
 
     def predict(self, sample):
         with self.graph.as_default():
