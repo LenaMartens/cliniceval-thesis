@@ -1,3 +1,5 @@
+import os
+from keras.models import load_model
 import logging
 import random
 import tensorflow as tf
@@ -190,8 +192,8 @@ class GlobalNormNN(Classifier):
         self.graph = tf.get_default_graph()
 
         model.compile(loss=global_norm_loss, optimizer=SGD(lr=0.1))
-        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234,
-                            max_q_size=1)
+        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=2, steps_per_epoch=2, max_q_size=1)
+        self.save()
 
     def predict(self, sample):
         with self.graph.as_default():
@@ -200,13 +202,24 @@ class GlobalNormNN(Classifier):
             distribution = self.base_model.predict(feature_vector)
         return distribution
 
-    def save(self, filepath):
-        self.machine.save(os.path.join(filepath, "C00l3st_model.h5"))
-
-    def __init__(self, trainingdata):
+    def save(self):
+        self.base_model.save(os.path.join(utils.model_path, self.model_name))
+    
+    def load(self):
+        self.base_model = load_model(os.path.join(utils.model_path, self.model_name))
+    
+    def __init__(self, trainingdata, pretrained=False, model_name="c00l_model"):
         """
         :param trainingdata: documents
         """
         self.machine = None
         self.base_model = None
-        self.train(trainingdata)
+        self.model_name = model_name
+        if pretrained:
+            self.load()
+        else:
+            self.train(trainingdata)
+
+
+
+
