@@ -137,7 +137,7 @@ class GlobalNormNN(Classifier):
             # Probabilities of decisions under model
             distribution = base_model(state_input)
             # Decision activation
-            output = Dot()(distribution, decision_input)
+            output = Dot(0)(distribution, decision_input)
             golden.append(output)
         # Sum all probabilities in golden sequence
         golden_sum = Add()(golden)
@@ -158,7 +158,7 @@ class GlobalNormNN(Classifier):
                 # Probabilities of decisions under model
                 distribution = base_model(state_input)
                 # Decision activation
-                output = Dot()(distribution, decision_input)
+                output = Dot(0)(distribution, decision_input)
                 sequence.append(output)
             beam.append(sequence)
 
