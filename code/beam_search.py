@@ -17,7 +17,7 @@ def to_list(node):
     if node.parent is None:
         return []
     l = to_list(node.parent)
-    l.append(node.configuration)
+    l.append(node)
     return l
 
 #@profile
@@ -107,7 +107,7 @@ def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
         new_nodes.sort(key=lambda x: x.score)
         end = min(beam, len(new_nodes))
         live_nodes = new_nodes[:end]
-        gold_output.append(next_golden_config)
+        gold_output.append(Node(None, next_golden_config, next_golden_action, 0))
         for node in live_nodes:
             if node.action == next_golden_action:
                 in_beam = True
