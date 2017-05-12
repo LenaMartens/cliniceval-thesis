@@ -36,7 +36,7 @@ def complete_base():
 
 
 def complete_transition():
-    tp = TransitiveProcedure(train_path=train_path, global_norm=True)
+    tp = TransitiveProcedure(train_path=train_path, global_norm=True, model_name="test")
     tp.predict(test_path)
     tp.evaluate(test_path)
 

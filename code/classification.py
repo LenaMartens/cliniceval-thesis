@@ -1,4 +1,5 @@
 import math
+from keras.models import load_model
 import os
 import tensorflow as tf
 import functools
@@ -170,6 +171,7 @@ class NNActions(Classifier):
         model.compile(loss='sparse_categorical_crossentropy', optimizer='sgd')
         self.machine = model
         model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234)
+        self.save()
 
     def predict(self, sample):
         feature_vector = ConfigurationVector(sample, sample.get_doc()).get_vector()
@@ -177,12 +179,19 @@ class NNActions(Classifier):
         distribution = self.machine.predict(feature_vector)
         return distribution
 
-    def save(self, filepath):
-        self.machine.save(os.path.join(filepath, "L3ss_C00l_model.h5"))
+    def save(self):
+        self.machine.save(os.path.join(utils.model_path, self.model_name))
 
-    def __init__(self, training_data):
+    def save(self):
+        self.machine = load_model(os.path.join(utils.model_path, self.model_name))
+    
+    def __init__(self, training_data, pretrained=False, model_name="lam3_model"):
         self.machine = None
-        self.train(training_data)
+        self.model_name = model_name
+        if pretrained:
+            self.load()
+        else:
+            self.train(training_data)
 
 
 def train_doctime_classifier(docs):
