@@ -50,7 +50,7 @@ actions = utils.get_actions()
 def vectorize_action(action):
     em = np.zeros(len(actions))
     em[actions[action]] = 1
-    return em
+    return em[np.newaxis]
 
 
 class GlobalNormNN(Classifier):
@@ -93,7 +93,7 @@ class GlobalNormNN(Classifier):
                                                                              beam=self.b, k=self.k)
 
                     empty_vector = vectorize_config(Configuration([], None), None)
-                    empty_action = np.zeros(len(actions))
+                    empty_action = np.zeros(len(actions))[np.newaxis]
                     features = []
                     for node in golden_input:
                         features.append(vectorize_config(node.configuration, doc))
@@ -139,7 +139,7 @@ class GlobalNormNN(Classifier):
             # Probabilities of decisions under model
             distribution = base_model(state_input)
             # Decision activation
-            output = Dot(0)(distribution, decision_input)
+            output = Dot(axes=0)([distribution, decision_input])
             golden.append(output)
         # Sum all probabilities in golden sequence
         golden_sum = Add()(golden)
@@ -160,7 +160,7 @@ class GlobalNormNN(Classifier):
                 # Probabilities of decisions under model
                 distribution = base_model(state_input)
                 # Decision activation
-                output = Dot(0)(distribution, decision_input)
+                output = Dot(axes=0)([distribution, decision_input])
                 sequence.append(output)
             beam.append(sequence)
 
@@ -183,10 +183,9 @@ class GlobalNormNN(Classifier):
         output = Add()([golden_sum, outer_sum])
 
         # Add beam inputs to all inputs
-        for beams in beam_inputs:
-            golden_inputs.extend(beams)
+        inputs = golden_inputs + beam_inputs
 
-        model = Model(golden_inputs, output)
+        model = Model(inputs, output)
 
         self.machine = model
         self.graph = tf.get_default_graph()
