@@ -72,15 +72,15 @@ class Document(object):
 
     def get_sentence(self, entity):
         index = entity.sentence
-        end = max(index, len(self.sentence_delimiters)-1)
+        end = max(index, len(self.sentence_delimiters) - 1)
         span = (self.sentence_delimiters[index], self.sentence_delimiters[end])
-        sentence = self.sentences[span[0]+1:span[1]]
+        sentence = self.sentences[span[0] + 1:span[1]]
         sentence = [x.strip().strip("\"\':.,-") for x in sentence.split(" ") if x != ""]
         e_word = entity.word
         for i, word in enumerate(sentence):
             if e_word.startswith(word):
                 sentence[i] = e_word
-        return sentence  
+        return sentence
 
     def get_words_inbetween(self, span1, span2):
         if span1[0] > span2[1]:
@@ -167,6 +167,31 @@ class Document(object):
         for relation in relations_xml:
             self.process_relation(relation)
 
+    def process_umls(self, umls_file):
+        # Generate events and timex
+        tree = ET.parse(umls_file)
+        root = tree.getroot()
+
+        entities_xml = root.find("annotations").findall("entity")
+        for entity in entities_xml:
+            if entity.find('span').text:
+                try:
+                    span = [int(x) for x in re.split('[, ;]+', entity.find('span').text)]
+                except ValueError:
+                    continue
+                id = None
+                for entity_id in self.sorted_entity_ids:
+                    search_span = self.entities[entity_id].span
+                    if search_span == span:
+                        id = entity_id
+                        break
+                    elif search_span[0] > span[1]:
+                        break
+                if id:
+                    ent = self.entities[id]
+                    ent.umls_type = entity.find("type").text
+                    utils.add_umls_type(entity.find("type").text)
+
     '''
     After reading in the document, add transitive relations if not already there
     '''
@@ -195,6 +220,7 @@ class Entity(object):
         self.id = id
         self.span = span
         self.word = word
+        self.umls_type = ""
 
     def __str__(self):
         return self.id
@@ -214,6 +240,7 @@ class Event(Entity):
         self.modality = xml_dict.find('ContextualModality').text
         self.contextual_aspect = xml_dict.find('ContextualAspect').text
         self.permanence = xml_dict.find('Permanence').text
+        self.umls_type = ""
 
     def __str__(self):
         return self.id
@@ -256,14 +283,19 @@ Helper reading methods for external use
 def read_document(parent_directory, dir):
     # Give doc the correct ID
     doc = Document(dir)
+    umls_file = None
     for file in os.listdir(os.path.join(parent_directory, dir)):
         file_path = os.path.join(parent_directory, dir, file)
         if file.find("Temporal") > -1:
             entity_file = file_path
+        if file.find("UMLS") > -1:
+            umls_file = file_path
         elif file.find(".") == -1:
             sentence_file = file_path
     doc.process_file(sentence_file)
     doc.process_annotations(entity_file)
+    if umls_file:
+        doc.process_umls(umls_file)
     return doc
 
 
@@ -279,6 +311,7 @@ def read_all(directory, transitive=False):
         docs.append(doc)
         for k, entity in doc.entities.items():
             utils.add_word_to_dictionary(entity.word)
+    print(utils.get_umls_types())
     utils.save_dictionary()
     return docs
 
