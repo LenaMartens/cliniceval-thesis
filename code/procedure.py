@@ -23,6 +23,7 @@ class Procedure(object):
                 doc = classification.predict_DCT_document(doc, self.doc_time_model)
             doc = self.annotator.annotate(doc)
             output.output_doc(doc, outputpath=outputpath)
+            break
 
     def evaluate(self, filepath):
         logger = logging.getLogger('progress_logger')
@@ -124,20 +125,16 @@ class BaseProcedure(Procedure):
 
 
 class TransitiveProcedure(Procedure):
-    def __init__(self, train_path, nn_path="", global_norm=False):
+    def __init__(self, train_path, global_norm=False, model_name="anon"):
         self.train_path = train_path
-        if nn_path:
-            nn = load_model(nn_path)
-        else:
-            nn = self.train_network()
+        self.global_norm = global_norm
+        self.model_name = model_name
+        nn = self.train_network()
         self.annotator = BeamAnnotator(network=nn)
         self.doc_time_model = None
-        self.global_norm = global_norm
 
     def generate_output_path(self, predict_path):
-        train = os.path.split(self.train_path)
-        pred = os.path.split(predict_path)
-        unique = "TransistionTrain{train}Predict{predict}".format(train=train[-1], predict=pred[-1])
+        unique = "model{model}".format(model=self.model_name)
         path = os.path.join(utils.outputpath, unique)
         return path
 
@@ -149,11 +146,9 @@ class TransitiveProcedure(Procedure):
             train_documents = data.read_all(self.train_path)
             logger.info("Started training")
             if self.global_norm:
-                model = global_norm_nn.GlobalNormNN(train_documents)
+                model = global_norm_nn.GlobalNormNN(train_documents, False, self.model_name)
             else:
-                model = classification.NNActions(train_documents)
-            logger.info("Saving model")
-            model.save("../Models/")
+                model = classification.NNActions(train_documents, self.model_name)
             return model
         else:
             raise Exception("No path to training corpus provided")

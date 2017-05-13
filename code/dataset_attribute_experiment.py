@@ -118,7 +118,7 @@ def action_class_imbalance_paragraphs(documents):
                 al += 1
             if len(entities) > 1 and seq > 0:
                 b += 1
-    	        logs+=math.log(seq, len(entities))
+                logs+=math.log(seq, len(entities))
     print(frequencies, al, par, logs/b)
 
 

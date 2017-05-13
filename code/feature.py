@@ -160,7 +160,7 @@ class PolarityFeatureVector(FeatureVector):
 
 
 '''
-One hot encoding of modality of the word (from UMLS input file)
+One hot encoding of modality of the word
 '''
 
 
@@ -176,6 +176,19 @@ class ModalityFeatureVector(FeatureVector):
         else:
             self.vector[len(modalities)] = 1
 
+'''
+One hot encoding of modality of the word
+'''
+
+
+class UMLSTypeFeatureVector(FeatureVector):
+    def generate_vector(self):
+        umls_types = utils.get_umls_types()
+        self.vector = np.zeros(len(umls_types) + 1)
+        try:
+            self.vector[umls_types[self.entity.umls_type]] = 1
+        except KeyError:
+            self.vector[len(umls_types)] = 1
 
 '''
 Do the two entities appear in the same paragraph?
@@ -285,6 +298,7 @@ class WordVector(ConcatenatedVector):
         global vector_length
         if self.entity is not None:
             self.features.append(WordEmbedding(self.entity))
+            self.features.append(UMLSTypeFeatureVector(self.entity))
             # self.features.append(LemmaFeatureVector(self.entity))
             self.features.append(CapitalFeatureVector(self.entity))
             self.features.append(POSFeatureVector(self.entity, document=self.document))

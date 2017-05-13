@@ -12,12 +12,14 @@ class Node(object):
         self.configuration = configuration
         self.score = score
 
-    def to_list(self):
-        if self.parent is None:
-            return []
-        return self.parent.to_list().append(self.configuration)
+def to_list(node):
+    if node.parent is None:
+        return []
+    l = to_list(node.parent)
+    l.append(node)
+    return l
 
-
+#@profile
 def beam_search(configuration, nn, beam=5):
     """
     Returns best sequence within beam.
@@ -30,8 +32,11 @@ def beam_search(configuration, nn, beam=5):
 
     dead_nodes = []
     live_nodes = [Node(None, configuration, None, 0)]
-    actions = utils.get_actions()
-    while live_nodes:
+    actions = utils.get_actions() 
+    cnt = 0
+    while live_nodes: 
+        print(cnt)
+        cnt+=1
         new_nodes = []
         for node in live_nodes:
             distribution = nn.predict(node.configuration)
@@ -46,11 +51,15 @@ def beam_search(configuration, nn, beam=5):
                         beam -= 1
                     else:
                         new_nodes.append(Node(node, conf_copy, action, score(node, prob)))
+            node.configuration = None
         new_nodes.sort(key=lambda x: x.score)
         end = min(beam, len(new_nodes))
+        print(beam, len(new_nodes))
         live_nodes = new_nodes[:end]
+        print(live_nodes[0].configuration)
+        print(len(dead_nodes),len(live_nodes))
     best = max(dead_nodes, key=lambda x: x.score)
-    print(best.score)
+    print("score  "+str(best.score))
     return best
 
 
@@ -71,10 +80,15 @@ def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
     actions = utils.get_actions()
     in_beam = True
     l = 0
-    golden_sequence = []
+    gold_output = []
 
     while live_nodes and in_beam and l < k:
         l += 1
+        in_beam = False
+        try:
+            (next_golden_config, next_golden_action) = next(golden_sequence)
+        except StopIteration:
+            break
         new_nodes = []
         for node in live_nodes:
             distribution = nn.predict(node.configuration)
@@ -92,20 +106,21 @@ def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
         new_nodes.sort(key=lambda x: x.score)
         end = min(beam, len(new_nodes))
         live_nodes = new_nodes[:end]
-        in_beam = False
-        (next_golden_config, next_golden_action) = golden_sequence.next()
+        gold_output.append(Node(None, next_golden_config, next_golden_action, 0))
         for node in live_nodes:
             if node.action == next_golden_action:
                 in_beam = True
-                golden_sequence.append(next_golden_config)
                 break
     beam_sequences = []
     for node in dead_nodes + live_nodes:
-        beam_sequences.extend(node.to_list())
-    return golden_sequence, beam_sequences
+        beam_sequences.append(to_list(node))
+    return gold_output, beam_sequences
 
 
 def score(previous, new):
     # smaller is better!!
     # negative log
-    return previous.score - math.log(new)
+    if new > 0:
+        return previous.score - math.log(new)
+    else:
+        return previous.score - 1000
