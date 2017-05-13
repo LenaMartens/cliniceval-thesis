@@ -11,8 +11,8 @@ retrain_DCT = False
 retrain_REL = False
 DCT_model_name = "SupportVectorMachine2.0Embeddings"
 relation_model_name = "LogisticRegression2.0EmbeddingsSmallerTrainingWindow"
-token_window = 30
-transitive = False
+token_window = 15
+transitive = True
 greedy = False
 """
 SHARED CONFIG

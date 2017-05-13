@@ -1,4 +1,3 @@
-import globals
 import copy
 
 import math

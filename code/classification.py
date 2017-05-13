@@ -2,7 +2,6 @@ import math
 import os
 import tensorflow as tf
 import functools
-import globals
 from tqdm import *
 from itertools import tee
 import logging
