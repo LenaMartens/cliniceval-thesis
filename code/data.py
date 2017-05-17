@@ -105,7 +105,7 @@ class Document(object):
             return None
 
     def get_amount_of_paragraphs(self):
-        return len(self.paragraph_delimiters) - 1
+        return len(self.paragraph_delimiters) + 1
 
     '''
     Processing methods describing how to turn the raw input into objects
@@ -116,7 +116,7 @@ class Document(object):
         id = id[:id.find('@')]
 
         span = [int(x) for x in re.split('[, ;]+', entity.find('span').text)]
-        paragraph = bisect.bisect(self.paragraph_delimiters, span[0]) - 1
+        paragraph = bisect.bisect(self.paragraph_delimiters, span[0])
         sentence = bisect.bisect(self.sentence_delimiters, span[0]) - 1
         token = bisect.bisect(self.token_delimiters, span[0]) - 1
         word = self.get_word(span)
@@ -311,7 +311,6 @@ def read_all(directory, transitive=False):
         docs.append(doc)
         for k, entity in doc.entities.items():
             utils.add_word_to_dictionary(entity.word)
-    print(utils.get_umls_types())
     utils.save_dictionary()
     return docs
 

@@ -9,10 +9,10 @@ BASE CONFIG
 """
 retrain_DCT = False
 retrain_REL = False
-DCT_model_name = "SupportVectorMachine2.0Embeddings"
-relation_model_name = "LogisticRegression2.0EmbeddingsSmallerTrainingWindow"
-token_window = 15
-transitive = True
+DCT_model_name = "SupportVectorMachine3.0Embeddings"
+relation_model_name = "LogisticRegression3.0EmbeddingsBetterWindow"
+token_window = 30
+transitive = False
 greedy = False
 """
 SHARED CONFIG
@@ -26,6 +26,7 @@ def complete_base():
                        token_window=token_window,
                        retrain_rel=retrain_REL,
                        retrain_dct=retrain_DCT,
+                       validation_path=utils.dev,
                        doc_time_path=DCT_model_name,
                        rel_classifier_path=relation_model_name,
                        greedy=greedy,
@@ -52,4 +53,4 @@ if __name__ == "__main__":
     logger.info('Start')
     # train word embedding model
     WordEmbedding(None, True, utils.train, "../Models/WordEmbedding")
-    complete_transition()
+    complete_base()

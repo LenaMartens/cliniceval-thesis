@@ -23,7 +23,6 @@ class Procedure(object):
                 doc = classification.predict_DCT_document(doc, self.doc_time_model)
             doc = self.annotator.annotate(doc)
             output.output_doc(doc, outputpath=outputpath)
-            break
 
     def evaluate(self, filepath):
         logger = logging.getLogger('progress_logger')
@@ -116,7 +115,7 @@ class BaseProcedure(Procedure):
 
     def generate_output_path(self, predict_path):
         p = os.path.split(predict_path)
-        unique = "{decision}{window}{trans}{corpus}".format(decision=("Greedy" if self.greedy else "ILP"),
+        unique = "{decision}{window}{trans}{corpus}NODCTUMLS".format(decision=("Greedy" if self.greedy else "ILP"),
                                                             window=self.token_window,
                                                             trans=("Transitive" if self.transitive else ""),
                                                             corpus=p[-1])
