@@ -28,10 +28,11 @@ def samepar_relations(documents):
     amount_of_relations = 0
     amount_of_samepars = 0
     for document in documents:
+        print(document.id, document.get_amount_of_paragraphs())
         relations = document.get_relations()
         amount_of_relations += len(relations)
         for relation in relations:
-            if abs(relation.source.paragraph - relation.target.paragraph) < 4:
+            if relation.source.paragraph == relation.target.paragraph:
                 amount_of_samepars += 1
     print(amount_of_samepars, amount_of_relations)
 
@@ -45,7 +46,7 @@ def samesentence_relations(documents):
         for relation in relations:
             if relation.source.sentence == relation.target.sentence:
                 amount_of_samesents += 1
-    print(amount_of_samesents / amount_of_relations)
+    print(amount_of_samesents,  amount_of_relations)
 
 
 def within_amount_of_tokens(documents, amount=30):
@@ -57,7 +58,7 @@ def within_amount_of_tokens(documents, amount=30):
         for relation in relations:
             if abs(relation.source.token - relation.target.token) < amount + 1:
                 amount_of_withinamount += 1
-    print(amount_of_withinamount, amount_of_relations)
+    print(amount_of_withinamount)
 
 
 def amount_of_candidates(documents, amount=30):
@@ -69,7 +70,7 @@ def amount_of_candidates(documents, amount=30):
         for i in entities:
             for j in entities:
                 if i != j:
-                    if abs(i.token - j.token) < amount + 1:
+                    if i.sentence == j.sentence:
                         if document.relation_exists(i, j):
                             positive += 1
                         else:
@@ -137,11 +138,17 @@ def action_class_imbalance(documents):
 if __name__ == "__main__":
     # action_class_imbalance(dev)
     # action_class_imbalance(train)
-    action_class_imbalance_paragraphs(dev)
-    action_class_imbalance_paragraphs(train)
+    # action_class_imbalance_paragraphs(dev)
+    # action_class_imbalance_paragraphs(train)
     # projective_trees(dev)
     # print(amount_of_candidates(train, 25))
     # print(amount_of_candidates(train, 10))
-    # print(amount_of_candidates(dev))
+    #for i in range(6, 30):
+    #    print(i)
+    #    print(amount_of_candidates(dev, i)[0])
+    #    print(amount_of_candidates(dev, i)[1])
+    #     within_amount_of_tokens(dev, i)
     # treeless(dev)
     # projective_trees(dev)
+    samesentence_relations(dev)
+    print(amount_of_candidates(dev))

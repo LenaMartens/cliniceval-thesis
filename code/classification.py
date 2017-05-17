@@ -3,7 +3,6 @@ from keras.models import load_model
 import os
 import tensorflow as tf
 import functools
-import globals
 from tqdm import *
 from itertools import tee
 import logging
@@ -215,7 +214,7 @@ def feature_generator(docs, token_window, batch_size):
                 features = []
 
 def train_relation_classifier(docs, token_window):
-    generator = feature_generator(docs, 10, 10000)
+    generator = feature_generator(docs, 6, 1000)
     lr = LogisticRegression(generator, token_window, batches=True)
     return lr
 

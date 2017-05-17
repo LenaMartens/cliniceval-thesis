@@ -97,6 +97,17 @@ def load_model(name):
     return model
 
 
+umls_types = {}
+id = 0
+
+
+def add_umls_type(text):
+    global umls_types, id
+    if text not in umls_types:
+        umls_types[text] = id
+        id += 1
+
+
 def get_doctimes():
     return {"BEFORE": 0, "AFTER": 1, "OVERLAP": 2, "BEFORE/OVERLAP": 3}
 
@@ -107,6 +118,11 @@ def get_polarities():
 
 def get_modalities():
     return {"ACTUAL": 0, "HEDGED": 1, "HYPOTHETICAL": 2, "GENERIC": 3}
+
+
+def get_umls_types():
+    global umls_types
+    return umls_types
 
 
 """

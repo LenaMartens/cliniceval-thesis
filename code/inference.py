@@ -21,8 +21,6 @@ def inference(document, logistic_model, token_window, transitive=False):
     model = Model('Relations in document')
     # No output
     model.Params.OutputFlag = 0
-    # Limit number of threads
-    model.Params.Threads = 4
     '''
         CONSTRAINT -> maar 1 label per relatie V
         CONSTRAINT -> transitiviteit Cik - Cjk - Cij >= -1 V

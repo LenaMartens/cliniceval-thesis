@@ -1,4 +1,5 @@
 from functools import partial
+import logging
 
 from data import Relation
 from feature import WordVectorWithContext, TimeRelationVector, WordEmbeddingVectorWithContext
@@ -62,15 +63,16 @@ def in_window(window, source, target):
 
 
 def constrained_candidates(document, constraint):
+    logger = logging.getLogger('progress_logger')
     entities = list(document.get_entities())
-    feature_vectors = []
-
+    feature_vectors = [TimeRelationVector(x, document) for x in document.get_relations()]
+    positive = len(feature_vectors)
     for entity1 in entities:
         for entity2 in entities:
-            if entity1 is not entity2 and constraint(entity1, entity2):
-                relation = Relation(source=entity1, target=entity2, positive=document.relation_exists(entity1, entity2))
+            if entity1 is not entity2 and constraint(entity1, entity2) and not document.relation_exists(entity1, entity2):
+                relation = Relation(source=entity1, target=entity2, positive=False)
                 feature_vectors.append(TimeRelationVector(relation, document))
-
+    logger.info('positive:{p}, negative:{n}'.format(p=positive, n=len(feature_vectors)-positive))
     return feature_vectors
 
 

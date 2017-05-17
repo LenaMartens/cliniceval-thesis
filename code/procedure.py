@@ -116,7 +116,7 @@ class BaseProcedure(Procedure):
 
     def generate_output_path(self, predict_path):
         p = os.path.split(predict_path)
-        unique = "{decision}{window}{trans}{corpus}".format(decision=("Greedy" if self.greedy else "ILP"),
+        unique = "{decision}{window}{trans}{corpus}NODCTUMLS".format(decision=("Greedy" if self.greedy else "ILP"),
                                                             window=self.token_window,
                                                             trans=("Transitive" if self.transitive else ""),
                                                             corpus=p[-1])
