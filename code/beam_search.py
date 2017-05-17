@@ -1,6 +1,7 @@
 import globals
+import time
 import copy
-
+import _pickle as cPickle
 import math
 
 import utils
@@ -21,7 +22,7 @@ def to_list(node):
     return l
 
 #@profile
-def beam_search(configuration, nn, beam=5):
+def beam_search(configuration, nn, beam=2):
     """
     Returns best sequence within beam.
     Beam = 1 generalizes to Greedy search.
@@ -34,33 +35,27 @@ def beam_search(configuration, nn, beam=5):
     dead_nodes = []
     live_nodes = [Node(None, configuration, None, 0)]
     actions = utils.get_actions() 
-    cnt = 0
     while live_nodes: 
-        print(cnt)
-        cnt+=1
         new_nodes = []
         for node in live_nodes:
             distribution = nn.predict(node.configuration)
             for i, prob in enumerate(distribution[0]):
                 action = list(actions.keys())[list(actions.values()).index(i)]
                 if node.configuration.action_possible(action):
-                    conf_copy = copy.deepcopy(node.configuration)
+                    conf_copy = cPickle.loads(cPickle.dumps(node.configuration, -1))
                     # applies action to config
                     getattr(conf_copy, action)()
-                    if conf_copy.empty_buffer():
-                        dead_nodes.append(Node(node, conf_copy, action, score(node, prob)))
-                        beam -= 1
-                    else:
-                        new_nodes.append(Node(node, conf_copy, action, score(node, prob)))
+                    new_nodes.append(Node(node, conf_copy, action, score(node, prob)))
             node.configuration = None
         new_nodes.sort(key=lambda x: x.score)
         end = min(beam, len(new_nodes))
-        print(beam, len(new_nodes))
         live_nodes = new_nodes[:end]
-        print(live_nodes[0].configuration)
-        print(len(dead_nodes),len(live_nodes))
+        for node in live_nodes:
+            if node.configuration.empty_buffer():
+                dead_nodes.append(node)
+                beam -= 1
+                live_nodes.remove(node)
     best = max(dead_nodes, key=lambda x: x.score)
-    print("score  "+str(best.score))
     return best
 
 
@@ -99,14 +94,15 @@ def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
                     conf_copy = copy.deepcopy(node.configuration)
                     # applies action to config
                     getattr(conf_copy, action)()
-                    if conf_copy.empty_buffer():
-                        dead_nodes.append(Node(node, conf_copy, action, score(node, prob)))
-                        beam -= 1
-                    else:
-                        new_nodes.append(Node(node, conf_copy, action, score(node, prob)))
+                    new_nodes.append(Node(node, conf_copy, action, score(node, prob)))
         new_nodes.sort(key=lambda x: x.score)
         end = min(beam, len(new_nodes))
         live_nodes = new_nodes[:end]
+        for node in live_nodes:
+            if node.configuration.empty_buffer():
+                dead_nodes.append(node)
+                beam -= 1
+                live_nodes.remove(node)
         gold_output.append(Node(None, next_golden_config, next_golden_action, 0))
         for node in live_nodes:
             if node.action == next_golden_action:

@@ -1,4 +1,5 @@
 import logging
+import objgraph
 import os
 
 import classification
@@ -23,7 +24,6 @@ class Procedure(object):
                 doc = classification.predict_DCT_document(doc, self.doc_time_model)
             doc = self.annotator.annotate(doc)
             output.output_doc(doc, outputpath=outputpath)
-            break
 
     def evaluate(self, filepath):
         logger = logging.getLogger('progress_logger')
@@ -141,12 +141,15 @@ class TransitiveProcedure(Procedure):
     def train_network(self):
         logger = logging.getLogger('progress_logger')
         logger.info("Training neural network")
-        if self.train_path:
-            logger.info("Reading documents")
-            train_documents = data.read_all(self.train_path)
+        pretrained = True
+        if self.train_path: 
+            train_documents = None
+            if not pretrained:
+                logger.info("Reading documents")
+                train_documents = data.read_all(self.train_path)
             logger.info("Started training")
             if self.global_norm:
-                model = global_norm_nn.GlobalNormNN(train_documents, False, self.model_name)
+                model = global_norm_nn.GlobalNormNN(train_documents, pretrained, self.model_name)
             else:
                 model = classification.NNActions(train_documents, self.model_name)
             return model

@@ -9,7 +9,6 @@ from itertools import tee
 import logging
 
 import beam_search
-import dataset_attribute_experiment
 from sklearn import svm, linear_model
 from sklearn.metrics import classification_report, f1_score, confusion_matrix
 import numpy as np

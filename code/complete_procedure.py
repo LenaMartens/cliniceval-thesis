@@ -1,4 +1,5 @@
 import utils
+import objgraph
 import logging
 
 from feature import WordEmbedding
@@ -36,7 +37,7 @@ def complete_base():
 
 
 def complete_transition():
-    tp = TransitiveProcedure(train_path=train_path, global_norm=True, model_name="test")
+    tp = TransitiveProcedure(train_path=train_path, global_norm=True, model_name="5epochs_tanh")
     tp.predict(test_path)
     tp.evaluate(test_path)
 
@@ -44,7 +45,7 @@ if __name__ == "__main__":
     logger = logging.getLogger('progress_logger')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
-    fh = logging.FileHandler('ilp.log')
+    fh = logging.FileHandler('tanh.log')
     fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     fh.setFormatter(formatter)

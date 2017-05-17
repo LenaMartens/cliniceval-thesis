@@ -1,5 +1,6 @@
 from beam_search import beam_search
-
+import logging
+import objgraph
 
 def add_arcs_to_document(arcs, document):
     for arc in arcs:
@@ -75,8 +76,10 @@ class BeamAnnotator(RelationAnnotator):
     def get_arcs(self, document):
         from covington_transistion import Configuration
         arcs = []
+        logger = logging.getLogger('progress_logger')
         for paragraph in range(document.get_amount_of_paragraphs()):
             entities = document.get_entities(paragraph=paragraph)
+            logger.info("Paragraph {p}, entities {e}".format(p=paragraph, e=len(entities)))
             if entities:
                 config = Configuration(entities, document)
                 best_end = beam_search(config, self.network)

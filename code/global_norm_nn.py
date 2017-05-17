@@ -22,10 +22,8 @@ def make_base_model(in_dim):
     model = Sequential()
 
     model.add(Dense(units=1024, input_dim=in_dim))
-    model.add(Activation('softmax'))
+    model.add(Activation('tanh'))
     model.add(Dense(units=4))
-    model.add(Activation('softmax'))
-
     return model
 
 
@@ -58,7 +56,7 @@ class GlobalNormNN(Classifier):
     k: maximum length of sequence
     b: beam size
     """
-    k = 50
+    k = 100
     b = 3
 
     def generate_training_data(self, docs):
@@ -113,7 +111,7 @@ class GlobalNormNN(Classifier):
                             features.append(empty_vector)
                             features.append(empty_action)
 
-                    logger.info("Paragraph:" + str(paragraph) + ", sequence len=" + str(i))
+                    logger.info("Paragraph:" + str(paragraph) + ", sequence len=" + str(len(golden_input)))
 
                     # y_true is not used
                     yield (features, [empty_vector])
@@ -190,8 +188,8 @@ class GlobalNormNN(Classifier):
         self.machine = model
         self.graph = tf.get_default_graph()
 
-        model.compile(loss=global_norm_loss, optimizer=SGD(lr=0.1))
-        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=2, steps_per_epoch=2, max_q_size=1)
+        model.compile(loss=global_norm_loss, optimizer=SGD())
+        model.fit_generator(self.generate_training_data(trainingdata), verbose=0, epochs=5, steps_per_epoch=1624, max_q_size=1)
         self.save()
 
     def predict(self, sample):
@@ -206,7 +204,7 @@ class GlobalNormNN(Classifier):
     
     def load(self):
         self.base_model = load_model(os.path.join(utils.model_path, self.model_name))
-    
+        self.graph = tf.get_default_graph()    
     def __init__(self, trainingdata, pretrained=False, model_name="c00l_model"):
         """
         :param trainingdata: documents
