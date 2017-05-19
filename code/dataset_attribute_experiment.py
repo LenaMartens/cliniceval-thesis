@@ -1,3 +1,4 @@
+from __future__ import division
 import math
 import data
 import oracle
@@ -90,13 +91,14 @@ def projective_trees(documents):
             begin = source.span[0]
             end = target.span[0]
             spans.append((begin, end))
-        spans.sort(key=lambda x: x[0])
+        spans.sort()
         non_projective = 0
         for i in range(len(spans) - 1):
-            if spans[i + 1][0] <= spans[i][1] <= spans[i + 1][1]:
+            if spans[i][0] < spans[i+1][0] < spans[i][1]:
                 non_projective += 1
         all += non_projective
         relations_len += len(relations)
+        print(document.id)
         print(non_projective / (len(relations) + 1))
     print(all / relations_len)
 
@@ -149,6 +151,6 @@ if __name__ == "__main__":
     #    print(amount_of_candidates(dev, i)[1])
     #     within_amount_of_tokens(dev, i)
     # treeless(dev)
-    # projective_trees(dev)
-    samesentence_relations(dev)
-    print(amount_of_candidates(dev))
+    projective_trees(dev)
+    # samesentence_relations(dev)
+    # print(amount_of_candidates(dev))

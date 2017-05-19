@@ -215,7 +215,7 @@ def feature_generator(docs, token_window, batch_size):
                 features = []
 
 def train_relation_classifier(docs, token_window):
-    generator = feature_generator(docs, 6, 1000)
+    generator = feature_generator(docs, 6, 500)
     lr = LogisticRegression(generator, token_window, batches=True)
     return lr
 

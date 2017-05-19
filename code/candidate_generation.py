@@ -51,7 +51,7 @@ def generate_training_candidates(documents, token_window):
 
 
 def same_sentence(source, target):
-    return source.sentence == target.sentence
+    return abs(source.sentence - target.sentence) < 2
 
 
 def same_paragraph(source, target):
@@ -77,7 +77,7 @@ def constrained_candidates(document, constraint):
 
 
 def generate_constrained_candidates(document, token_window=30):
-    return constrained_candidates(document, partial(in_window, token_window))
+    return constrained_candidates(document, same_sentence)
 
 
 def generate_all_candidates(document):
