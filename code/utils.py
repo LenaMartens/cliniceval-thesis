@@ -155,7 +155,7 @@ class Sentences(object):
 
 # Returns Document objects with entities that can be annotated
 def test_document_generator(filepath):
-    for direct in os.listdir(filepath):
+    for direct in os.listdir(filepath)[::-1]:
         yield data.read_document(parent_directory=filepath, dir=direct)
 
 

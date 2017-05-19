@@ -148,6 +148,7 @@ class Document(object):
 
         self.sentences = f_handle.read()
         self.paragraph_delimiters = [m.start() for m in re.finditer('\[end.*\]\s*\[start.*\]', self.sentences)]
+        # self.paragraph_delimiters = [m.start() for m in re.finditer('\n', self.sentences)]
         self.sentence_delimiters = [m.start() for m in re.finditer('\.', self.sentences)]
         span_generator = WhitespaceTokenizer().span_tokenize(self.sentences)
         self.token_delimiters = [span[0] for span in span_generator]
@@ -308,9 +309,9 @@ def read_all(directory, transitive=False):
         doc = read_document(directory, direct)
         if transitive:
             doc.close_transitivity()
-        docs.append(doc)
         for k, entity in doc.entities.items():
             utils.add_word_to_dictionary(entity.word)
+        docs.append(doc)
     utils.save_dictionary()
     return docs
 

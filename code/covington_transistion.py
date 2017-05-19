@@ -123,6 +123,8 @@ class Configuration:
         return None
 
     def action_possible(self, action_str):
+        if len(self.buffer) == 0:
+            return False
         if action_str == "left_arc":
             return self.can_do_left_arc()
         if action_str == "right_arc":

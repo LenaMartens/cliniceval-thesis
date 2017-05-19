@@ -1,4 +1,5 @@
 import copy
+import _pickle as cPickle
 
 import utils
 from data import read_all
@@ -54,6 +55,7 @@ class NNOracle(Oracle):
         distribution = distribution.tolist()[0]
         en = list(enumerate(distribution))
         en.sort(key=lambda tup: tup[1])
+        print(en)
         for (ind, val) in en[::-1]:
             action = list(actions.keys())[list(actions.values()).index(ind)]
             if configuration.action_possible(action):
@@ -68,8 +70,8 @@ def get_training_sequence(entities, arcs, doc):
 
     while not configuration.empty_buffer():
         function_string = oracle.next_step(configuration)
-        # conf_copy = copy.deepcopy(configuration)
-        yield (configuration, function_string)
+        conf_copy = cPickle.loads(cPickle.dumps(configuration, -1))
+        yield (conf_copy, function_string)
         # applies function to configuration
         getattr(configuration, function_string)()
 
