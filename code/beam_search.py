@@ -91,7 +91,7 @@ def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
             for i, prob in enumerate(distribution[0]):
                 action = list(actions.keys())[list(actions.values()).index(i)]
                 if not node.configuration.empty_buffer() and node.configuration.action_possible(action):
-                    conf_copy = copy.deepcopy(node.configuration)
+                    conf_copy = cPickle.loads(cPickle.dumps(node.configuration, -1))
                     # applies action to config
                     getattr(conf_copy, action)()
                     new_nodes.append(Node(node, conf_copy, action, score(node, prob)))

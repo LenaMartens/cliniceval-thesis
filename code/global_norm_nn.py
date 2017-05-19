@@ -57,7 +57,7 @@ class GlobalNormNN(Classifier):
     b: beam size
     """
     k = 100
-    b = 3
+    b = 2
 
     def generate_training_data(self, docs):
         """
@@ -189,7 +189,7 @@ class GlobalNormNN(Classifier):
         self.graph = tf.get_default_graph()
 
         model.compile(loss=global_norm_loss, optimizer=SGD())
-        model.fit_generator(self.generate_training_data(trainingdata), verbose=0, epochs=5, steps_per_epoch=1624, max_q_size=1)
+        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1624, max_q_size=1)
         self.save()
 
     def predict(self, sample):
@@ -212,7 +212,7 @@ class GlobalNormNN(Classifier):
         self.machine = None
         self.base_model = None
         self.model_name = model_name
-        if pretrained:
+        if not pretrained:
             self.load()
         else:
             self.train(trainingdata)

@@ -125,12 +125,14 @@ class BaseProcedure(Procedure):
 
 
 class TransitiveProcedure(Procedure):
-    def __init__(self, train_path, global_norm=False, model_name="anon"):
+    def __init__(self, train_path, global_norm=False, retrain = False, model_name="anon"):
         self.train_path = train_path
         self.global_norm = global_norm
         self.model_name = model_name
+        self.retrain = retrain
         nn = self.train_network()
-        self.annotator = BeamAnnotator(network=nn)
+        oracle = NNOracle(nn)
+        self.annotator = TransitionAnnotator(oracle=oracle)
         self.doc_time_model = None
 
     def generate_output_path(self, predict_path):
@@ -141,17 +143,16 @@ class TransitiveProcedure(Procedure):
     def train_network(self):
         logger = logging.getLogger('progress_logger')
         logger.info("Training neural network")
-        pretrained = True
         if self.train_path: 
             train_documents = None
-            if not pretrained:
+            if self.retrain:
                 logger.info("Reading documents")
                 train_documents = data.read_all(self.train_path)
             logger.info("Started training")
             if self.global_norm:
-                model = global_norm_nn.GlobalNormNN(train_documents, pretrained, self.model_name)
+                model = global_norm_nn.GlobalNormNN(train_documents, self.retrain, self.model_name)
             else:
-                model = classification.NNActions(train_documents, self.model_name)
+                model = classification.NNActions(train_documents, self.retrain, self.model_name)
             return model
         else:
             raise Exception("No path to training corpus provided")

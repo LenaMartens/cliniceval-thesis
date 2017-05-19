@@ -136,13 +136,15 @@ class SupportVectorMachine(Classifier):
 
 
 class NNActions(Classifier):
-    def generate_training_data(self, docs, batch_size=100):
+    def generate_training_data(self, docs, batch_size=1000):
+        logger = logging.getLogger('progress_logger')
         while 1:
             x_train = []
             y_train = []
             random.seed()
             random.shuffle(docs)
-            for doc in docs:
+            doc_len = len(docs)
+            for i, doc in enumerate(docs):
                 for paragraph in range(doc.get_amount_of_paragraphs()):
                     entities = doc.get_entities(paragraph=paragraph)
                     relations = doc.get_relations(paragraph=paragraph)
@@ -151,6 +153,7 @@ class NNActions(Classifier):
                         x_train.append(feature)
                         y_train.append(utils.get_actions()[action])
                         if len(x_train) == batch_size:
+                            logger.info("{i} out of len {l}".format(i=i, l=doc_len))
                             yield (np.vstack(x_train), np.vstack(y_train))
                             x_train = []
                             y_train = []
@@ -180,13 +183,13 @@ class NNActions(Classifier):
     def save(self):
         self.machine.save(os.path.join(utils.model_path, self.model_name))
 
-    def save(self):
+    def load(self):
         self.machine = load_model(os.path.join(utils.model_path, self.model_name))
     
     def __init__(self, training_data, pretrained=False, model_name="lam3_model"):
         self.machine = None
         self.model_name = model_name
-        if pretrained:
+        if not pretrained:
             self.load()
         else:
             self.train(training_data)
