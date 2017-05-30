@@ -134,12 +134,36 @@ def action_class_imbalance(documents):
             al += 1
     print(frequencies, al, len(documents))
 
+def forbidden_relations(documents):
+    all = 0
+    no_e_to_e = 0
+    count = dict.fromkeys(forbidden_love.keys(),0)
+    for doc in documents:
+        for relation in doc.get_relations():
+            all +=1
+            if relation.source.get_class() != "Event" or relation.target.get_class() != "Event":
+                no_e_to_e +=1
+                continue
+            if (relation.source.doc_time_rel, relation.target.doc_time_rel) in forbidden_love:
+                count[(relation.source.doc_time_rel, relation.target.doc_time_rel)] +=1
+    print(all, no_e_to_e, count)
+forbidden_love = {
+    ("BEFORE", "AFTER"): True,
+    ("AFTER", "BEFORE"): True,
+    ("BEFORE", "OVERLAP"): True,
+    ("AFTER", "OVERLAP"): True,
+    ("BEFORE/OVERLAP", "AFTER"): True,
+    ("BEFORE", "BEFORE/OVERLAP"): True,
+    ("AFTER", "BEFORE/OVERLAP"): True,
+}
 
 if __name__ == "__main__":
-    # action_class_imbalance(dev)
-    # action_class_imbalance(train)
-    # action_class_imbalance_paragraphs(dev)
-    # action_class_imbalance_paragraphs(train)
+    # samepar_relations(dev)
+    # samepar_relations(train)
+    action_class_imbalance(dev)
+    action_class_imbalance(train)
+    action_class_imbalance_paragraphs(dev)
+    action_class_imbalance_paragraphs(train)
     # projective_trees(dev)
     # print(amount_of_candidates(train, 25))
     # print(amount_of_candidates(train, 10))
@@ -149,6 +173,9 @@ if __name__ == "__main__":
     #    print(amount_of_candidates(dev, i)[1])
     #     within_amount_of_tokens(dev, i)
     # treeless(dev)
+    # treeless(train)
+    # forbidden_relations(dev)
+    # forbidden_relations(train)
     # projective_trees(dev)
-    samesentence_relations(dev)
-    print(amount_of_candidates(dev))
+    # samesentence_relations(dev)
+    # print(amount_of_candidates(dev))

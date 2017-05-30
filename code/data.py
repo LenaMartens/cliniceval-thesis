@@ -200,12 +200,16 @@ class Document(object):
     def close_transitivity(self):
         entities = self.get_entities()
         mapping = self.relation_mapping
-        for i in entities:
-            for j in entities:
-                for k in entities:
-                    if i is not j and j is not k and k is not i:
-                        if (i.id, j.id) in mapping and (j.id, k.id) in mapping and (i.id, k.id) not in mapping:
-                            self.add_relation(i.id, k.id)
+        for (i, j) in list(mapping):
+            for (k, l) in list(mapping):
+                if j == k and (i, l) not in mapping:
+                    self.add_relation(i, l)
+        # for i in entities:
+            # for j in entities:
+                # for k in entities:
+                    # if i is not j and j is not k and k is not i:
+                        # if (i.id, j.id) in mapping and (j.id, k.id) in mapping and (i.id, k.id) not in mapping:
+                            # self.add_relation(i.id, k.id)
 
 
 '''

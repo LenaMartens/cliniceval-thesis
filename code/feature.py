@@ -121,6 +121,7 @@ class DocTimeVector(FeatureVector):
 
 tagdict = load('help/tagsets/upenn_tagset.pickle')
 tag_list = list(tagdict.keys())
+tag_list.sort()
 
 '''
 One hot encoding of part of speech tag.
@@ -364,4 +365,3 @@ class ConfigurationVector(ConcatenatedVector):
         # add parent
         self.features.append(WordEmbedding(self.entity.get_parent(ent)))
         self.features.append(DocTimeVector(ent))
-        # TODO: add children

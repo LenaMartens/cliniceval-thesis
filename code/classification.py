@@ -1,4 +1,5 @@
 import math
+import keras
 from keras.models import load_model
 import os
 import tensorflow as tf
@@ -134,6 +135,7 @@ class SupportVectorMachine(Classifier):
         sample = sample.get_vector().reshape(1, -1)
         return self.machine.predict(sample)
 
+earlyStopping=keras.callbacks.EarlyStopping(monitor='val_loss', patience=0, verbose=1, mode='auto')
 
 class NNActions(Classifier):
     def generate_training_data(self, docs, batch_size=1000):
@@ -158,20 +160,21 @@ class NNActions(Classifier):
                             x_train = []
                             y_train = []
 
-    def train(self, trainingdata):
+    def train(self, trainingdata, validation_data):
         """
         :param trainingdata: documents
         """
         model = Sequential()
         in_dim = len(ConfigurationVector(Configuration([], None), None).get_vector())
 
-        model.add(Dense(units=1024, input_dim=in_dim))
+        model.add(Dense(units=512, input_dim=in_dim))
         model.add(Activation('softmax'))
         model.add(Dense(units=4))
         model.add(Activation('softmax'))
         model.compile(loss='sparse_categorical_crossentropy', optimizer='sgd')
         self.machine = model
-        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1234)
+        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=20, steps_per_epoch=3,
+                            callbacks=[earlyStopping], validation_data = self.generate_training_data(validation_data), validation_steps = 10)
         self.save()
 
     def predict(self, sample):
@@ -186,13 +189,13 @@ class NNActions(Classifier):
     def load(self):
         self.machine = load_model(os.path.join(utils.model_path, self.model_name))
     
-    def __init__(self, training_data, pretrained=False, model_name="lam3_model"):
+    def __init__(self, training_data, validation_data, pretrained=False, model_name="lam3_model"):
         self.machine = None
         self.model_name = model_name
         if not pretrained:
             self.load()
         else:
-            self.train(training_data)
+            self.train(training_data, validation_data)
 
 
 def train_doctime_classifier(docs):
