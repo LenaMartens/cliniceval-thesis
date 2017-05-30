@@ -9,9 +9,9 @@ from procedure import BaseProcedure, TransitiveProcedure
 BASE CONFIG
 """
 retrain_DCT = False
-retrain_REL = False
+retrain_REL = True
 DCT_model_name = "SupportVectorMachine3.0Embeddings"
-relation_model_name = "LogisticRegression3.0EmbeddingsBetterWindow"
+relation_model_name = "LogisticRegression3.0EmbeddingsSentenceWindow"
 token_window = 30
 transitive = False
 greedy = False

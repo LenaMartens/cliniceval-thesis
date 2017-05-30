@@ -16,7 +16,7 @@ def inference(document, logistic_model, token_window, transitive=False):
     logger = logging.getLogger('progress_logger')
     candidates = generate_constrained_candidates(document, token_window)
     
-    logger.info("Inference on doc {id}".format(id=document.id))    
+    logger.info("Inference on doc {id}, candidates: {c}".format(id=document.id, c=len(candidates)))    
 
     model = Model('Relations in document')
     # No output
