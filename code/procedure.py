@@ -1,5 +1,4 @@
 import logging
-import objgraph
 import os
 
 import classification
@@ -47,7 +46,8 @@ class BaseProcedure(Procedure):
                  doc_time_path="",
                  token_window=30,
                  greedy=False,
-                 transitive=False):
+                 transitive=False,
+                 linear=True):
         """
         :param train_path: Path to training corpus (not required if models don't need to be retrained)
         :param token_window: Window in which candidates need to be generated
@@ -60,16 +60,18 @@ class BaseProcedure(Procedure):
         self.transitive = transitive
         self.token_window = token_window
         self.greedy = greedy
-
+        self.doctimepath= doc_time_path
+        self.relpath= rel_classifier_path
         if greedy:
             self.annotator = GreedyAnnotator(token_window=token_window)
         else:
             self.annotator = InferenceAnnotator(token_window=token_window, transitive=transitive)
 
         if retrain_dct:
-            self.doc_time_model = self.train_doctime(doc_time_path)
+            self.doc_time_model = self.train_doctime(doc_time_path, linear)
         else:
             self.doc_time_model = utils.load_model(doc_time_path)
+        self.doc_time_model = None
         if retrain_rel:
             self.annotator.model = self.train_rel_classifier(rel_classifier_path)
         else:
@@ -88,14 +90,14 @@ class BaseProcedure(Procedure):
                 print(eval_str)
                 file.write(eval_str)
 
-    def train_doctime(self, save_path):
+    def train_doctime(self, save_path, linear):
         logger = logging.getLogger('progress_logger')
         logger.info("Training doctime classifier")
         if self.train_path:
             logger.info("Reading documents")
-            train_documents = data.read_all(self.train_path, transitive=self.transitive)
+            train_documents = data.read_all(self.train_path, transitive=self.transitive)[:50]
             logger.info("Started training")
-            model = classification.train_doctime_classifier(train_documents)
+            model = classification.train_doctime_classifier(train_documents, linear=linear)
             utils.save_model(model, name=save_path)
             return model
         else:
@@ -115,11 +117,13 @@ class BaseProcedure(Procedure):
             raise Exception("No path to training corpus provided")
 
     def generate_output_path(self, predict_path):
-        p = os.path.split(predict_path)
-        unique = "{decision}{window}{trans}{corpus}SENTENCEUMLS".format(decision=("Greedy" if self.greedy else "ILP"),
+        p = os.path.split(self.doctimepath)
+        l = os.path.split(self.relpath)
+        unique = "{decision}{window}{trans}{dctmodel}{crmodel}".format(decision=("Greedy" if self.greedy else "ILP"),
                                                             window=self.token_window,
                                                             trans=("Transitive" if self.transitive else ""),
-                                                            corpus=p[-1])
+                                                            dctmodel=p[-1],
+                                                            crmodel=l[-1])
         path = os.path.join(utils.outputpath, unique)
         return path
 

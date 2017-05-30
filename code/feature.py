@@ -121,6 +121,7 @@ class DocTimeVector(FeatureVector):
 
 tagdict = load('help/tagsets/upenn_tagset.pickle')
 tag_list = list(tagdict.keys())
+tag_list.sort()
 
 '''
 One hot encoding of part of speech tag.
@@ -158,6 +159,13 @@ class PolarityFeatureVector(FeatureVector):
             except KeyError or AttributeError:
                 self.vector[len(polarities)] = 1
 
+class EorT(FeatureVector):
+    def generate_vector(self):
+        self.vector = np.zeros(2)
+        if self.entity.get_class() == "Event":
+            self.vector[0] = 1
+        else:
+            self.vector[1] = 1
 
 '''
 One hot encoding of modality of the word
@@ -297,14 +305,16 @@ class WordVector(ConcatenatedVector):
     def generate_vector(self):
         global vector_length
         if self.entity is not None:
-            self.features.append(WordEmbedding(self.entity))
+        #    self.features.append(WordEmbedding(self.entity))
             self.features.append(UMLSTypeFeatureVector(self.entity))
-            # self.features.append(LemmaFeatureVector(self.entity))
+            self.features.append(LemmaFeatureVector(self.entity))
+            self.features.append(WordFeatureVector(self.entity))
             self.features.append(CapitalFeatureVector(self.entity))
             self.features.append(POSFeatureVector(self.entity, document=self.document))
             self.features.append(DocTimeVector(self.entity))
             self.features.append(ModalityFeatureVector(self.entity))
             self.features.append(PolarityFeatureVector(self.entity))
+            self.features.append(EorT(self.entity))
             if vector_length == 0:
                 for feature in self.features:
                     vector_length += len(feature.get_vector())

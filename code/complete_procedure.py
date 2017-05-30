@@ -1,7 +1,6 @@
 import utils
-import objgraph
 import logging
-
+import data
 from feature import WordEmbedding
 from procedure import BaseProcedure, TransitiveProcedure
 
@@ -10,11 +9,12 @@ BASE CONFIG
 """
 retrain_DCT = False
 retrain_REL = True
-DCT_model_name = "SupportVectorMachine3.0Embeddings"
-relation_model_name = "LogisticRegression3.0EmbeddingsSentenceWindow"
+DCT_model_name = "SupportVectorMachineNonLinear"
+relation_model_name = "LogisticRegressionAllFeaturesSameWindowLessDocuments"
 token_window = 30
 transitive = False
-greedy = False
+greedy = True
+linear = False
 """
 SHARED CONFIG
 """
@@ -23,15 +23,16 @@ test_path = utils.dev
 
 
 def complete_base():
+    data.read_all(test_path)
     bp = BaseProcedure(train_path=train_path,
                        token_window=token_window,
                        retrain_rel=retrain_REL,
                        retrain_dct=retrain_DCT,
-                       validation_path=utils.dev,
                        doc_time_path=DCT_model_name,
                        rel_classifier_path=relation_model_name,
                        greedy=greedy,
-                       transitive=transitive)
+                       transitive=transitive,
+                       linear=linear)
     # Where the magic happens
     bp.predict(test_path)
     bp.evaluate(test_path)
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     logger = logging.getLogger('progress_logger')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
-    fh = logging.FileHandler('blocal.log')
+    fh = logging.FileHandler('sniff.log')
     fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     fh.setFormatter(formatter)
@@ -54,4 +55,4 @@ if __name__ == "__main__":
     logger.info('Start')
     # train word embedding model
     WordEmbedding(None, True, utils.train, "../Models/WordEmbedding")
-    complete_transition()
+    complete_base()

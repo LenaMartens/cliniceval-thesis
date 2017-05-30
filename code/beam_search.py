@@ -1,7 +1,6 @@
-import globals
 import time
 import copy
-import _pickle as cPickle
+import cPickle as cPickle
 import math
 
 import utils

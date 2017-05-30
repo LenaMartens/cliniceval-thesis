@@ -1,5 +1,5 @@
 import copy
-import _pickle as cPickle
+import cPickle as cPickle
 
 import utils
 from data import read_all

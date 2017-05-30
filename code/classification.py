@@ -123,10 +123,11 @@ class SupportVectorMachine(Classifier):
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
         input = scipy.sparse.csr_matrix(input)
-
-        # BALANCED BECAUSE OF DATA BIAS + linear
-        self.machine = svm.LinearSVC(class_weight='balanced')
-
+        if self.linear:
+            # BALANCED BECAUSE OF DATA BIAS + linear
+            self.machine = svm.LinearSVC(class_weight='balanced')
+        else:
+            self.machine = svm.SVC(kernel='rbf', class_weight='balanced')
         self.machine.fit(input, output)
 
     def predict(self, sample):
@@ -134,6 +135,14 @@ class SupportVectorMachine(Classifier):
         sample = sample.get_vector().reshape(1, -1)
         return self.machine.predict(sample)
 
+    def __init__(self, trainingdata, class_to_fy=None, linear=True):
+        """
+        :param trainingdata: docs
+        :param class_to_fy:
+        """
+        self.class_to_fy = class_to_fy
+        self.linear = linear
+        self.train(self.generate_training_data(trainingdata))
 
 class NNActions(Classifier):
     def generate_training_data(self, docs, batch_size=1000):
@@ -195,15 +204,15 @@ class NNActions(Classifier):
             self.train(training_data)
 
 
-def train_doctime_classifier(docs):
-    svm = SupportVectorMachine(docs, "doc_time_rel")
+def train_doctime_classifier(docs, linear=True):
+    svm = SupportVectorMachine(docs, "doc_time_rel", linear)
     return svm
 
 
 def feature_generator(docs, token_window, batch_size):
     logger = logging.getLogger('progress_logger')
     features = []
-    iterations = 2
+    iterations = 1
     for i in range(iterations):
         start = 0
         len_docs = len(docs)
@@ -217,7 +226,7 @@ def feature_generator(docs, token_window, batch_size):
                 features = []
 
 def train_relation_classifier(docs, token_window):
-    generator = feature_generator(docs, 6, 500)
+    generator = feature_generator(docs, token_window, 50)
     lr = LogisticRegression(generator, token_window, batches=True)
     return lr
 

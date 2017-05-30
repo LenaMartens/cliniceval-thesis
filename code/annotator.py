@@ -1,6 +1,5 @@
 from beam_search import beam_search
 import logging
-import objgraph
 
 def add_arcs_to_document(arcs, document):
     for arc in arcs:
