@@ -111,7 +111,6 @@ def add_umls_type(text):
 def get_doctimes():
     return {"BEFORE": 0, "AFTER": 1, "OVERLAP": 2, "BEFORE/OVERLAP": 3}
 
-
 def get_polarities():
     return {"NEG": 0, "POS": 1}
 
@@ -155,7 +154,7 @@ class Sentences(object):
 
 # Returns Document objects with entities that can be annotated
 def test_document_generator(filepath):
-    for direct in os.listdir(filepath)[::-1]:
+    for direct in os.listdir(filepath):
         yield data.read_document(parent_directory=filepath, dir=direct)
 
 

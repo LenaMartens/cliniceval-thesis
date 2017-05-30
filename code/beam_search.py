@@ -57,7 +57,7 @@ def beam_search(configuration, nn, beam=2):
     best = max(dead_nodes, key=lambda x: x.score)
     return best
 
-
+#@profile
 def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
     """
         Returns all beams the model predicts up until golden sequence

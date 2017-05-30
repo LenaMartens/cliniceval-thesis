@@ -374,4 +374,3 @@ class ConfigurationVector(ConcatenatedVector):
         # add parent
         self.features.append(WordEmbedding(self.entity.get_parent(ent)))
         self.features.append(DocTimeVector(ent))
-        # TODO: add children

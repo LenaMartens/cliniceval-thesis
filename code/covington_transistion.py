@@ -7,7 +7,9 @@ class Configuration:
         # entity objects
         self.stack1 = [str(RootEntity())]
         self.stack2 = list()
-        self.buffer = [str(x) for x in list(entities)]
+        entities = list(entities)
+        entities.sort(key=lambda x: x.span[0])
+        self.buffer = [str(x) for x in entities]
         self.doc = document
         self.children_dict = {}
         self.arcs_dict = {}

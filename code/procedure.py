@@ -30,7 +30,7 @@ class Procedure(object):
         outputpath = self.generate_output_path(filepath)
         anafora_command = "python -m anafora.evaluate -r {ref} -p {path} -x " \
                           "\"(?i).*clin.*Temp.*[.]xml$\"".format(ref=filepath, path=outputpath)
-        os.system('cd ../anaforatools/;' + anafora_command + "> {path}".format(path=os.path.join(outputpath, "results.txt")))
+        os.system('cd ../anaforatools-0.9.2/;' + anafora_command + "> {path}".format(path=os.path.join(outputpath, "results.txt")))
 
     def generate_output_path(self, predict_path):
         return "shouldn't happen"
@@ -129,14 +129,16 @@ class BaseProcedure(Procedure):
 
 
 class TransitiveProcedure(Procedure):
-    def __init__(self, train_path, global_norm=False, retrain = False, model_name="anon"):
+    def __init__(self, train_path, validation_path, global_norm=False, retrain = False, model_name="anon"):
         self.train_path = train_path
+        self.validation = validation_path
         self.global_norm = global_norm
         self.model_name = model_name
         self.retrain = retrain
         nn = self.train_network()
-        oracle = NNOracle(nn)
-        self.annotator = TransitionAnnotator(oracle=oracle)
+        # oracle = NNOracle(nn)
+        # self.annotator = TransitionAnnotator(oracle=oracle)
+        self.annotator = BeamAnnotator(nn)
         self.doc_time_model = None
 
     def generate_output_path(self, predict_path):
@@ -149,14 +151,16 @@ class TransitiveProcedure(Procedure):
         logger.info("Training neural network")
         if self.train_path: 
             train_documents = None
+            validation_documents = None
             if self.retrain:
                 logger.info("Reading documents")
                 train_documents = data.read_all(self.train_path)
+                validation_documents = data.read_all(self.validation)
             logger.info("Started training")
             if self.global_norm:
-                model = global_norm_nn.GlobalNormNN(train_documents, self.retrain, self.model_name)
+                model = global_norm_nn.GlobalNormNN(train_documents, validation_documents, self.retrain, self.model_name)
             else:
-                model = classification.NNActions(train_documents, self.retrain, self.model_name)
+                model = classification.NNActions(train_documents, validation_documents, self.retrain, self.model_name)
             return model
         else:
             raise Exception("No path to training corpus provided")

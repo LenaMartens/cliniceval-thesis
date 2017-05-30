@@ -1,5 +1,6 @@
 import os
 from keras.models import load_model
+import keras
 import logging
 import random
 import tensorflow as tf
@@ -14,16 +15,18 @@ from feature import ConfigurationVector
 import keras.backend as K
 from keras.optimizers import SGD
 from keras.models import Sequential, Model
-from keras.layers import Dense, Activation, Input, Merge
+from keras.layers import Dense, Activation, Input, Merge, Dropout
 from keras.layers.merge import Add, Dot
 
 
 def make_base_model(in_dim):
     model = Sequential()
 
-    model.add(Dense(units=1024, input_dim=in_dim))
-    model.add(Activation('tanh'))
+    model.add(Dense(units=512, input_dim=in_dim))
+    model.add(Dropout(0.2))
+    model.add(Activation('softmax'))
     model.add(Dense(units=4))
+    model.add(Activation('softmax'))
     return model
 
 
@@ -33,6 +36,8 @@ def global_norm_loss(y_true, y_pred):
     # ln of sum of sum of predictions of all beams)
     return y_pred
 
+earlyStopping=keras.callbacks.EarlyStopping(monitor='val_loss', patience=15, verbose=1, mode='auto')
+csv_logger = keras.callbacks.CSVLogger('training.log')
 
 def negativeActivation(x):
     return -x
@@ -110,13 +115,16 @@ class GlobalNormNN(Classifier):
                         for i in range(self.k - len(beam)):
                             features.append(empty_vector)
                             features.append(empty_action)
-
+                    for i in range(self.b - len(beam_inputs)):
+                        for k in range(self.k):
+                            features.append(empty_vector)
+                            features.append(empty_action)
                     logger.info("Paragraph:" + str(paragraph) + ", sequence len=" + str(len(golden_input)))
 
                     # y_true is not used
                     yield (features, [empty_vector])
 
-    def train(self, trainingdata):
+    def train(self, trainingdata, validation_data):
         in_dim = len(ConfigurationVector(Configuration([], None), None).get_vector())
 
         # Shared model
@@ -168,10 +176,11 @@ class GlobalNormNN(Classifier):
         # Apply exp to all inner sums
         exp_activation = Activation(K.exp)
         inner_sequence_sums = list(map(exp_activation, inner_sequence_sums))
-
-        # Sum all beam sequences together
-        outer_sum = Add()(inner_sequence_sums)
-
+        if len(inner_sequence_sums) > 1:
+            # Sum all beam sequences together
+            outer_sum = Add()(inner_sequence_sums)
+        else:
+            outer_sum = inner_sequence_sums
         # Log activation
         outer_sum = Activation(K.log)(outer_sum)
 
@@ -188,8 +197,10 @@ class GlobalNormNN(Classifier):
         self.machine = model
         self.graph = tf.get_default_graph()
 
-        model.compile(loss=global_norm_loss, optimizer=SGD())
-        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=5, steps_per_epoch=1624, max_q_size=1)
+        model.compile(loss=global_norm_loss, optimizer=SGD(lr=0.5))
+        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=100, steps_per_epoch=20, callbacks=[earlyStopping, csv_logger], 
+                            validation_data=self.generate_training_data(validation_data), validation_steps = 20,
+                            max_q_size=1)
         self.save()
 
     def predict(self, sample):
@@ -205,7 +216,7 @@ class GlobalNormNN(Classifier):
     def load(self):
         self.base_model = load_model(os.path.join(utils.model_path, self.model_name))
         self.graph = tf.get_default_graph()    
-    def __init__(self, trainingdata, pretrained=False, model_name="c00l_model"):
+    def __init__(self, trainingdata, validation_data, pretrained=False, model_name="c00l_model"):
         """
         :param trainingdata: documents
         """
@@ -215,7 +226,7 @@ class GlobalNormNN(Classifier):
         if not pretrained:
             self.load()
         else:
-            self.train(trainingdata)
+            self.train(trainingdata, validation_data)
 
 
 

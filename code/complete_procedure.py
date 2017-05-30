@@ -39,7 +39,7 @@ def complete_base():
 
 
 def complete_transition():
-    tp = TransitiveProcedure(train_path=train_path, global_norm=True, retrain = True, model_name="new_global")
+    tp = TransitiveProcedure(train_path=train_path, validation_path=test_path, global_norm=True, retrain = True, model_name="512_0.2_bigger_lr")
     tp.predict(test_path)
     tp.evaluate(test_path)
 
