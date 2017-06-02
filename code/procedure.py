@@ -30,7 +30,8 @@ class Procedure(object):
         outputpath = self.generate_output_path(filepath)
         anafora_command = "python -m anafora.evaluate -r {ref} -p {path} -x " \
                           "\"(?i).*clin.*Temp.*[.]xml$\"".format(ref=filepath, path=outputpath)
-        os.system('cd ../anaforatools-0.9.2/;' + anafora_command + "> {path}".format(path=os.path.join(outputpath, "results.txt")))
+        os.system('cd ../anaforatools-0.9.2/;' + anafora_command + "> {path}".format(
+            path=os.path.join(outputpath, "results.txt")))
 
     def generate_output_path(self, predict_path):
         return "shouldn't happen"
@@ -60,8 +61,8 @@ class BaseProcedure(Procedure):
         self.transitive = transitive
         self.token_window = token_window
         self.greedy = greedy
-        self.doctimepath= doc_time_path
-        self.relpath= rel_classifier_path
+        self.doctimepath = doc_time_path
+        self.relpath = rel_classifier_path
         if greedy:
             self.annotator = GreedyAnnotator(token_window=token_window)
         else:
@@ -120,21 +121,23 @@ class BaseProcedure(Procedure):
         p = os.path.split(self.doctimepath)
         l = os.path.split(self.relpath)
         unique = "{decision}{window}{trans}{dctmodel}{crmodel}".format(decision=("Greedy" if self.greedy else "ILP"),
-                                                            window=self.token_window,
-                                                            trans=("Transitive" if self.transitive else ""),
-                                                            dctmodel=p[-1],
-                                                            crmodel=l[-1])
+                                                                       window=self.token_window,
+                                                                       trans=("Transitive" if self.transitive else ""),
+                                                                       dctmodel=p[-1],
+                                                                       crmodel=l[-1])
         path = os.path.join(utils.outputpath, unique)
         return path
 
 
 class TransitiveProcedure(Procedure):
-    def __init__(self, train_path, validation_path, global_norm=False, retrain = False, model_name="anon"):
+    def __init__(self, train_path, validation_path, global_norm=False, retrain=False,
+                 model_name="anon", pretrained_base=None):
         self.train_path = train_path
         self.validation = validation_path
         self.global_norm = global_norm
         self.model_name = model_name
         self.retrain = retrain
+        self.pretrained_base=pretrained_base
         nn = self.train_network()
         # oracle = NNOracle(nn)
         # self.annotator = TransitionAnnotator(oracle=oracle)
@@ -149,7 +152,7 @@ class TransitiveProcedure(Procedure):
     def train_network(self):
         logger = logging.getLogger('progress_logger')
         logger.info("Training neural network")
-        if self.train_path: 
+        if self.train_path:
             train_documents = None
             validation_documents = None
             if self.retrain:
@@ -158,7 +161,8 @@ class TransitiveProcedure(Procedure):
                 validation_documents = data.read_all(self.validation)
             logger.info("Started training")
             if self.global_norm:
-                model = global_norm_nn.GlobalNormNN(train_documents, validation_documents, self.retrain, self.model_name)
+                model = global_norm_nn.GlobalNormNN(train_documents, validation_documents, self.retrain,
+                                                    self.model_name, pretrained_base=self.pretrained_base)
             else:
                 model = classification.NNActions(train_documents, validation_documents, self.retrain, self.model_name)
             return model

@@ -19,12 +19,16 @@ from keras.layers import Dense, Activation, Input, Merge, Dropout
 from keras.layers.merge import Add, Dot
 
 
+def load_pretrained_base_model(path):
+    return load_model(os.path.join(utils.model_path, path))
+
+
 def make_base_model(in_dim):
     model = Sequential()
 
     model.add(Dense(units=512, input_dim=in_dim))
-#    model.add(Dropout(0.2))
-#    model.add(Activation('softmax'))
+    #    model.add(Dropout(0.2))
+    #    model.add(Activation('softmax'))
     model.add(Dense(units=4))
     model.add(Activation('softmax'))
     return model
@@ -36,8 +40,10 @@ def global_norm_loss(y_true, y_pred):
     # ln of sum of sum of predictions of all beams)
     return y_pred
 
-earlyStopping=keras.callbacks.EarlyStopping(monitor='val_loss', patience=10, verbose=1, mode='auto')
+
+earlyStopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10, verbose=1, mode='auto')
 csv_logger = keras.callbacks.CSVLogger('training.log')
+
 
 def negativeActivation(x):
     return -x
@@ -73,7 +79,7 @@ class GlobalNormNN(Classifier):
         * i:k are Empty vectors
         * b*k:(b*k)+i are first i steps of sequence for all sequences in beam
         * (b*k)+i:(b+1)*k are Empty vectors
-        The sequences i the beam also contain the golden sequence.
+        The sequences in the beam also contain the golden sequence.
         A step consists of a feature vector of the state and a one-hot encoded vector of the decision taken
         """
         logger = logging.getLogger('progress_logger')
@@ -124,11 +130,14 @@ class GlobalNormNN(Classifier):
                     # y_true is not used
                     yield (features, [empty_vector])
 
-    def train(self, trainingdata, validation_data):
+    def train(self, trainingdata, validation_data, pretrained=None):
         in_dim = len(ConfigurationVector(Configuration([], None), None).get_vector())
 
         # Shared model
-        base_model = make_base_model(in_dim)
+        if pretrained:
+            base_model = load_pretrained_base_model(pretrained)
+        else:
+            base_model = make_base_model(in_dim)
         self.base_model = base_model
 
         # All golden decisions = ONE SEQUENCE
@@ -198,8 +207,9 @@ class GlobalNormNN(Classifier):
         self.graph = tf.get_default_graph()
 
         model.compile(loss=global_norm_loss, optimizer=SGD())
-        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=100, steps_per_epoch=20, callbacks=[earlyStopping, csv_logger], 
-                            validation_data=self.generate_training_data(validation_data), validation_steps = 20,
+        model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=100, steps_per_epoch=20,
+                            callbacks=[earlyStopping, csv_logger],
+                            validation_data=self.generate_training_data(validation_data), validation_steps=20,
                             max_q_size=1)
         self.save()
 
@@ -212,11 +222,12 @@ class GlobalNormNN(Classifier):
 
     def save(self):
         self.base_model.save(os.path.join(utils.model_path, self.model_name))
-    
+
     def load(self):
         self.base_model = load_model(os.path.join(utils.model_path, self.model_name))
-        self.graph = tf.get_default_graph()    
-    def __init__(self, trainingdata, validation_data, pretrained=False, model_name="c00l_model"):
+        self.graph = tf.get_default_graph()
+
+    def __init__(self, trainingdata, validation_data, pretrained=False, model_name="c00l_model", pretrained_base=None):
         """
         :param trainingdata: documents
         """
@@ -226,8 +237,4 @@ class GlobalNormNN(Classifier):
         if not pretrained:
             self.load()
         else:
-            self.train(trainingdata, validation_data)
-
-
-
-
+            self.train(trainingdata, validation_data, pretrained_base)
