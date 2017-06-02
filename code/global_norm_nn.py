@@ -23,8 +23,8 @@ def make_base_model(in_dim):
     model = Sequential()
 
     model.add(Dense(units=512, input_dim=in_dim))
-    model.add(Dropout(0.2))
-    model.add(Activation('softmax'))
+#    model.add(Dropout(0.2))
+#    model.add(Activation('softmax'))
     model.add(Dense(units=4))
     model.add(Activation('softmax'))
     return model
@@ -36,7 +36,7 @@ def global_norm_loss(y_true, y_pred):
     # ln of sum of sum of predictions of all beams)
     return y_pred
 
-earlyStopping=keras.callbacks.EarlyStopping(monitor='val_loss', patience=15, verbose=1, mode='auto')
+earlyStopping=keras.callbacks.EarlyStopping(monitor='val_loss', patience=10, verbose=1, mode='auto')
 csv_logger = keras.callbacks.CSVLogger('training.log')
 
 def negativeActivation(x):
@@ -197,7 +197,7 @@ class GlobalNormNN(Classifier):
         self.machine = model
         self.graph = tf.get_default_graph()
 
-        model.compile(loss=global_norm_loss, optimizer=SGD(lr=0.5))
+        model.compile(loss=global_norm_loss, optimizer=SGD())
         model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=100, steps_per_epoch=20, callbacks=[earlyStopping, csv_logger], 
                             validation_data=self.generate_training_data(validation_data), validation_steps = 20,
                             max_q_size=1)

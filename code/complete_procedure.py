@@ -10,7 +10,7 @@ BASE CONFIG
 retrain_DCT = False
 retrain_REL = True
 DCT_model_name = "SupportVectorMachineNonLinear"
-relation_model_name = "LogisticRegressionAllFeaturesSameWindowLessDocuments"
+relation_model_name = "LogisticRegressionAllFeaturesSameWindow"
 token_window = 30
 transitive = False
 greedy = True
@@ -39,7 +39,7 @@ def complete_base():
 
 
 def complete_transition():
-    tp = TransitiveProcedure(train_path=train_path, validation_path=test_path, global_norm=True, retrain = True, model_name="512_0.2_bigger_lr")
+    tp = TransitiveProcedure(train_path=train_path, validation_path=test_path, global_norm=True, retrain = False, model_name="512_no_activation_global")
     tp.predict(test_path)
     tp.evaluate(test_path)
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     logger = logging.getLogger('progress_logger')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
-    fh = logging.FileHandler('sniff.log')
+    fh = logging.FileHandler('no_activation.log')
     fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     fh.setFormatter(formatter)
@@ -55,4 +55,4 @@ if __name__ == "__main__":
     logger.info('Start')
     # train word embedding model
     WordEmbedding(None, True, utils.train, "../Models/WordEmbedding")
-    complete_base()
+    complete_transition()

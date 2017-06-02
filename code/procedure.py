@@ -95,7 +95,7 @@ class BaseProcedure(Procedure):
         logger.info("Training doctime classifier")
         if self.train_path:
             logger.info("Reading documents")
-            train_documents = data.read_all(self.train_path, transitive=self.transitive)[:50]
+            train_documents = data.read_all(self.train_path, transitive=self.transitive)
             logger.info("Started training")
             model = classification.train_doctime_classifier(train_documents, linear=linear)
             utils.save_model(model, name=save_path)
@@ -108,7 +108,7 @@ class BaseProcedure(Procedure):
         logger.info("Training relation classifier")
         if self.train_path:
             logger.info("Reading documents")
-            train_documents = data.read_all(self.train_path, transitive=self.transitive)
+            train_documents = data.read_all(self.train_path, transitive=self.transitive)[:50]
             logger.info("Started training")
             model = classification.train_relation_classifier(train_documents, self.token_window)
             utils.save_model(model, save_path)
