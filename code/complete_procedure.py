@@ -40,7 +40,7 @@ def complete_base():
 
 def complete_transition():
     tp = TransitiveProcedure(train_path=train_path, validation_path=test_path, global_norm=True, retrain=True,
-                             model_name="512_local_and_then_global", pretrained_base="512_local")
+                             model_name="512_no_activation_at_all")
     tp.predict(test_path)
     tp.evaluate(test_path)
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     logger = logging.getLogger('progress_logger')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
-    fh = logging.FileHandler('pretrained.log')
+    fh = logging.FileHandler('meh.log')
     fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     fh.setFormatter(formatter)

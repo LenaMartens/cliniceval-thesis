@@ -41,6 +41,7 @@ def beam_search(configuration, nn, beam=2):
         new_nodes = []
         for node in live_nodes:
             distribution = nn.predict(node.configuration)
+            print(distribution)
             for i, prob in enumerate(distribution[0]):
                 action = list(actions.keys())[list(actions.values()).index(i)]
                 if node.configuration.action_possible(action):
