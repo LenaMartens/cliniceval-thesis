@@ -7,11 +7,13 @@ import utils
 
 
 class Node(object):
-    def __init__(self, parent, configuration, action, score):
+    def __init__(self, parent, configuration, action, score, golden=False):
         self.parent = parent
         self.action = action
         self.configuration = configuration
         self.score = score
+        self.golden = golden
+
 
 def to_list(node):
     if node.parent is None:
@@ -20,7 +22,8 @@ def to_list(node):
     l.append(node)
     return l
 
-#@profile
+
+# @profile
 def beam_search(configuration, nn, beam=2):
     """
     Returns best sequence within beam.
@@ -33,8 +36,8 @@ def beam_search(configuration, nn, beam=2):
 
     dead_nodes = []
     live_nodes = [Node(None, configuration, None, 0)]
-    actions = utils.get_actions() 
-    while live_nodes: 
+    actions = utils.get_actions()
+    while live_nodes:
         new_nodes = []
         for node in live_nodes:
             distribution = nn.predict(node.configuration)
@@ -57,7 +60,8 @@ def beam_search(configuration, nn, beam=2):
     best = max(dead_nodes, key=lambda x: x.score)
     return best
 
-#@profile
+
+# @profile
 def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
     """
         Returns all beams the model predicts up until golden sequence
@@ -71,7 +75,7 @@ def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
         :return: All paths in beam
     """
     dead_nodes = []
-    live_nodes = [Node(None, configuration, None, 0)]
+    live_nodes = [Node(None, configuration, None, 0, True)]
     actions = utils.get_actions()
     in_beam = True
     l = 0
@@ -104,7 +108,8 @@ def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
                 live_nodes.remove(node)
         gold_output.append(Node(None, next_golden_config, next_golden_action, 0))
         for node in live_nodes:
-            if node.action == next_golden_action:
+            if node.action == next_golden_action and node.parent.golden:
+                node.golden = True
                 in_beam = True
                 break
     beam_sequences = []
