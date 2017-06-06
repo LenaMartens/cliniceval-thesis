@@ -6,11 +6,15 @@ import utils
 from data import read_all
 from covington_transistion import Configuration
 
+"""
+The oracles that are used to decide what step to take next in the transition-based parsing systems. The knowing oracle
+is used for training, the others for prediction.
+"""
+
 
 class Oracle(object):
     def next_step(self, configuration):
         """
-
         :param configuration: Configuration
         :return: String describing the action that needs to be taken next
         """
@@ -18,10 +22,15 @@ class Oracle(object):
 
 
 class KnowingOracle(Oracle):
+    """
+    Knows the outcome and how to get there.
+    """
     def __init__(self, arcs):
+        # The golden arc-collection it is working towards
         self.arcs = arcs
 
     def next_step(self, configuration):
+        # The next step is deterministically decided by the resulting arc-collection self.arcs
         if configuration.empty_stack():
             return "shift"
 
@@ -48,15 +57,17 @@ class KnowingOracle(Oracle):
 class NNOracle(Oracle):
     # Regular old greedy parser
     def __init__(self, network):
+        # The network that decides what steps to take
         self.network = network
 
     def next_step(self, configuration):
+        # The next step is the best decision according to self.network if it is possible to do that action, otherwise
+        # it is the next best one.
         distribution = self.network.predict(configuration)
         actions = utils.get_actions()
         distribution = distribution.tolist()[0]
         en = list(enumerate(distribution))
         en.sort(key=lambda tup: tup[1])
-        print(en)
         for (ind, val) in en[::-1]:
             action = list(actions.keys())[list(actions.values()).index(ind)]
             if configuration.action_possible(action):
@@ -64,12 +75,15 @@ class NNOracle(Oracle):
         print("This should not print")
         return None
 
+
 class RandomOracle(Oracle):
+    # An oracle that takes random decisions based on the distribution of actions found in the dataset
     def __init__(self):
         pass
 
     def next_step(self, configuration):
-        indices = [0, 1, 2, 3]
+        indices = range(4)
+        # TODO: not hardcoded
         distribution = [0.04, 0.15, 0.13, 0.68]
         actions = utils.get_actions()
         for i in range(4):
@@ -85,7 +99,11 @@ class RandomOracle(Oracle):
                 del distribution[x]
         return None
 
+
 def get_training_sequence(entities, arcs, doc):
+    # Given entities and arcs, yield the sequence of configuration and actions needed to get from the intitial
+    # configuration to the terminal one
+    # Is used to determine the training sequence of a document
     configuration = Configuration(entities, doc)
     oracle = KnowingOracle(arcs)
 
@@ -98,8 +116,9 @@ def get_training_sequence(entities, arcs, doc):
 
 
 if __name__ == '__main__':
+    # Test methods
     documents = read_all(utils.dev, transitive=False)
     for doc in documents:
         sequence = get_training_sequence(doc.get_entities(), doc.get_relations(), doc)
-
+        # Should print equal amounts
         print(len(doc.get_relations()), len([x for x in sequence if x[1] in ["left_arc", "right_arc"]]))

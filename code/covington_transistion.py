@@ -1,19 +1,26 @@
 from utils import Arc
 from data import Entity
 
+"""
+A Covington style transition-based system.
+"""
+
 
 class Configuration:
     def __init__(self, entities, document):
-        # entity objects
         self.stack1 = [str(RootEntity())]
         self.stack2 = list()
         entities = list(entities)
+        # Sort based on order in text.
         entities.sort(key=lambda x: x.span[0])
         self.buffer = [str(x) for x in entities]
         self.doc = document
         self.children_dict = {}
         self.arcs_dict = {}
 
+    """
+    CONDITIONS
+    """
     def reachable(self, i, j, visited):
         if (i, j) in self.arcs_dict:
             return True
@@ -48,6 +55,21 @@ class Configuration:
         NO_CYCLE_CONDITION = (j not in self.children_dict) or (not self.reachable(i, j, {}))
         return ROOT_CONDITION and HEAD_CONDITION and NO_CYCLE_CONDITION
 
+    def action_possible(self, action_str):
+        if len(self.buffer) == 0:
+            return False
+        if action_str == "left_arc":
+            return self.can_do_left_arc()
+        if action_str == "right_arc":
+            return self.can_do_right_arc()
+        if action_str == "no_arc":
+            return len(self.stack1) != 0
+        return True
+
+    """
+    ACTIONS
+    """
+
     # buffer to stack
     def left_arc(self):
         i = self.stack1.pop()
@@ -74,20 +96,15 @@ class Configuration:
         i = self.stack1.pop()
         self.stack2.append(i)
 
+    """
+    GETTERS
+    """
+
     def get_buffer_head(self):
         return self.buffer[0]
 
     def get_stack_head(self):
         return self.stack1[-1]
-
-    def on_stack(self, entity):
-        return str(entity) in self.stack1
-
-    def empty_buffer(self):
-        return len(self.buffer) == 0
-
-    def empty_stack(self):
-        return len(self.stack1) == 0
 
     def get_arcs(self):
         arcs = []
@@ -124,20 +141,23 @@ class Configuration:
                     return p
         return None
 
-    def action_possible(self, action_str):
-        if len(self.buffer) == 0:
-            return False
-        if action_str == "left_arc":
-            return self.can_do_left_arc()
-        if action_str == "right_arc":
-            return self.can_do_right_arc()
-        if action_str == "no_arc":
-            return len(self.stack1) != 0
-        return True
-
     def get_doc(self):
         return self.doc
 
+    """
+    STATE CHECKERS
+    """
+
+    def on_stack(self, entity):
+        return str(entity) in self.stack1
+
+    def empty_buffer(self):
+        return len(self.buffer) == 0
+
+    def empty_stack(self):
+        return len(self.stack1) == 0
+
+    # String representation
     def __str__(self):
         buffer = [str(i) for i in self.buffer]
         stack1 = [str(i) for i in self.stack1]
@@ -146,7 +166,7 @@ class Configuration:
                                                                                        elements1=stack1,
                                                                                        elements2=stack2)
 
-
+# The ROOT entity is a subclass of Entity and behaves the same.
 class RootEntity(Entity):
     @staticmethod
     def get_class():
