@@ -7,7 +7,7 @@ import global_norm_nn
 import output
 import utils
 from annotator import GreedyAnnotator, InferenceAnnotator, TransitionAnnotator, BeamAnnotator
-from oracle import NNOracle
+from oracle import NNOracle, RandomOracle
 from keras.models import load_model
 
 
@@ -139,8 +139,8 @@ class TransitiveProcedure(Procedure):
         self.retrain = retrain
         self.pretrained_base=pretrained_base
         nn = self.train_network()
-        # oracle = NNOracle(nn)
-        # self.annotator = TransitionAnnotator(oracle=oracle)
+        #oracle = RandomOracle()
+        #self.annotator = TransitionAnnotator(oracle=oracle)
         self.annotator = BeamAnnotator(nn)
         self.doc_time_model = None
 

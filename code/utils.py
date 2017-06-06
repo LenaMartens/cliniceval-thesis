@@ -141,15 +141,15 @@ class Sentences(object):
         self.filepath = filepath
 
     def __iter__(self):
-        filepath = self.filepath
-        for direct in os.listdir(filepath):
-            for file in os.listdir(os.path.join(filepath, direct)):
-                if file.find(".") < 0:
-                    file_path = os.path.join(filepath, direct, file)
-                    with open(file_path) as f_handle:
-                        for line in f_handle:
-                            if not (line.startswith("[") and line.endswith("]\n")):
-                                yield [x.lower() for x in line.split()]
+        for filepath in self.filepath:
+            for direct in os.listdir(filepath):
+                for file in os.listdir(os.path.join(filepath, direct)):
+                    if file.find(".") < 0:
+                        file_path = os.path.join(filepath, direct, file)
+                        with open(file_path) as f_handle:
+                            for line in f_handle:
+                                if not (line.startswith("[") and line.endswith("]\n")):
+                                    yield [x.lower() for x in line.split()]
 
 
 # Returns Document objects with entities that can be annotated

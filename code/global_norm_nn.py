@@ -25,11 +25,11 @@ def load_pretrained_base_model(path):
 
 def make_base_model(in_dim):
     model = Sequential()
-
+    print(in_dim)
     model.add(Dense(units=512, input_dim=in_dim))
     #    model.add(Dropout(0.2))
-    #    model.add(Activation('softmax'))
-    model.add(Dense(units=4))
+    model.add(Activation('softmax'))
+    model.add(Dense(units=4, input_dim=in_dim))
     model.add(Activation('softmax'))
     return model
 

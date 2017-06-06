@@ -39,8 +39,7 @@ def complete_base():
 
 
 def complete_transition():
-    tp = TransitiveProcedure(train_path=train_path, validation_path=test_path, global_norm=True, retrain=True,
-                             model_name="512_no_activation_at_all")
+    tp = TransitiveProcedure(train_path=train_path, validation_path=test_path, global_norm=True, retrain=True, model_name="fourbeam_global")
     tp.predict(test_path)
     tp.evaluate(test_path)
 
@@ -49,12 +48,12 @@ if __name__ == "__main__":
     logger = logging.getLogger('progress_logger')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
-    fh = logging.FileHandler('meh.log')
+    fh = logging.FileHandler('random.log')
     fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     fh.setFormatter(formatter)
     logger.addHandler(fh)
     logger.info('Start')
     # train word embedding model
-    WordEmbedding(None, True, utils.train, "../Models/WordEmbedding")
+    WordEmbedding(None, True, [utils.train], "../Models/WordEmbedding")
     complete_transition()

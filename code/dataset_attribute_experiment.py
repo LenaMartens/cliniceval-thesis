@@ -136,6 +136,10 @@ def action_class_imbalance(documents):
             al += 1
     print(frequencies, al, len(documents))
 
+def chosen_actions(documents, network): 
+    frequencies = {"left_arc": 0, "right_arc": 0, "no_arc": 0, "shift": 0}
+    
+
 def forbidden_relations(documents):
     all = 0
     no_e_to_e = 0

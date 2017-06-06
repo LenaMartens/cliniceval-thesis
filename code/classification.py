@@ -176,9 +176,9 @@ class NNActions(Classifier):
         model = Sequential()
         in_dim = len(ConfigurationVector(Configuration([], None), None).get_vector())
 
-        model.add(Dense(units=512, input_dim=in_dim))
-        model.add(Activation('softmax'))
-        model.add(Dense(units=4))
+        # model.add(Dense(units=512, input_dim=in_dim))
+        # model.add(Activation('softmax'))
+        model.add(Dense(units=4, input_dim=in_dim))
         model.add(Activation('softmax'))
         model.compile(loss='sparse_categorical_crossentropy', optimizer='sgd')
         self.machine = model

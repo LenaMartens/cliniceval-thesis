@@ -292,9 +292,10 @@ class WordEmbedding(FeatureVector):
         global wordembedding_model
         try:
             self.vector = wordembedding_model[self.entity.word.lower()]
-        except:
+        except AttributeError:
             self.vector = np.zeros(100)
-
+        except KeyError:
+            self.vector = np.zeros(100)
 
 '''
 Specific feature vectors used in training and prediction

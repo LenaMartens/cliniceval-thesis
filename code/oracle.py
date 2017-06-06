@@ -1,4 +1,5 @@
 import copy
+import numpy
 import _pickle as cPickle
 
 import utils
@@ -63,6 +64,26 @@ class NNOracle(Oracle):
         print("This should not print")
         return None
 
+class RandomOracle(Oracle):
+    def __init__(self):
+        pass
+
+    def next_step(self, configuration):
+        indices = [0, 1, 2, 3]
+        distribution = [0.04, 0.15, 0.13, 0.68]
+        actions = utils.get_actions()
+        for i in range(4):
+            ind = numpy.random.choice(indices, 1, distribution)[0]
+            print(ind)
+            action = list(actions.keys())[list(actions.values()).index(ind)]
+            if configuration.action_possible(action):
+                print(action)
+                return action
+            else:
+                x = indices.index(ind)
+                del indices[x]
+                del distribution[x]
+        return None
 
 def get_training_sequence(entities, arcs, doc):
     configuration = Configuration(entities, doc)
