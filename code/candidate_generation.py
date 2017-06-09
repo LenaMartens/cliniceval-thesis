@@ -4,6 +4,9 @@ import logging
 from data import Relation
 from feature import WordVectorWithContext, TimeRelationVector, WordEmbeddingVectorWithContext
 
+"""
+Candidate generation for the CR-task
+"""
 
 # DOCTIME candidates
 def generate_doctime_training_data(documents):
@@ -18,36 +21,6 @@ def generate_doctime_training_data(documents):
 def doc_time_feature(entity, document):
     return WordVectorWithContext(entity, document)
 
-
-'''
-MIGHT NEED IN FUTURE
-def generate_training_candidates(documents, token_window):
-    feature_vectors = []
-    for document in documents:
-        # Get positive candidates
-        entities = list(document.get_entities())
-        relations = document.get_relations()
-        for relation in relations:
-            feature_vectors.append(TimeRelationVector(relation, document))
-        # Generate negative candidates (as many as there are positive)
-        added = 0
-        maxr = len(entities)
-        relation_len = len(relations)
-        added_dict = {}
-        tried = 0
-        while added < relation_len and tried < 100000:
-            tried += 1
-            [source_id, target_id] = random.sample(range(0, maxr), 2)
-            if (source_id, target_id) not in added_dict:
-                source = entities[source_id]
-                target = entities[target_id]
-                if not document.relation_exists(source, target) and abs(source.token - target.token) < token_window + 1:
-                    relation = Relation(source=source, target=target, positive=False)
-                    feature_vectors.append(TimeRelationVector(relation, document))
-                    added += 1
-                    added_dict[(source_id, target_id)] = True
-    return feature_vectors
-'''
 
 
 def same_sentence(source, target):
@@ -73,7 +46,7 @@ def constrained_candidates(document, constraint):
                 feature_vectors.append(TimeRelationVector(relation, document))
     return feature_vectors
 
-
+# External method used by classification.py
 def generate_constrained_candidates(document, token_window=30):
     return constrained_candidates(document, partial(in_window, token_window))
 

@@ -10,6 +10,15 @@ from annotator import GreedyAnnotator, InferenceAnnotator, TransitionAnnotator, 
 from oracle import NNOracle, RandomOracle
 from keras.models import load_model
 
+"""
+A Procedure encapsulates all steps needed in an end-to-end process:
+    * Reading in documents
+    * Training or loading models
+    * Predicting DR labels
+    * Annotating document with CR relations using an Annotator
+    * Outputting documents
+"""
+
 
 class Procedure(object):
     def predict(self, filepath):
@@ -74,7 +83,6 @@ class BaseProcedure(Procedure):
             self.doc_time_model = self.train_doctime(doc_time_path, linear)
         else:
             self.doc_time_model = utils.load_model(doc_time_path)
-        self.doc_time_model = None
         if retrain_rel:
             self.annotator.model = self.train_rel_classifier(rel_classifier_path)
         else:
@@ -132,17 +140,27 @@ class BaseProcedure(Procedure):
 
 
 class TransitiveProcedure(Procedure):
-    def __init__(self, train_path, validation_path, global_norm=False, retrain=False,
-                 model_name="anon", pretrained_base=None):
+    def __init__(self, train_path=None,
+                 validation_path=None,
+                 global_norm=False,
+                 retrain=False,
+                 model_name="anon",
+                 pretrained_base=None):
+        """
+        :param train_path: Path to training corpus (not required if models don't need to be retrained)
+        :param validation_path: Path to validation corpus (not required if models don't need to be retrained)
+        :param global_norm: Flag for global normalization
+        :param retrain: Whether or not the neural network needs to be retrained
+        :param model_name: The name of the neural network to be saved or loaded
+        :param pretrained_base: If global_norm, the name of the locally normalized and trained model to start from
+        """
         self.train_path = train_path
         self.validation = validation_path
         self.global_norm = global_norm
         self.model_name = model_name
         self.retrain = retrain
-        self.pretrained_base=pretrained_base
+        self.pretrained_base = pretrained_base
         nn = self.train_network()
-        #oracle = RandomOracle()
-        #self.annotator = TransitionAnnotator(oracle=oracle)
         self.annotator = BeamAnnotator(nn)
         self.doc_time_model = None
 

@@ -25,24 +25,41 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras import metrics
 
+"""
+Handles everything to do with classification: trains the DR and CR classifiers and the locally normalised neural network.
+It also handles prediction of test samples.
+"""
+
 
 class Classifier:
     def train(self, trainingdata):
+        """
+        Train self given data. Sets self.machine to a trained instance.
+        """
         pass
 
     def predict(self, sample):
+        """
+        Predicts either the label of distribution of a sample based on the trained self.machine
+        """
         pass
 
     def generate_training_data(self, docs):
+        """
+        If preprocessing is needed
+        """
         pass
 
     def evaluate(self, validation):
+        """
+        Evaluate self on validation data and return a String.
+        """
         pass
 
     def __init__(self, trainingdata, class_to_fy=None):
         """
         :param trainingdata: docs
-        :param class_to_fy:
+        :param class_to_fy: class to classify on
         """
         self.class_to_fy = class_to_fy
         self.train(self.generate_training_data(trainingdata))
@@ -69,16 +86,19 @@ class LogisticRegression(Classifier):
         return docs
 
     def train(self, generator):
-        # PARTIAL FIT because of memory problems
+        # Input is a generator because complete training set might not fit in memory
+        # Batch training
         if self.batches:
             classes = None
             for data in generator:
                 X = [x.get_vector() for x in data]
+                # Sparsify matrix
                 X = scipy.sparse.csr_matrix(X)
                 Y = [getattr(x.entity, self.class_to_fy) for x in data]
                 if classes is None:
                     classes = np.unique(Y)
                 self.machine.partial_fit(X, Y, classes=classes)
+        # Unbatched training
         else:
             data = [item for sublist in generator for item in sublist]
             input = [x.get_vector() for x in data]
@@ -92,11 +112,13 @@ class LogisticRegression(Classifier):
         return self.machine.predict_proba(sample)
 
     def __init__(self, trainingdata, token_window, batches=False):
-        # List of FeatureVectors
+        # Determines probability of relationship being "positive"
         self.class_to_fy = "positive"
         self.token_window = token_window
         self.batches = batches
+
         if batches:
+            # Needs a partial_fit method for batched training
             self.machine = linear_model.SGDClassifier(loss="log", penalty="l2")
         else:
             self.machine = linear_model.LogisticRegression()
@@ -118,14 +140,15 @@ class SupportVectorMachine(Classifier):
                'confusion matrix:\n{}'.format(confusion_matrix(y_true, y_pred))
 
     def generate_training_data(self, docs):
+        # Preprocessing method
         return generate_doctime_training_data(docs)
 
     def train(self, trainingdata):
         input = [x.get_vector() for x in trainingdata]
         output = [getattr(x.entity, self.class_to_fy) for x in trainingdata]
         input = scipy.sparse.csr_matrix(input)
+        # BALANCED BECAUSE OF DATA BIAS
         if self.linear:
-            # BALANCED BECAUSE OF DATA BIAS + linear
             self.machine = svm.LinearSVC(class_weight='balanced')
         else:
             self.machine = svm.SVC(kernel='rbf', class_weight='balanced')
@@ -137,14 +160,14 @@ class SupportVectorMachine(Classifier):
         return self.machine.predict(sample)
 
     def __init__(self, trainingdata, class_to_fy=None, linear=True):
-        """
-        :param trainingdata: docs
-        :param class_to_fy:
-        """
         self.class_to_fy = class_to_fy
         self.linear = linear
         self.train(self.generate_training_data(trainingdata))
-earlyStopping=keras.callbacks.EarlyStopping(monitor='val_loss', patience=0, verbose=1, mode='auto')
+
+
+# Early stopping condition defined for the training of the neural network
+earlyStopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=0, verbose=1, mode='auto')
+
 
 class NNActions(Classifier):
     def generate_training_data(self, docs, batch_size=1000):
@@ -170,34 +193,35 @@ class NNActions(Classifier):
                             y_train = []
 
     def train(self, trainingdata, validation_data):
-        """
-        :param trainingdata: documents
-        """
         model = Sequential()
         in_dim = len(ConfigurationVector(Configuration([], None), None).get_vector())
 
-        # model.add(Dense(units=512, input_dim=in_dim))
-        # model.add(Activation('softmax'))
+        model.add(Dense(units=512, input_dim=in_dim))
+        model.add(Activation('softmax'))
         model.add(Dense(units=4, input_dim=in_dim))
         model.add(Activation('softmax'))
         model.compile(loss='sparse_categorical_crossentropy', optimizer='sgd')
         self.machine = model
         model.fit_generator(self.generate_training_data(trainingdata), verbose=1, epochs=20, steps_per_epoch=3,
-                            callbacks=[earlyStopping], validation_data = self.generate_training_data(validation_data), validation_steps = 10)
+                            callbacks=[earlyStopping], validation_data=self.generate_training_data(validation_data),
+                            validation_steps=10)
         self.save()
 
     def predict(self, sample):
+        # Sample is a Configuration
         feature_vector = ConfigurationVector(sample, sample.get_doc()).get_vector()
         feature_vector = np.array(feature_vector)[np.newaxis]
         distribution = self.machine.predict(feature_vector)
         return distribution
 
     def save(self):
+        # Save the model to file
         self.machine.save(os.path.join(utils.model_path, self.model_name))
 
     def load(self):
+        # Load the model from file
         self.machine = load_model(os.path.join(utils.model_path, self.model_name))
-    
+
     def __init__(self, training_data, validation_data, pretrained=False, model_name="lam3_model"):
         self.machine = None
         self.model_name = model_name
@@ -208,11 +232,13 @@ class NNActions(Classifier):
 
 
 def train_doctime_classifier(docs, linear=True):
+    # External method that gets called by other scripts
     svm = SupportVectorMachine(docs, "doc_time_rel", linear)
     return svm
 
 
 def feature_generator(docs, token_window, batch_size):
+    # The generator used for the batched training of the LR classifier
     logger = logging.getLogger('progress_logger')
     features = []
     iterations = 1
@@ -228,13 +254,18 @@ def feature_generator(docs, token_window, batch_size):
                 yield features
                 features = []
 
+
 def train_relation_classifier(docs, token_window):
+    # External method that gets called by other scripts
     generator = feature_generator(docs, token_window, 100)
     lr = LogisticRegression(generator, token_window, batches=True)
     return lr
 
 
 def predict_DCT_document(document, model):
+    # External method that gets called by other scripts
+
+    # First make sure that the document is cleared of annotations
     document.clear_doc_time_rels()
     for entity in document.get_entities():
         if entity.get_class() == "Event":
@@ -242,23 +273,3 @@ def predict_DCT_document(document, model):
             dct = model.predict(feature)
             entity.doc_time_rel = dct[0]
     return document
-
-
-# Maybe this can be removed
-def predict_DCT(documents, model=None):
-    for document in documents:
-        predict_DCT_document(document, model)
-    return documents
-
-
-if __name__ == '__main__':
-    # because of pickle issues
-    from classification import SupportVectorMachine, LogisticRegression
-
-    docs = read_all(utils.dev)
-    train_doctime_classifier(docs)
-# features = generate_training_candidates(docs)
-# lr = LogisticRegression(features)
-# utils.save_model(lr, name="LogisticRegression_randomcandidate")
-# for i in range(10):
-#     print("predicted: " + str(lr.predict(features[i])) + " actual: " + str(features[i].entity.positive))
