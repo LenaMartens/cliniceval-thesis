@@ -19,6 +19,8 @@ class Procedure(object):
         outputpath = self.generate_output_path(predict_path=filepath)
         for doc in documents:
             logger.info("Doc {id}".format(id=doc.id))
+            if os.path.isdir(os.path.join(outputpath, doc.id)):
+                continue
             if self.doc_time_model:
                 doc = classification.predict_DCT_document(doc, self.doc_time_model)
             doc = self.annotator.annotate(doc)
