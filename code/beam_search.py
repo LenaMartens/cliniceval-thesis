@@ -5,6 +5,9 @@ import math
 
 import utils
 
+"""
+Provides beam search methods: for training and prediction
+"""
 
 class Node(object):
     def __init__(self, parent, configuration, action, score, golden=False):
@@ -23,7 +26,7 @@ def to_list(node):
     return l
 
 
-# @profile
+
 def beam_search(configuration, nn, beam=2):
     """
     Returns best sequence within beam.
@@ -61,7 +64,6 @@ def beam_search(configuration, nn, beam=2):
     return best
 
 
-# @profile
 def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
     """
         Returns all beams the model predicts up until golden sequence
@@ -119,7 +121,6 @@ def in_beam_search(configuration, nn, golden_sequence, k, beam=2):
 
 
 def score(previous, new):
-    # smaller is better!!
     # negative log
     if new > 0:
         return previous.score - math.log(new)

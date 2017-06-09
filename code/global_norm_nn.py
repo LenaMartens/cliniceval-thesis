@@ -18,6 +18,10 @@ from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Input, Merge, Dropout
 from keras.layers.merge import Add, Dot
 
+"""
+Defines the globally normalised neural network and some help functionality.
+The GlobalNormNN class is a Classifier and has the same interface.
+"""
 
 def load_pretrained_base_model(path):
     return load_model(os.path.join(utils.model_path, path))
@@ -229,7 +233,11 @@ class GlobalNormNN(Classifier):
 
     def __init__(self, trainingdata, validation_data, pretrained=False, model_name="c00l_model", pretrained_base=None):
         """
-        :param trainingdata: documents
+        :param trainingdata: documents to train on
+		:param validation_data: documents for validation during testing
+		:param pretrained: if true, load model from file
+        :param model_name: how to save the model after training or load the model from file
+        :param pretrained_base: if not None, the name of the base model to start training from
         """
         self.machine = None
         self.base_model = None

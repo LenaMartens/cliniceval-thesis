@@ -4,6 +4,10 @@ import data
 import oracle
 import utils
 
+"""
+Script for testing attributes of the datasets
+"""
+
 dev = data.read_all(utils.dev)
 train = data.read_all(utils.train)
 
@@ -153,6 +157,7 @@ def forbidden_relations(documents):
             if (relation.source.doc_time_rel, relation.target.doc_time_rel) in forbidden_love:
                 count[(relation.source.doc_time_rel, relation.target.doc_time_rel)] +=1
     print(all, no_e_to_e, count)
+
 forbidden_love = {
     ("BEFORE", "AFTER"): True,
     ("AFTER", "BEFORE"): True,

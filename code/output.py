@@ -5,6 +5,9 @@ from xml.dom import minidom
 import utils
 import xml.etree.ElementTree as etree
 
+"""
+Utility methods to ouput files in the correct XML format
+"""
 
 def save_as_xml(document, filename):
     doc_id = document.id

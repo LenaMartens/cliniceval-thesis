@@ -223,7 +223,6 @@ What is the distance between the two entities?
 '''
 
 
-# TODO: ONEHOT of normalisatie
 class DistanceVector(RelationFeatureVector):
     def generate_vector(self):
         distance = abs(self.source.token - self.target.token)
@@ -298,7 +297,7 @@ class WordEmbedding(FeatureVector):
             self.vector = np.zeros(100)
 
 '''
-Specific feature vectors used in training and prediction
+Specific feature vectors used in training and prediction, for external use
 '''
 
 
